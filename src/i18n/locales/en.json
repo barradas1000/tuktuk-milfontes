@@ -1,0 +1,215 @@
+{
+  "hero": {
+    "title": "Discover Milfontes in Style",
+    "subtitle": "Tuk-Tuk Adventures along the Vicentine Coast",
+    "description": "Explore Vila Nova de Milfontes and surroundings in a unique tuk-tuk experience. Stunning landscapes, history and guaranteed fun!",
+    "descriptionHighlight": "Book your adventure now!",
+    "reserveNow": "Book Now",
+    "rating": "4.9/5 ⭐ (200+ reviews)"
+  },
+  "benefits": {
+    "title": "Why Choose",
+    "titleHighlight": "Our Tuk-Tuks?",
+    "subtitle": "Comfort, fun and unique experiences guaranteed for the whole family",
+    "exclusiveRoutes": {
+      "title": "Exclusive Routes",
+      "description": "Access to unique locations and panoramic views that you can only reach with our specialized tuk-tuks"
+    },
+    "familyComfort": {
+      "title": "Family Comfort",
+      "description": "Safe and comfortable vehicles, ideal for families with children and people of all ages"
+    },
+    "quickReservation": {
+      "title": "Quick Reservation",
+      "description": "Simple and fast WhatsApp booking system. Confirm your tour in just a few minutes"
+    }
+  },
+  "pricing": {
+    "title": "Transparent",
+    "titleHighlight": "Pricing",
+    "subtitle": "Fair and clear prices, no surprises. Guaranteed fun for the whole family!",
+    "upTo2People": "Up to 2 people",
+    "additionalPeople": "Additional people",
+    "seeDetailedPrices": "See Detailed Prices",
+    "detailedPricesTitle": "Complete Price Table",
+    "howPricesWork": "How Prices Work",
+    "basePrice": "Base Price",
+    "basePriceDesc": "Fixed price up to 2 people per tuk-tuk",
+    "additionalPeopleDesc": "€3.50 for each additional person (maximum 4 people per tuk-tuk)",
+    "priceExamples": "Price Examples:",
+    "person": "person",
+    "people": "people",
+    "makeReservation": "Make Reservation"
+  },
+  "explore": {
+    "title": "Explore",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Like Never Before",
+    "description": "Discover the best kept secrets of Vila Nova de Milfontes and Vicentine Coast from a unique perspective",
+    "panoramicView": "Unique Panoramic View",
+    "panoramicViewDesc": "Enjoy the best views of the Alentejo coast",
+    "historicHeritage": "Historic Heritage",
+    "historicHeritageDesc": "Learn about the rich history of this fishing village"
+  },
+  "availability": {
+    "title": "Real-Time",
+    "titleHighlight": "Availability",
+    "subtitle": "Check available times and book your perfect moment",
+    "availabilityToday": "Availability Today",
+    "availableSlots": "Available slots for booking",
+    "available": "Available",
+    "occupied": "Occupied",
+    "reserveSpecificTime": "To book a specific time, use the reservation form"
+  },
+  "testimonials": {
+    "title": "What our",
+    "titleHighlight": "customers say",
+    "rating": "5.0 (200+ reviews)",
+    "items": {
+      "0": {
+        "quote": "Best experience of the trip! My kids loved discovering the secret beaches. The guide was fantastic!",
+        "name": "Ana Silva",
+        "designation": "Lisbon"
+      },
+      "1": {
+        "quote": "Amazing tour! The tuk-tuk is super comfortable and the views are breathtaking. I recommend 100%!",
+        "name": "João Santos",
+        "designation": "Porto"
+      },
+      "2": {
+        "quote": "Professional and very fun service. The children didn't stop smiling throughout the tour!",
+        "name": "Maria Costa",
+        "designation": "Coimbra"
+      },
+      "3": {
+        "quote": "We discovered incredible places we would never find on our own. An unforgettable experience!",
+        "name": "Unique Experience",
+        "designation": "Milfontes"
+      },
+      "4": {
+        "quote": "The tuk-tuks are modern and safe. The whole family had a great time during the tour!",
+        "name": "Happy Family",
+        "designation": "Adventure"
+      },
+      "5": {
+        "quote": "Even at special events, the service is impeccable. Fun and joy at every moment!",
+        "name": "Guaranteed Fun",
+        "designation": "Carnival"
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently",
+    "titleHighlight": "Asked Questions",
+    "subtitle": "We clarify your main doubts about our tuk-tuk tours",
+    "q1": "How many people fit in a tuk-tuk?",
+    "a1": "The tuk-tuk can carry 4 people plus the driver.",
+    "q2": "Do tours operate in the rain?",
+    "a2": "Our tuk-tuks have covers, but in case of heavy rain, we can reschedule at no cost.",
+    "q3": "Is advance booking necessary?",
+    "a3": "We recommend booking at least 24 hours in advance, especially during high season.",
+    "q4": "Are there group discounts?",
+    "a4": "Yes, we offer special discounts for groups. Contact us for more information.",
+    "q5": "Are tuk-tuks safe for children?",
+    "a5": "Yes, all our tuk-tuks are equipped with seat belts and are perfectly safe for children."
+  },
+  "cta": {
+    "title": "Ready for the",
+    "titleHighlight": "Adventure?",
+    "description": "Book your tuk-tuk tour now and discover Milfontes in a unique and unforgettable way!",
+    "reserveNow": "Book Now",
+    "talkToUs": "Talk to Us",
+    "phone": "968 784 043",
+    "schedule": "Every day 9am-8pm"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. All rights reserved.",
+    "insurance": "Insurance included",
+    "photos": "Photos included",
+    "localGuides": "Local guides"
+  },
+  "tours": {
+    "title": "Our Tours",
+    "panoramic": {
+      "title": "Panoramic village tour",
+      "description": "Discover the most emblematic points of Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Furnas Beach",
+      "description": "Journey to the famous Furnas Beach with photo stops",
+      "duration": "1h 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Bridge crossing",
+      "description": "Cross the historic bridge with panoramic views",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Romantic Sunset",
+      "description": "Enjoy the most beautiful sunset on the coast",
+      "duration": "2h",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Night tour",
+      "description": "Explore the village under moonlight with a unique perspective",
+      "duration": "1h",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Fishermen's Route",
+      "description": "Learn about local fishing traditions",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp",
+    "email": "Email"
+  },
+  "map": {
+    "title": "Location and",
+    "titleHighlight": "Points of Interest",
+    "subtitle": "Find us in the heart of Vila Nova de Milfontes and discover the main tourist attractions",
+    "mapTitle": "Location",
+    "description": "Find us in the heart of Vila Nova de Milfontes",
+    "pointsOfInterest": "Points of Interest",
+    "historicCenter": "Historic Center",
+    "milfontesBeach": "Milfontes Beach",
+    "fort": "São Clemente Fort",
+    "nearbyBeaches": "Nearby Beaches",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Furnas Beach",
+    "viewpoints": "Panoramic Viewpoints",
+    "openInGoogleMaps": "Open in Google Maps",
+    "clickToSee": "Click to see on map"
+  },
+  "reservation": {
+    "title": "Book Your Tour",
+    "subtitle": "Fill in the details and confirm via WhatsApp",
+    "name": "Full Name",
+    "email": "Email",
+    "phone": "Phone",
+    "date": "Desired Date",
+    "time": "Desired Time",
+    "tourType": "Tour Type",
+    "numberOfPeople": "Number of People",
+    "message": "Additional Message",
+    "messagePlaceholder": "Any additional information or special requests...",
+    "selectTour": "Select tour type",
+    "people1": "1 person",
+    "people2": "2 people",
+    "people3": "3 people",
+    "people4": "4 people",
+    "confirmWhatsApp": "Confirm via WhatsApp",
+    "reservationSent": "Reservation sent!",
+    "reservationDescription": "You will be redirected to WhatsApp to confirm your reservation.",
+    "required": "required"
+  }
+}

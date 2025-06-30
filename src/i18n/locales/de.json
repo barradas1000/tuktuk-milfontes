@@ -1,0 +1,183 @@
+{
+  "hero": {
+    "title": "Entdecken Sie Milfontes mit Stil",
+    "subtitle": "Tuk-Tuk Abenteuer entlang der Vicentinischen Küste",
+    "description": "Erkunden Sie Vila Nova de Milfontes und Umgebung in einem einzigartigen Tuk-Tuk Erlebnis. Atemberaubende Landschaften, Geschichte und garantierter Spaß!",
+    "descriptionHighlight": "Buchen Sie Ihr Abenteuer jetzt!",
+    "reserveNow": "Jetzt Buchen",
+    "rating": "4.9/5 ⭐ (200+ Bewertungen)"
+  },
+  "benefits": {
+    "title": "Warum Unsere",
+    "titleHighlight": "Tuk-Tuks Wählen?",
+    "subtitle": "Komfort, Spaß und einzigartige Erlebnisse garantiert für die ganze Familie",
+    "exclusiveRoutes": {
+      "title": "Exklusive Routen",
+      "description": "Zugang zu einzigartigen Orten und Panoramablicken, die Sie nur mit unseren spezialisierten Tuk-Tuks erreichen können"
+    },
+    "familyComfort": {
+      "title": "Familienkomfort",
+      "description": "Sichere und komfortable Fahrzeuge, ideal für Familien mit Kindern und Menschen jeden Alters"
+    },
+    "quickReservation": {
+      "title": "Schnelle Reservierung",
+      "description": "Einfaches und schnelles WhatsApp-Buchungssystem. Bestätigen Sie Ihre Tour in wenigen Minuten"
+    }
+  },
+  "pricing": {
+    "title": "Transparente",
+    "titleHighlight": "Preise",
+    "subtitle": "Faire und klare Preise, keine Überraschungen. Garantierter Spaß für die ganze Familie!",
+    "upTo2People": "Bis zu 2 Personen",
+    "additionalPeople": "Zusätzliche Personen",
+    "seeDetailedPrices": "Detaillierte Preise Anzeigen",
+    "detailedPricesTitle": "Vollständige Preistabelle",
+    "howPricesWork": "Wie Die Preise Funktionieren",
+    "basePrice": "Grundpreis",
+    "basePriceDesc": "Festpreis bis zu 2 Personen pro Tuk-Tuk",
+    "additionalPeopleDesc": "€3.50 für jede zusätzliche Person (maximal 4 Personen pro Tuk-Tuk)",
+    "priceExamples": "Preisbeispiele:",
+    "person": "Person",
+    "people": "Personen",
+    "makeReservation": "Reservierung Machen"
+  },
+  "explore": {
+    "title": "Erkunden Sie",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Wie Nie Zuvor",
+    "description": "Entdecken Sie die bestgehüteten Geheimnisse von Vila Nova de Milfontes und der Vicentinischen Küste aus einer einzigartigen Perspektive",
+    "panoramicView": "Einzigartiger Panoramablick",
+    "panoramicViewDesc": "Genießen Sie die besten Aussichten der Alentejo-Küste",
+    "historicHeritage": "Historisches Erbe",
+    "historicHeritageDesc": "Erfahren Sie mehr über die reiche Geschichte dieses Fischerdorfs"
+  },
+  "availability": {
+    "title": "Echtzeit-",
+    "titleHighlight": "Verfügbarkeit",
+    "subtitle": "Überprüfen Sie verfügbare Zeiten und buchen Sie Ihren perfekten Moment",
+    "availabilityToday": "Verfügbarkeit Heute",
+    "availableSlots": "Verfügbare Zeitfenster für Buchungen",
+    "available": "Verfügbar",
+    "occupied": "Besetzt",
+    "reserveSpecificTime": "Um eine bestimmte Zeit zu buchen, verwenden Sie das Reservierungsformular"
+  },
+  "testimonials": {
+    "title": "Was unsere",
+    "titleHighlight": "Kunden sagen",
+    "rating": "5.0 (200+ Bewertungen)"
+  },
+  "faq": {
+    "title": "Häufig gestellte",
+    "titleHighlight": "Fragen",
+    "subtitle": "Wir klären Ihre Hauptfragen zu unseren Tuk-Tuk Touren",
+    "q1": "Wie viele Personen passen in ein Tuk-Tuk?",
+    "a1": "Das Tuk-Tuk kann 4 Personen plus den Fahrer befördern.",
+    "q2": "Funktionieren die Touren bei Regen?",
+    "a2": "Unsere Tuk-Tuks haben Abdeckungen, aber bei starkem Regen können wir kostenlos umplanen.",
+    "q3": "Ist eine Vorabreservierung notwendig?",
+    "a3": "Wir empfehlen, mindestens 24 Stunden im Voraus zu buchen, besonders in der Hochsaison.",
+    "q4": "Gibt es Gruppenrabatte?",
+    "a4": "Ja, wir bieten spezielle Rabatte für Gruppen. Kontaktieren Sie uns für weitere Informationen.",
+    "q5": "Sind Tuk-Tuks sicher für Kinder?",
+    "a5": "Ja, alle unsere Tuk-Tuks sind mit Sicherheitsgurten ausgestattet und völlig sicher für Kinder."
+  },
+  "cta": {
+    "title": "Bereit für das",
+    "titleHighlight": "Abenteuer?",
+    "description": "Buchen Sie Ihre Tuk-Tuk Tour jetzt und entdecken Sie Milfontes auf einzigartige und unvergessliche Weise!",
+    "reserveNow": "Jetzt Buchen",
+    "talkToUs": "Mit Uns Sprechen",
+    "phone": "968 784 043",
+    "schedule": "Täglich 9-20 Uhr"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. Alle Rechte vorbehalten.",
+    "insurance": "Versicherung inbegriffen",
+    "photos": "Fotos inbegriffen",
+    "localGuides": "Ortskundige Führer"
+  },
+  "tours": {
+    "title": "Unsere Touren",
+    "panoramic": {
+      "title": "Panoramische Dorf-Tour",
+      "description": "Entdecken Sie die markantesten Punkte von Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Furnas Strand",
+      "description": "Reise zum berühmten Furnas Strand mit Fotostopps",
+      "duration": "1h 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Brückenüberquerung",
+      "description": "Überqueren Sie die historische Brücke mit Panoramablick",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Romantischer Sonnenuntergang",
+      "description": "Genießen Sie den schönsten Sonnenuntergang an der Küste",
+      "duration": "2h",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Nacht-Tour",
+      "description": "Erkunden Sie das Dorf im Mondlicht mit einer einzigartigen Perspektive",
+      "duration": "1h",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Fischerroute",
+      "description": "Erfahren Sie mehr über lokale Fischereitraditionen",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Kontaktieren Sie uns",
+    "phone": "Telefon",
+    "whatsapp": "WhatsApp",
+    "email": "E-Mail"
+  },
+  "map": {
+    "title": "Standort und",
+    "titleHighlight": "Sehenswürdigkeiten",
+    "subtitle": "Finden Sie uns im Herzen von Vila Nova de Milfontes und entdecken Sie die wichtigsten Sehenswürdigkeiten",
+    "mapTitle": "Standort",
+    "description": "Finden Sie uns im Herzen von Vila Nova de Milfontes",
+    "pointsOfInterest": "Sehenswürdigkeiten",
+    "historicCenter": "Historisches Zentrum",
+    "milfontesBeach": "Milfontes Strand",
+    "fort": "São Clemente Fort",
+    "nearbyBeaches": "Nahegelegene Strände",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Furnas Strand",
+    "viewpoints": "Panoramapunkte",
+    "openInGoogleMaps": "In Google Maps öffnen",
+    "clickToSee": "Klicken, um auf der Karte zu sehen"
+  },
+  "reservation": {
+    "title": "Buchen Sie Ihre Tour",
+    "subtitle": "Füllen Sie die Details aus und bestätigen Sie über WhatsApp",
+    "name": "Vollständiger Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "date": "Gewünschtes Datum",
+    "time": "Gewünschte Zeit",
+    "tourType": "Tourtyp",
+    "numberOfPeople": "Anzahl der Personen",
+    "message": "Zusätzliche Nachricht",
+    "messagePlaceholder": "Weitere Informationen oder besondere Wünsche...",
+    "selectTour": "Tourtyp auswählen",
+    "people1": "1 Person",
+    "people2": "2 Personen",
+    "people3": "3 Personen",
+    "people4": "4 Personen",
+    "confirmWhatsApp": "Über WhatsApp bestätigen",
+    "reservationSent": "Reservierung gesendet!",
+    "reservationDescription": "Sie werden zu WhatsApp weitergeleitet, um Ihre Reservierung zu bestätigen.",
+    "required": "erforderlich"
+  }
+}

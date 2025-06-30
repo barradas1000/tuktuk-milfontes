@@ -1,0 +1,183 @@
+{
+  "hero": {
+    "title": "Scopri Milfontes con Stile",
+    "subtitle": "Avventure in Tuk-Tuk lungo la Costa Vicentina",
+    "description": "Esplora Vila Nova de Milfontes e dintorni in un'esperienza unica in tuk-tuk. Paesaggi mozzafiato, storia e divertimento garantito!",
+    "descriptionHighlight": "Prenota ora la tua avventura!",
+    "reserveNow": "Prenota Ora",
+    "rating": "4.9/5 ⭐ (200+ recensioni)"
+  },
+  "benefits": {
+    "title": "Perché Scegliere",
+    "titleHighlight": "i Nostri Tuk-Tuk?",
+    "subtitle": "Comfort, divertimento ed esperienze uniche garantite per tutta la famiglia",
+    "exclusiveRoutes": {
+      "title": "Percorsi Esclusivi",
+      "description": "Accesso a luoghi unici e viste panoramiche che puoi raggiungere solo con i nostri tuk-tuk specializzati"
+    },
+    "familyComfort": {
+      "title": "Comfort Familiare",
+      "description": "Veicoli sicuri e confortevoli, ideali per famiglie con bambini e persone di tutte le età"
+    },
+    "quickReservation": {
+      "title": "Prenotazione Rapida",
+      "description": "Sistema di prenotazione WhatsApp semplice e veloce. Conferma il tuo tour in pochi minuti"
+    }
+  },
+  "pricing": {
+    "title": "Prezzi",
+    "titleHighlight": "Trasparenti",
+    "subtitle": "Prezzi giusti e chiari, senza sorprese. Divertimento garantito per tutta la famiglia!",
+    "upTo2People": "Fino a 2 persone",
+    "additionalPeople": "Persone aggiuntive",
+    "seeDetailedPrices": "Visualizza Prezzi Dettagliati",
+    "detailedPricesTitle": "Tabella Prezzi Completa",
+    "howPricesWork": "Come Funzionano i Prezzi",
+    "basePrice": "Prezzo Base",
+    "basePriceDesc": "Prezzo fisso fino a 2 persone per tuk-tuk",
+    "additionalPeopleDesc": "€3.50 per ogni persona aggiuntiva (massimo 4 persone per tuk-tuk)",
+    "priceExamples": "Esempi di Prezzi:",
+    "person": "persona",
+    "people": "persone",
+    "makeReservation": "Effettuare Prenotazione"
+  },
+  "explore": {
+    "title": "Esplora",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Come Mai Prima",
+    "description": "Scopri i segreti meglio custoditi di Vila Nova de Milfontes e della Costa Vicentina da una prospettiva unica",
+    "panoramicView": "Vista Panoramica Unica",
+    "panoramicViewDesc": "Goditi le migliori viste della costa dell'Alentejo",
+    "historicHeritage": "Patrimonio Storico",
+    "historicHeritageDesc": "Scopri la ricca storia di questo villaggio di pescatori"
+  },
+  "availability": {
+    "title": "Disponibilità in",
+    "titleHighlight": "Tempo Reale",
+    "subtitle": "Controlla gli orari disponibili e prenota il tuo momento perfetto",
+    "availabilityToday": "Disponibilità Oggi",
+    "availableSlots": "Slot disponibili per prenotazioni",
+    "available": "Disponibile",
+    "occupied": "Occupato",
+    "reserveSpecificTime": "Per prenotare un orario specifico, usa il modulo di prenotazione"
+  },
+  "testimonials": {
+    "title": "Cosa dicono i nostri",
+    "titleHighlight": "clienti",
+    "rating": "5.0 (200+ recensioni)"
+  },
+  "faq": {
+    "title": "Domande",
+    "titleHighlight": "Frequenti",
+    "subtitle": "Chiariremo i tuoi principali dubbi sui nostri tour in tuk-tuk",
+    "q1": "Quante persone possono salire su un tuk-tuk?",
+    "a1": "Il tuk-tuk può trasportare 4 persone più il conducente.",
+    "q2": "I tour funzionano con la pioggia?",
+    "a2": "I nostri tuk-tuk hanno coperture, ma in caso di pioggia forte, possiamo riprogrammare senza costi.",
+    "q3": "È necessario prenotare in anticipo?",
+    "a3": "Consigliamo di prenotare almeno 24 ore in anticipo, specialmente in alta stagione.",
+    "q4": "Ci sono sconti per gruppi?",
+    "a4": "Sì, offriamo sconti speciali per gruppi. Contattaci per maggiori informazioni.",
+    "q5": "I tuk-tuk sono sicuri per i bambini?",
+    "a5": "Sì, tutti i nostri tuk-tuk sono dotati di cinture di sicurezza e sono perfettamente sicuri per i bambini."
+  },
+  "cta": {
+    "title": "Pronto per l'",
+    "titleHighlight": "Avventura?",
+    "description": "Prenota ora il tuo tour in tuk-tuk e scopri Milfontes in modo unico e indimenticabile!",
+    "reserveNow": "Prenota Ora",
+    "talkToUs": "Parla Con Noi",
+    "phone": "968 784 043",
+    "schedule": "Ogni giorno 9-20"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. Tutti i diritti riservati.",
+    "insurance": "Assicurazione inclusa",
+    "photos": "Foto incluse",
+    "localGuides": "Guide locali"
+  },
+  "tours": {
+    "title": "I nostri Tour",
+    "panoramic": {
+      "title": "Tour panoramico del villaggio",
+      "description": "Scopri i punti più emblematici di Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Spiaggia di Furnas",
+      "description": "Viaggio alla famosa Spiaggia di Furnas con soste fotografiche",
+      "duration": "1h 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Attraversamento del ponte",
+      "description": "Attraversa il ponte storico con vista panoramica",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Tramonto Romantico",
+      "description": "Goditi il tramonto più bello della costa",
+      "duration": "2h",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Tour notturno",
+      "description": "Esplora il villaggio al chiaro di luna con una prospettiva unica",
+      "duration": "1h",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Rotta dei Pescatori",
+      "description": "Scopri le tradizioni di pesca locali",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Contattaci",
+    "phone": "Telefono",
+    "whatsapp": "WhatsApp",
+    "email": "Email"
+  },
+  "map": {
+    "title": "Posizione",
+    "titleHighlight": "Punti di Interesse",
+    "subtitle": "Trovaci nel cuore di Vila Nova de Milfontes e scopri le principali attrazioni turistiche",
+    "mapTitle": "Posizione",
+    "description": "Trovaci nel cuore di Vila Nova de Milfontes",
+    "pointsOfInterest": "Punti di Interesse",
+    "historicCenter": "Centro Storico",
+    "milfontesBeach": "Spiaggia di Milfontes",
+    "fort": "Forte di São Clemente",
+    "nearbyBeaches": "Spiagge Vicine",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Spiaggia di Furnas",
+    "viewpoints": "Punti Panoramici",
+    "openInGoogleMaps": "Apri in Google Maps",
+    "clickToSee": "Clicca per vedere sulla mappa"
+  },
+  "reservation": {
+    "title": "Prenota il tuo Tour",
+    "subtitle": "Compila i dettagli e conferma via WhatsApp",
+    "name": "Nome Completo",
+    "email": "Email",
+    "phone": "Telefono",
+    "date": "Data Desiderata",
+    "time": "Ora Desiderata",
+    "tourType": "Tipo di Tour",
+    "numberOfPeople": "Numero di Persone",
+    "message": "Messaggio Aggiuntivo",
+    "messagePlaceholder": "Qualsiasi informazione aggiuntiva o richiesta speciale...",
+    "selectTour": "Seleziona tipo di tour",
+    "people1": "1 persona",
+    "people2": "2 persone",
+    "people3": "3 persone",
+    "people4": "4 persone",
+    "confirmWhatsApp": "Conferma via WhatsApp",
+    "reservationSent": "Prenotazione inviata!",
+    "reservationDescription": "Sarai reindirizzato a WhatsApp per confermare la tua prenotazione.",
+    "required": "richiesto"
+  }
+}

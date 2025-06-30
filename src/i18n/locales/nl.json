@@ -1,0 +1,215 @@
+{
+  "hero": {
+    "title": "Ontdek Milfontes met Stijl",
+    "subtitle": "Tuk-Tuk Avonturen langs de Vicentijnse Kust",
+    "description": "Verken Vila Nova de Milfontes en omgeving in een unieke tuk-tuk ervaring. Prachtige landschappen, geschiedenis en gegarandeerd plezier!",
+    "descriptionHighlight": "Boek nu uw avontuur!",
+    "reserveNow": "Nu Boeken",
+    "rating": "4.9/5 ⭐ (200+ beoordelingen)"
+  },
+  "benefits": {
+    "title": "Waarom Kiezen voor",
+    "titleHighlight": "Onze Tuk-Tuks?",
+    "subtitle": "Comfort, plezier en unieke ervaringen gegarandeerd voor het hele gezin",
+    "exclusiveRoutes": {
+      "title": "Exclusieve Routes",
+      "description": "Toegang tot unieke locaties en panoramische uitzichten die je alleen kunt bereiken met onze gespecialiseerde tuk-tuks"
+    },
+    "familyComfort": {
+      "title": "Gezinscomfort",
+      "description": "Veilige en comfortabele voertuigen, ideaal voor gezinnen met kinderen en mensen van alle leeftijden"
+    },
+    "quickReservation": {
+      "title": "Snelle Reservering",
+      "description": "Eenvoudig en snel WhatsApp boekingssysteem. Bevestig je tour in slechts een paar minuten"
+    }
+  },
+  "pricing": {
+    "title": "Transparante",
+    "titleHighlight": "Prijzen",
+    "subtitle": "Eerlijke en duidelijke prijzen, geen verrassingen. Gegarandeerd plezier voor het hele gezin!",
+    "upTo2People": "Tot 2 personen",
+    "additionalPeople": "Extra personen",
+    "seeDetailedPrices": "Gedetailleerde Prijzen Bekijken",
+    "detailedPricesTitle": "Volledige Prijstabel",
+    "howPricesWork": "Hoe De Prijzen Werken",
+    "basePrice": "Basisprijs",
+    "basePriceDesc": "vaste prijs tot 2 personen per tuk-tuk",
+    "additionalPeopleDesc": "€3.50 voor elke extra persoon (maximum 4 personen per tuk-tuk)",
+    "priceExamples": "Prijsvoorbeelden:",
+    "person": "persoon",
+    "people": "personen",
+    "makeReservation": "Reservering Maken"
+  },
+  "explore": {
+    "title": "Verken",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Zoals Nooit Tevoren",
+    "description": "Ontdek de best bewaarde geheimen van Vila Nova de Milfontes en de Vicentijnse Kust vanuit een uniek perspectief",
+    "panoramicView": "Uniek Panoramisch Uitzicht",
+    "panoramicViewDesc": "Geniet van de beste uitzichten van de Alentejo kust",
+    "historicHeritage": "Historisch Erfgoed",
+    "historicHeritageDesc": "Leer over de rijke geschiedenis van dit vissersdorp"
+  },
+  "availability": {
+    "title": "Real-time",
+    "titleHighlight": "Beschikbaarheid",
+    "subtitle": "Bekijk beschikbare tijden en boek je perfecte moment",
+    "availabilityToday": "Beschikbaarheid Vandaag",
+    "availableSlots": "Beschikbare tijdsslots voor boekingen",
+    "available": "Beschikbaar",
+    "occupied": "Bezet",
+    "reserveSpecificTime": "Om een specifieke tijd te boeken, gebruik het reserveringsformulier"
+  },
+  "testimonials": {
+    "title": "Wat onze",
+    "titleHighlight": "klanten zeggen",
+    "rating": "5.0 (200+ beoordelingen)",
+    "items": {
+      "0": {
+        "quote": "Beste ervaring van de reis! Mijn kinderen vonden het geweldig om de geheime stranden te ontdekken. De gids was fantastisch!",
+        "name": "Ana Silva",
+        "designation": "Lissabon"
+      },
+      "1": {
+        "quote": "Geweldige tour! De tuk-tuk is super comfortabel en de uitzichten zijn adembenemend. Ik beveel het 100% aan!",
+        "name": "João Santos",
+        "designation": "Porto"
+      },
+      "2": {
+        "quote": "Professionele en zeer leuke service. De kinderen stopten niet met glimlachen tijdens de hele tour!",
+        "name": "Maria Costa",
+        "designation": "Coimbra"
+      },
+      "3": {
+        "quote": "We ontdekten ongelooflijke plekken die we nooit alleen zouden hebben gevonden. Een onvergetelijke ervaring!",
+        "name": "Unieke Ervaring",
+        "designation": "Milfontes"
+      },
+      "4": {
+        "quote": "De tuk-tuks zijn modern en veilig. Het hele gezin had een geweldige tijd tijdens de tour!",
+        "name": "Gelukkig Gezin",
+        "designation": "Avontuur"
+      },
+      "5": {
+        "quote": "Zelfs bij speciale evenementen is de service onberispelijk. Plezier en vreugde op elk moment!",
+        "name": "Gegarandeerd Plezier",
+        "designation": "Carnaval"
+      }
+    }
+  },
+  "faq": {
+    "title": "Veelgestelde",
+    "titleHighlight": "Vragen",
+    "subtitle": "We verduidelijken je hoofdvragen over onze tuk-tuk tours",
+    "q1": "Hoeveel mensen passen er in een tuk-tuk?",
+    "a1": "De tuk-tuk biedt plaats aan 4 personen plus de bestuurder.",
+    "q2": "Rijden de tours bij regen?",
+    "a2": "Onze tuk-tuks hebben afdekking, maar bij zware regen kunnen we kosteloos herplannen.",
+    "q3": "Is vooraf boeken nodig?",
+    "a3": "We raden aan om minstens 24 uur van tevoren te boeken, vooral in het hoogseizoen.",
+    "q4": "Zijn er groepskortingen?",
+    "a4": "Ja, we bieden speciale kortingen voor groepen. Neem contact met ons op voor meer informatie.",
+    "q5": "Zijn tuk-tuks veilig voor kinderen?",
+    "a5": "Ja, al onze tuk-tuks zijn uitgerust met veiligheidsgordels en zijn perfect veilig voor kinderen."
+  },
+  "cta": {
+    "title": "Klaar voor het",
+    "titleHighlight": "Avontuur?",
+    "description": "Boek nu je tuk-tuk tour en ontdek Milfontes op een unieke en onvergetelijke manier!",
+    "reserveNow": "Nu Boeken",
+    "talkToUs": "Praat Met Ons",
+    "phone": "968 784 043",
+    "schedule": "Elke dag 9-20 uur"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. Alle rechten voorbehouden.",
+    "insurance": "Verzekering inbegrepen",
+    "photos": "Foto's inbegrepen",
+    "localGuides": "Lokale gidsen"
+  },
+  "tours": {
+    "title": "Onze Tours",
+    "panoramic": {
+      "title": "Panoramische dorpstour",
+      "description": "Ontdek de meest emblematische punten van Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Furnas Strand",
+      "description": "Reis naar het beroemde Furnas Strand met fotostops",
+      "duration": "1u 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Brugoversteek",
+      "description": "Steek de historische brug over met panoramisch uitzicht",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Romantische Zonsondergang",
+      "description": "Geniet van de mooiste zonsondergang aan de kust",
+      "duration": "2u",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Nacht tour",
+      "description": "Verken het dorp bij maanlicht met een uniek perspectief",
+      "duration": "1u",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Vissers Route",
+      "description": "Leer over lokale visserstraditieses",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Neem contact op",
+    "phone": "Telefoon",
+    "whatsapp": "WhatsApp",
+    "email": "Email"
+  },
+  "map": {
+    "title": "Locatie en",
+    "titleHighlight": "Bezienswaardigheden",
+    "subtitle": "Vind ons in het hart van Vila Nova de Milfontes en ontdek de belangrijkste toeristische attracties",
+    "mapTitle": "Locatie",
+    "description": "Vind ons in het hart van Vila Nova de Milfontes",
+    "pointsOfInterest": "Bezienswaardigheden",
+    "historicCenter": "Historisch Centrum",
+    "milfontesBeach": "Milfontes Strand",
+    "fort": "São Clemente Fort",
+    "nearbyBeaches": "Nabije Stranden",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Furnas Strand",
+    "viewpoints": "Panoramische Uitkijkpunten",
+    "openInGoogleMaps": "Openen in Google Maps",
+    "clickToSee": "Klik om op de kaart te zien"
+  },
+  "reservation": {
+    "title": "Boek uw Tour",
+    "subtitle": "Vul de details in en bevestig via WhatsApp",
+    "name": "Volledige Naam",
+    "email": "Email",
+    "phone": "Telefoon",
+    "date": "Gewenste Datum",
+    "time": "Gewenste Tijd",
+    "tourType": "Tour Type",
+    "numberOfPeople": "Aantal Personen",
+    "message": "Aanvullend Bericht",
+    "messagePlaceholder": "Eventuele aanvullende informatie of speciale verzoeken...",
+    "selectTour": "Selecteer tour type",
+    "people1": "1 persoon",
+    "people2": "2 personen",
+    "people3": "3 personen",
+    "people4": "4 personen",
+    "confirmWhatsApp": "Bevestigen via WhatsApp",
+    "reservationSent": "Reservering verzonden!",
+    "reservationDescription": "U wordt doorgestuurd naar WhatsApp om uw reservering te bevestigen.",
+    "required": "vereist"
+  }
+}

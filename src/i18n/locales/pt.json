@@ -1,0 +1,215 @@
+{
+  "hero": {
+    "title": "Descubra Milfontes com Estilo",
+    "subtitle": "Aventuras de Tuk-Tuk pela Costa Vicentina",
+    "description": "Explore Vila Nova de Milfontes e arredores numa experiência única de tuk-tuk. Paisagens deslumbrantes, história e diversão garantida!",
+    "descriptionHighlight": "Reserve já a sua aventura!",
+    "reserveNow": "Reservar Agora",
+    "rating": "4.9/5 ⭐ (200+ avaliações)"
+  },
+  "benefits": {
+    "title": "Porquê Escolher os",
+    "titleHighlight": "Nossos Tuk-Tuks?",
+    "subtitle": "Conforto, diversão e experiências únicas garantidas para toda a família",
+    "exclusiveRoutes": {
+      "title": "Rotas Exclusivas",
+      "description": "Acesso a locais únicos e vistas panorâmicas que só consegue alcançar com os nossos tuk-tuks especializados"
+    },
+    "familyComfort": {
+      "title": "Conforto Familiar",
+      "description": "Veículos seguros e confortáveis, ideais para famílias com crianças e pessoas de todas as idades"
+    },
+    "quickReservation": {
+      "title": "Reserva Rápida",
+      "description": "Sistema de reservas WhatsApp simples e rápido. Confirme o seu passeio em apenas alguns minutos"
+    }
+  },
+  "pricing": {
+    "title": "Preços",
+    "titleHighlight": "Transparentes",
+    "subtitle": "Preços justos e claros, sem surpresas. Diversão garantida para toda a família!",
+    "upTo2People": "Até 2 pessoas",
+    "additionalPeople": "Pessoas adicionais",
+    "seeDetailedPrices": "Ver Preços Detalhados",
+    "detailedPricesTitle": "Tabela de Preços Completa",
+    "howPricesWork": "Como Funcionam os Preços",
+    "basePrice": "Preço Base",
+    "basePriceDesc": "Preço fixo até 2 pessoas por tuk-tuk",
+    "additionalPeopleDesc": "€3.50 por cada pessoa adicional (máximo 4 pessoas por tuk-tuk)",
+    "priceExamples": "Exemplos de Preços:",
+    "person": "pessoa",
+    "people": "pessoas",
+    "makeReservation": "Fazer Reserva"
+  },
+  "explore": {
+    "title": "Explore",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Como Nunca Antes",
+    "description": "Descubra os segredos mais bem guardados de Vila Nova de Milfontes e Costa Vicentina numa perspetiva única",
+    "panoramicView": "Vista Panorâmica Única",
+    "panoramicViewDesc": "Desfrute das melhores vistas da costa alentejana",
+    "historicHeritage": "Património Histórico",
+    "historicHeritageDesc": "Conheça a rica história desta vila piscatória"
+  },
+  "availability": {
+    "title": "Disponibilidade em",
+    "titleHighlight": "Tempo Real",
+    "subtitle": "Consulte os horários disponíveis e reserve o seu momento perfeito",
+    "availabilityToday": "Disponibilidade Hoje",
+    "availableSlots": "Horários disponíveis para reserva",
+    "available": "Disponível",
+    "occupied": "Ocupado",
+    "reserveSpecificTime": "Para reservar um horário específico, use o formulário de reserva"
+  },
+  "testimonials": {
+    "title": "O que dizem os nossos",
+    "titleHighlight": "clientes",
+    "rating": "5.0 (200+ avaliações)",
+    "items": {
+      "0": {
+        "quote": "Melhor experiência da viagem! Meus filhos adoraram conhecer as praias secretas. O guia foi fantástico!",
+        "name": "Ana Silva",
+        "designation": "Lisboa"
+      },
+      "1": {
+        "quote": "Passeio incrível! O tuk-tuk é super confortável e as vistas são de tirar o fôlego. Recomendo 100%!",
+        "name": "João Santos",
+        "designation": "Porto"
+      },
+      "2": {
+        "quote": "Serviço profissional e muito divertido. As crianças não pararam de sorrir durante todo o passeio!",
+        "name": "Maria Costa",
+        "designation": "Coimbra"
+      },
+      "3": {
+        "quote": "Descobrimos lugares incríveis que nunca encontraríamos sozinhos. Uma experiência inesquecível!",
+        "name": "Experiência Única",
+        "designation": "Milfontes"
+      },
+      "4": {
+        "quote": "Os tuk-tuks são modernos e seguros. Toda a família se divertiu muito durante o passeio!",
+        "name": "Família Feliz",
+        "designation": "Aventura"
+      },
+      "5": {
+        "quote": "Até nos eventos especiais, o serviço é impecável. Diversão e alegria em cada momento!",
+        "name": "Diversão Garantida",
+        "designation": "Carnaval"
+      }
+    }
+  },
+  "faq": {
+    "title": "Perguntas",
+    "titleHighlight": "Frequentes",
+    "subtitle": "Esclarecemos as suas principais dúvidas sobre os nossos passeios de tuk-tuk",
+    "q1": "Quantas pessoas cabem num tuk-tuk?",
+    "a1": "O tuk-tuk tem capacidade até 4 pessoas, mais o condutor",
+    "q2": "Os passeios funcionam com chuva?",
+    "a2": "Os nossos tuk-tuks têm cobertura, mas em caso de chuva forte, podemos reagendar sem custos.",
+    "q3": "É necessário reservar com antecedência?",
+    "a3": "Recomendamos reservar com pelo menos 24 horas de antecedência, especialmente na época alta.",
+    "q4": "Há descontos para grupos?",
+    "a4": "Sim, oferecemos descontos especiais para grupos. Contacte-nos para mais informações.",
+    "q5": "Os tuk-tuks são seguros para crianças?",
+    "a5": "Sim, todos os nossos tuk-tuks estão equipados com cintos de segurança e são perfeitamente seguros para crianças."
+  },
+  "cta": {
+    "title": "Pronto para a",
+    "titleHighlight": "Aventura?",
+    "description": "Reserve já o seu passeio de tuk-tuk e descubra Milfontes de forma única e inesquecível!",
+    "reserveNow": "Reservar Agora",
+    "talkToUs": "Falar Connosco",
+    "phone": "968 784 043",
+    "schedule": "Todos os dias 9h-20h"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. Todos os direitos reservados.",
+    "insurance": "Seguro incluído",
+    "photos": "Fotos incluídas",
+    "localGuides": "Guias locais"
+  },
+  "tours": {
+    "title": "Os Nossos Passeios",
+    "panoramic": {
+      "title": "Passeio panorâmico pela vila",
+      "description": "Descubra os pontos mais emblemáticos de Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Praia das Furnas",
+      "description": "Viagem até à famosa Praia das Furnas com paragens fotográficas",
+      "duration": "1h 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Travessia da ponte",
+      "description": "Atravesse a ponte histórica com vistas panorâmicas",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Pôr do Sol Romântico",
+      "description": "Desfrute do mais belo pôr do sol da costa",
+      "duration": "2h",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Passeio noturno",
+      "description": "Explore a vila sob o luar numa perspetiva única",
+      "duration": "1h",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Rota dos Pescadores",
+      "description": "Conheça as tradições piscatórias locais",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Contacte-nos",
+    "phone": "Telefone",
+    "whatsapp": "WhatsApp",
+    "email": "Email"
+  },
+  "map": {
+    "title": "Localização e",
+    "titleHighlight": "Pontos de Interesse",
+    "subtitle": "Encontre-nos no coração de Vila Nova de Milfontes e descubra as principais atrações turísticas",
+    "mapTitle": "Localização",
+    "description": "Encontre-nos no coração de Vila Nova de Milfontes",
+    "pointsOfInterest": "Pontos de Interesse",
+    "historicCenter": "Centro Histórico",
+    "milfontesBeach": "Praia de Milfontes",
+    "fort": "Forte de São Clemente",
+    "nearbyBeaches": "Praias Próximas",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Praia das Furnas",
+    "viewpoints": "Miradouros Panorâmicos",
+    "openInGoogleMaps": "Abrir no Google Maps",
+    "clickToSee": "Clique para ver no mapa"
+  },
+  "reservation": {
+    "title": "Reserve o Seu Passeio",
+    "subtitle": "Preencha os dados e confirme via WhatsApp",
+    "name": "Nome Completo",
+    "email": "Email",
+    "phone": "Telefone",
+    "date": "Data Pretendida",
+    "time": "Hora Pretendida",
+    "tourType": "Tipo de Passeio",
+    "numberOfPeople": "Número de Pessoas",
+    "message": "Mensagem Adicional",
+    "messagePlaceholder": "Qualquer informação adicional ou pedido especial...",
+    "selectTour": "Selecione o tipo de passeio",
+    "people1": "1 pessoa",
+    "people2": "2 pessoas",
+    "people3": "3 pessoas",
+    "people4": "4 pessoas",
+    "confirmWhatsApp": "Confirmar via WhatsApp",
+    "reservationSent": "Reserva enviada!",
+    "reservationDescription": "Será redirecionado para o WhatsApp para confirmar a sua reserva.",
+    "required": "obrigatório"
+  }
+}
