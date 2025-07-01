@@ -67,19 +67,19 @@
     "rating": "5.0 (200+ avaliações)",
     "items": {
       "0": {
-        "quote": "Melhor experiência da viagem! Meus filhos adoraram conhecer as praias secretas. O guia foi fantástico!",
+        "quote": "O Diogo Caria é um guia fantástico!\nFoi uma ótima experiência, adorei conhecer locais que não conhecia em Milfontes",
         "name": "Ana Silva",
         "designation": "Lisboa"
       },
       "1": {
         "quote": "Passeio incrível! O tuk-tuk é super confortável e as vistas são de tirar o fôlego. Recomendo 100%!",
-        "name": "João Santos",
+        "name": "Luisa Almeida",
         "designation": "Porto"
       },
       "2": {
-        "quote": "Serviço profissional e muito divertido. As crianças não pararam de sorrir durante todo o passeio!",
-        "name": "Maria Costa",
-        "designation": "Coimbra"
+        "quote": "Garantimos um Serviço profissional e divertido. Passeios inesquecíveis!",
+        "name": "Sónia Santos",
+        "designation": "Tuktuk-milfontes"
       },
       "3": {
         "quote": "Descobrimos lugares incríveis que nunca encontraríamos sozinhos. Uma experiência inesquecível!",
@@ -88,8 +88,8 @@
       },
       "4": {
         "quote": "Os tuk-tuks são modernos e seguros. Toda a família se divertiu muito durante o passeio!",
-        "name": "Família Feliz",
-        "designation": "Aventura"
+        "name": "Conforto Garantido",
+        "designation": ""
       },
       "5": {
         "quote": "Até nos eventos especiais, o serviço é impecável. Diversão e alegria em cada momento!",
