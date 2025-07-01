@@ -156,7 +156,8 @@
     "furnasBeach": "Furnas Strand",
     "viewpoints": "Panoramapunkte",
     "openInGoogleMaps": "In Google Maps öffnen",
-    "clickToSee": "Klicken, um auf der Karte zu sehen"
+    "clickToSee": "Klicken, um auf der Karte zu sehen",
+    "exitMap": "Karte verlassen"
   },
   "reservation": {
     "title": "Buchen Sie Ihre Tour",

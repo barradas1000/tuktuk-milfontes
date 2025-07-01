@@ -31,6 +31,11 @@ import {
   Waves,
   Euro,
   X,
+  Facebook,
+  Instagram,
+  Twitter,
+  CreditCard,
+  Mail,
 } from "lucide-react";
 import MilfontesLeafletMap from "@/components/MilfontesLeafletMap";
 import ReservationForm from "@/components/ReservationForm";
@@ -150,7 +155,10 @@ const Index = () => {
       <LanguageSelector />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section
+        id="hero"
+        className="relative min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white"
+      >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-800/60 to-transparent"></div>
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -227,7 +235,7 @@ const Index = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 px-4 bg-white">
+      <section id="about" className="py-20 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-blue-900 mb-6">
@@ -318,7 +326,10 @@ const Index = () => {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-amber-50 to-white">
+      <section
+        id="tours"
+        className="py-20 px-4 bg-gradient-to-br from-amber-50 to-white"
+      >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-blue-900 mb-6">
@@ -548,7 +559,10 @@ const Index = () => {
       </section>
 
       {/* Explore Milfontes Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
+      <section
+        id="explore-section"
+        className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50"
+      >
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-blue-900 mb-6">
@@ -640,7 +654,10 @@ const Index = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-4 bg-gradient-to-br from-blue-50 to-white">
+      <section
+        id="faq"
+        className="py-20 px-4 bg-gradient-to-br from-blue-50 to-white"
+      >
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-blue-900 mb-6">
@@ -773,10 +790,158 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 bg-blue-950 text-center">
-        <div className="max-w-4xl mx-auto">
-          <p className="text-blue-300 mb-4">{t("footer.copyright")}</p>
-          <div className="flex justify-center items-center gap-6 text-sm text-blue-400">
+      <footer className="py-12 px-4 bg-blue-950 text-blue-100 border-t border-blue-900 mt-12">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
+          {/* Contacto */}
+          <div>
+            <h3 className="text-lg font-bold mb-2 text-amber-400">
+              {t("footer.contactTitle")}
+            </h3>
+            <p className="mb-1">
+              <MapPin className="inline w-4 h-4 mr-1 text-amber-400" />
+              Lugar da Boavista, cx postal 2510, Foros do Freixial - 7645-037
+              Vila Nova de Milfontes
+            </p>
+            <p className="mb-1">
+              <Phone className="inline w-4 h-4 mr-1 text-amber-400" />
+              963 496 320
+            </p>
+            <p className="mb-1">
+              <Mail className="inline w-4 h-4 mr-1 text-amber-400" />
+              diogo.carias@outlook.pt
+            </p>
+          </div>
+
+          {/* Links rápidos */}
+          <div>
+            <h3 className="text-lg font-bold mb-2 text-amber-400">
+              {t("footer.quickLinks")}
+            </h3>
+            <ul className="space-y-1">
+              <li>
+                <a href="/#hero" className="hover:underline">
+                  {t("footer.linkHome")}
+                </a>
+              </li>
+              <li>
+                <a href="/#about" className="hover:underline">
+                  {t("footer.linkAbout")}
+                </a>
+              </li>
+              <li>
+                <a href="/#tours" className="hover:underline">
+                  {t("footer.linkServices")}
+                </a>
+              </li>
+              <li>
+                <a href="/#reservation" className="hover:underline">
+                  {t("footer.linkBooking")}
+                </a>
+              </li>
+              <li>
+                <a href="/#faq" className="hover:underline">
+                  {t("footer.linkFAQ")}
+                </a>
+              </li>
+              <li>
+                <a href="/sitemap.xml" className="hover:underline">
+                  {t("footer.linkSitemap")}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Políticas e legais */}
+          <div>
+            <h3 className="text-lg font-bold mb-2 text-amber-400">
+              {t("footer.policies")}
+            </h3>
+            <ul className="space-y-1">
+              <li>
+                <a href="#" className="hover:underline">
+                  {t("footer.terms")}
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:underline">
+                  {t("footer.privacy")}
+                </a>
+              </li>
+              <li>
+                <a href="#" className="hover:underline">
+                  {t("footer.cancellation")}
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-lg font-bold mt-4 mb-2 text-amber-400">
+              {t("footer.legalInfo")}
+            </h3>
+            <p className="mb-1">NIF: 237319594</p>
+            <p className="mb-1">RNAAT: 438/2025</p>
+            <p className="mb-1">{t("footer.licenseInfo")}</p>
+          </div>
+
+          {/* Redes sociais, newsletter, pagamentos, créditos */}
+          <div>
+            <h3 className="text-lg font-bold mb-2 text-amber-400">
+              {t("footer.followUs")}
+            </h3>
+            <div className="flex gap-3 mb-4">
+              <a
+                href="https://www.facebook.com/share/192HyZevo9/"
+                target="_blank"
+                rel="noopener"
+                aria-label="Facebook"
+                className="hover:text-amber-400"
+              >
+                <Facebook className="w-5 h-5" />
+              </a>
+              <a
+                href="https://www.instagram.com/tuktuk.milfontes?igsh=MXIwc3c2YjZuNHpoeA=="
+                target="_blank"
+                rel="noopener"
+                aria-label="Instagram"
+                className="hover:text-amber-400"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a
+                href="https://wa.me/qr/CMOIHHQFEY5NC1"
+                target="_blank"
+                rel="noopener"
+                aria-label="WhatsApp"
+                className="hover:text-amber-400"
+              >
+                <MessageCircle className="w-5 h-5" />
+              </a>
+            </div>
+            <h3 className="text-lg font-bold mb-2 text-amber-400">
+              {t("footer.paymentInfo")}
+            </h3>
+            <div className="flex gap-2 mb-2">
+              <span className="inline-flex items-center px-2 py-1 bg-gray-200 text-blue-900 rounded text-xs font-semibold">
+                Mbway
+              </span>
+              <span className="inline-flex items-center px-2 py-1 bg-gray-200 text-blue-900 rounded text-xs font-semibold">
+                Dinheiro
+              </span>
+            </div>
+            <p className="text-xs mb-2">{t("footer.paymentSecurity")}</p>
+            <h3 className="text-lg font-bold mb-2 text-amber-400">
+              {t("footer.credits")}
+            </h3>
+            <p className="text-xs mb-2">{t("footer.copyright")}</p>
+            <p className="text-xs mb-2">{t("footer.attributions")}</p>
+            <a
+              href="mailto:diogo.carias@outlook.pt"
+              className="text-xs underline hover:text-amber-400"
+            >
+              {t("footer.support")}
+            </a>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto mt-8 border-t border-blue-900 pt-4 text-center text-blue-400 text-xs">
+          <div className="flex flex-wrap justify-center gap-4">
             <span className="flex items-center gap-1">
               <Shield className="w-4 h-4" />
               {t("footer.insurance")}
@@ -788,6 +953,48 @@ const Index = () => {
             <span className="flex items-center gap-1">
               <Waves className="w-4 h-4" />
               {t("footer.localGuides")}
+            </span>
+          </div>
+          <div
+            className="flex flex-col items-center mt-6 gap-2 p-4 rounded-lg"
+            style={{ background: "#FBBF24" }}
+          >
+            <span className="font-bold text-blue-900 text-lg mb-1">
+              Site desenvolvido por:
+            </span>
+            <span className="font-semibold text-blue-900 text-xl">
+              Carlos Barradas
+            </span>
+            <span className="text-blue-900 text-lg">
+              Email:{" "}
+              <a
+                href="mailto:carlosbarradas@gmail.com"
+                className="underline hover:text-blue-800"
+              >
+                carlosbarradas@gmail.com
+              </a>
+            </span>
+            <span className="text-blue-900 text-lg">
+              WhatsApp:{" "}
+              <a
+                href="https://wa.me/351965758022"
+                target="_blank"
+                rel="noopener"
+                className="underline hover:text-blue-800"
+              >
+                351 965 758 022
+              </a>
+            </span>
+            <span className="text-blue-900 text-lg">
+              Site:{" "}
+              <a
+                href="https://carlosbarradas.com/gestor-de-anuncios/"
+                target="_blank"
+                rel="noopener"
+                className="underline hover:text-blue-800"
+              >
+                carlosbarradas.com
+              </a>
             </span>
           </div>
         </div>

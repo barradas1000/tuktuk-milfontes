@@ -156,7 +156,8 @@
     "furnasBeach": "Plage de Furnas",
     "viewpoints": "Points de vue panoramiques",
     "openInGoogleMaps": "Ouvrir dans Google Maps",
-    "clickToSee": "Cliquez pour voir sur la carte"
+    "clickToSee": "Cliquez pour voir sur la carte",
+    "exitMap": "Quitter la carte"
   },
   "reservation": {
     "title": "Réservez votre tour",

@@ -126,7 +126,30 @@
     "copyright": "© 2024 TukTuk Milfontes. Todos os direitos reservados.",
     "insurance": "Seguro incluído",
     "photos": "Fotos incluídas",
-    "localGuides": "Guias locais"
+    "localGuides": "Guias locais",
+    "contactTitle": "Informações de Contacto",
+    "quickLinks": "Links Rápidos",
+    "linkHome": "Início",
+    "linkAbout": "Sobre Nós",
+    "linkServices": "Serviços",
+    "linkBooking": "Reservas",
+    "linkFAQ": "FAQ / Ajuda",
+    "linkSitemap": "Mapa do Site",
+    "policies": "Políticas e Termos",
+    "terms": "Termos e Condições",
+    "privacy": "Política de Privacidade",
+    "cancellation": "Política de Cancelamento",
+    "legalInfo": "Informações Legais",
+    "licenseInfo": "Licenciado pelo Turismo de Portugal",
+    "followUs": "Siga-nos",
+    "newsletter": "Subscreva a nossa newsletter",
+    "newsletterPlaceholder": "O seu e-mail",
+    "subscribe": "Subscrever",
+    "paymentInfo": "Métodos de Pagamento",
+    "paymentSecurity": "Pagamentos 100% seguros (SSL)",
+    "credits": "Créditos e Atribuições",
+    "attributions": "Imagens e ícones de fontes públicas e autores referenciados.",
+    "support": "Suporte ao Cliente"
   },
   "tours": {
     "title": "Os Nossos Passeios",
@@ -188,7 +211,8 @@
     "furnasBeach": "Praia das Furnas",
     "viewpoints": "Miradouros Panorâmicos",
     "openInGoogleMaps": "Abrir no Google Maps",
-    "clickToSee": "Clique para ver no mapa"
+    "clickToSee": "Clique para ver no mapa",
+    "exitMap": "Sair do mapa"
   },
   "reservation": {
     "title": "Reserve o Seu Passeio",

@@ -126,7 +126,30 @@
     "copyright": "© 2024 TukTuk Milfontes. All rights reserved.",
     "insurance": "Insurance included",
     "photos": "Photos included",
-    "localGuides": "Local guides"
+    "localGuides": "Local guides",
+    "contactTitle": "Contact Information",
+    "quickLinks": "Quick Links",
+    "linkHome": "Home",
+    "linkAbout": "About Us",
+    "linkServices": "Services",
+    "linkBooking": "Booking",
+    "linkFAQ": "FAQ / Help",
+    "linkSitemap": "Sitemap",
+    "policies": "Policies & Terms",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy",
+    "cancellation": "Cancellation Policy",
+    "legalInfo": "Legal Information",
+    "licenseInfo": "Licensed by Turismo de Portugal",
+    "followUs": "Follow Us",
+    "newsletter": "Subscribe to our newsletter",
+    "newsletterPlaceholder": "Your email",
+    "subscribe": "Subscribe",
+    "paymentInfo": "Payment Methods",
+    "paymentSecurity": "100% secure payments (SSL)",
+    "credits": "Credits & Attributions",
+    "attributions": "Images and icons from public sources and referenced authors.",
+    "support": "Customer Support"
   },
   "tours": {
     "title": "Our Tours",
@@ -188,7 +211,8 @@
     "furnasBeach": "Furnas Beach",
     "viewpoints": "Panoramic Viewpoints",
     "openInGoogleMaps": "Open in Google Maps",
-    "clickToSee": "Click to see on map"
+    "clickToSee": "Click to see on map",
+    "exitMap": "Exit map"
   },
   "reservation": {
     "title": "Book Your Tour",

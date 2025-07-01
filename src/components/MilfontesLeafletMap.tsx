@@ -302,10 +302,17 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
     } else {
       navigate("/");
     }
+    // Scroll para o próximo elemento após o mapa
+    setTimeout(() => {
+      const nextSection = document.getElementById("explore-section");
+      if (nextSection) {
+        nextSection.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 200);
   };
 
   return (
-    <div style={{ position: "relative" }}>
+    <div id="milfontes-leaflet-map" style={{ position: "relative" }}>
       <button
         onClick={handleExit}
         style={{
@@ -321,7 +328,7 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
           fontWeight: "bold",
         }}
       >
-        Sair do mapa
+        {t("map.exitMap")}
       </button>
       <div style={{ position: "relative", width: "100%", margin: "auto" }}>
         <div style={titleStyle}>{t("map.description")}</div>
