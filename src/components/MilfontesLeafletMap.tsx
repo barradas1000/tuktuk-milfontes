@@ -22,7 +22,9 @@ const pointsOfInterest = [
     category: "Praias",
     coords: [37.722123, -8.787765],
     description: "poi.franquia.description",
-    image: "https://euroveloportugal.com/files/2016/03/praia-da-franquia-2.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/foz%20do%20mira.jpg",
+    mapDescriptionKey: "praiaDaFranquia",
   },
   {
     name: "Praia do Farol",
@@ -30,112 +32,143 @@ const pointsOfInterest = [
     coords: [37.718758, -8.790392],
     description: "poi.farol.description",
     image:
-      "https://bandeiraazul.abaae.pt/wp-content/uploads/sites/2/2025/awards/p64.Farol2.340x190.jpg",
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/praia_do_farol_main_1_1024_2500.jpg",
+    mapDescriptionKey: "praiaDoFarol",
   },
   {
     name: "Praia do Malhão",
     category: "Praias",
     coords: [37.783864, -8.801333],
     description: "poi.malhao.description",
-    image: "https://i.imgur.com/10QwQw0K.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Praia%20dos%20Aivados.jpeg",
+    mapDescriptionKey: "praiaDoMalhao",
   },
   {
     name: "Praia das Furnas",
     category: "Praias",
     coords: [37.719489, -8.7838],
     description: "poi.furnas.description",
-    image: "https://i.imgur.com/14QwQw0O.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/praia%20das%20furnas.jpg",
+    mapDescriptionKey: "praiaDasFurnas",
   },
   {
     name: "Praia do Patacho",
     category: "Praias",
     coords: [37.725596, -8.792988],
     description: "poi.patacho.description",
-    image: "https://i.imgur.com/15QwQw0P.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Praia%20do%20Patacho.webp",
+    mapDescriptionKey: "praiaDoPatacho",
   },
   {
     name: "Praia do Carreiro das Fazendas",
     category: "Praias",
     coords: [37.723423, -8.79201],
     description: "poi.carreiro.description",
-    image: "https://i.imgur.com/16QwQw0Q.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Praia%20do%20Carreiro%20das%20Fazendas.jpeg",
+    mapDescriptionKey: "praiaDoCarreiroDasFazendas",
   },
   {
     name: "Praia do Porto das Barcas",
     category: "Praias",
     coords: [37.734612, -8.796488],
     description: "poi.portoBarcas.description",
-    image: "https://i.imgur.com/17QwQw0R.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Praia%20do%20Porto%20das%20Barcas.jpg",
+    mapDescriptionKey: "praiaDoPortoDasBarcas",
   },
   {
     name: "Praia dos Aivados",
     category: "Praias",
     coords: [37.806233, -8.796916],
     description: "poi.aivados.description",
-    image: "https://i.imgur.com/18QwQw0S.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Praia%20dos%20Aivados.jpeg",
+    mapDescriptionKey: "praiaDosAivados",
   },
   {
     name: "Forte de São Clemente",
     category: "História e Cultura",
     coords: [37.7231734, -8.7835174],
     description: "poi.forte.description",
-    image: "https://i.imgur.com/2QwQw0C.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Forte%20de%20S%C3%A3o%20Clemente.jpeg",
+    mapDescriptionKey: "forteDeSaoClemente",
   },
   {
     name: "Farol de Vila Nova de Milfontes",
     category: "História e Cultura",
     coords: [37.7195, -8.790139],
     description: "poi.farolMilfontes.description",
-    image: "https://placehold.co/600x400/A52A2A/FFFFFF?text=Farol",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/praia_do_farol_main_1_1024_2500.jpg",
+    mapDescriptionKey: "farolDeVilaNovaDeMilfontes",
   },
   {
     name: "Igreja de Nossa Senhora da Graça",
     category: "História e Cultura",
     coords: [37.723494, -8.782072],
     description: "poi.igreja.description",
-    image: "https://i.imgur.com/3QwQw0D.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Igreja%20de%20Nossa%20Senhora%20da%20Gra%C3%A7a.jpeg",
+    mapDescriptionKey: "igrejaDeNossaSenhoraDaGrca",
   },
   {
     name: "Estátua do Arcanjo",
     category: "História e Cultura",
     coords: [37.719501, -8.79014],
     description: "poi.arcanjo.description",
-    image: "https://i.imgur.com/1QwQw0B.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Est%C3%A1tua%20do%20Arcanjo.jpeg",
+    mapDescriptionKey: "estaturaDoArcanjo",
   },
   {
     name: "Jardim Público",
     category: "Espaços Verdes",
     coords: [37.727778, -8.782167],
     description: "poi.jardimPublico.description",
-    image: "https://i.imgur.com/8QwQw0I.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/jardim%20publico.jpeg",
+    mapDescriptionKey: "jardimPublico",
   },
   {
     name: "Parque Natural do Sudoeste Alentejano",
     category: "Espaços Verdes",
     coords: [37.75, -8.79],
     description: "poi.parqueNatural.description",
-    image: "https://placehold.co/600x400/228B22/FFFFFF?text=Parque+Natural",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Parque%20Natural%20do%20Sudoeste%20Alentejano.jpeg",
+    mapDescriptionKey: "parqueNaturalDoSudoesteAlentejano",
   },
   {
     name: "Parque Infantil",
     category: "Espaços Verdes",
     coords: [37.7277585, -8.7818885],
     description: "poi.parqueInfantil.description",
-    image: "https://i.imgur.com/4QwQw0E.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Parque%20Infantil.jpeg",
+    mapDescriptionKey: "parqueInfantil",
   },
   {
     name: "Jardim Paragem dos Autocarros",
     category: "Espaços Verdes",
     coords: [37.7310194, -8.7827907],
     description: "poi.jardimParagem.description",
-    image: "https://placehold.co/600x400/228B22/FFFFFF?text=Jardim+Paragem",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Jardim%20Paragem%20dos%20Autocarros.jpeg",
+    mapDescriptionKey: "jardimParagemDosAutocarros",
   },
   {
     name: "Estuário do Rio Mira",
     category: "Espaços Verdes",
     coords: [37.7250949, -8.7873245],
     description: "poi.rioMira.description",
-    image: "https://placehold.co/600x400/228B22/FFFFFF?text=Rio+Mira",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/foz%20do%20mira.jpg",
+    mapDescriptionKey: "estuarioDoRioMira",
   },
   {
     name: "Restaurante A Choupana",
@@ -143,119 +176,160 @@ const pointsOfInterest = [
     coords: [37.718759, -8.790393],
     description: "poi.choupana.description",
     image:
-      "https://turismo.cm-odemira.pt/thumbs/cmodemira/uploads/poi/image/670/onde_comer_a_choupana_vn_milfontes_1_1024_2500.jpg",
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/restaurante%20choupana.webp",
+    mapDescriptionKey: "restauranteAChoupana",
   },
   {
     name: "Tasca do Celso",
     category: "Gastronomia",
     coords: [37.724358, -8.783387],
     description: "poi.tascaCelso.description",
-    image: "https://placehold.co/600x400/FFA500/FFFFFF?text=Tasca+do+Celso",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/tasca%20do%20celso.webp",
+    mapDescriptionKey: "tascaDoCelso",
   },
   {
     name: "A Manjedoura",
     category: "Gastronomia",
     coords: [37.726, -8.784],
     description: "poi.manjedoura.description",
-    image: "https://placehold.co/600x400/FFA500/FFFFFF?text=A+Manjedoura",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/A%20Manjedoura.webp",
+    mapDescriptionKey: "aManjedoura",
+  },
+  {
+    name: "Restaurante Ritual",
+    category: "Gastronomia",
+    coords: [37.7262, -8.7842],
+    description: "Restaurante de cozinha contemporânea em Milfontes.",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/restaurante%20ritual.webp",
+    mapDescriptionKey: "restauranteRitual",
+  },
+  {
+    name: "Pátio Alentejano",
+    category: "Gastronomia",
+    coords: [37.7265, -8.7845],
+    description: "Restaurante típico alentejano em Milfontes.",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/patio%20alentejano.png",
+    mapDescriptionKey: "patioAlentejano",
   },
   {
     name: "Restaurante HS Milfontes Beach",
     category: "Gastronomia",
     coords: [37.721, -8.788],
     description: "poi.hsBeach.description",
-    image: "https://placehold.co/600x400/FFA500/FFFFFF?text=HS+Milfontes+Beach",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Restaurante%20HS%20Milfontes%20Beach.jpeg",
+    mapDescriptionKey: "restauranteHSMilfontesBeach",
   },
   {
     name: "Mercado de Vila Nova de Milfontes",
     category: "Comércio",
     coords: [37.729768, -8.784901],
     description: "poi.mercadoMilfontes.description",
-    image: "https://i.imgur.com/6QwQw0G.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Mercado%20de%20Vila%20Nova%20de%20Milfontes.jpeg",
+    mapDescriptionKey: "mercadoDeVilaNovaDeMilfontes",
   },
   {
     name: "Mercado das Brunheiras",
     category: "Comércio",
     coords: [37.752948, -8.755478],
     description: "poi.brunheiras.description",
-    image: "https://placehold.co/600x400/4682B4/FFFFFF?text=Mercado+Brunheiras",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Mercado%20das%20Brunheiras.jpeg",
+    mapDescriptionKey: "mercadoDasBrunheiras",
   },
   {
     name: "Milsuper",
     category: "Comércio",
     coords: [37.728, -8.783],
     description: "poi.milsuper.description",
-    image: "https://placehold.co/600x400/4682B4/FFFFFF?text=Milsuper",
+    image: "https://tuktuk-milfontes.vercel.app/lovable-uploads/Milsuper.jpeg",
+    mapDescriptionKey: "milsuper",
   },
   {
     name: "Meu Super",
     category: "Comércio",
     coords: [37.725, -8.781],
     description: "poi.meusuper.description",
-    image: "https://i.imgur.com/7QwQw0H.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Meu%20Super.jpeg",
+    mapDescriptionKey: "meuSuper",
   },
   {
     name: "Frutas e Companhia Amanhecer",
     category: "Comércio",
     coords: [37.729724, -8.781062],
     description: "poi.amanhecer.description",
-    image: "https://placehold.co/600x400/4682B4/FFFFFF?text=Amanhecer",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Frutas%20e%20Companhia%20Amanhecer.jpeg",
+    mapDescriptionKey: "frutasECompanhiaAmanhecer",
   },
   {
     name: "Supermercado SPAR",
     category: "Comércio",
     coords: [37.7285317, -8.7824555],
     description: "poi.spar.description",
-    image: "https://placehold.co/600x400/4682B4/FFFFFF?text=SPAR",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Supermercado%20SPAR.jpeg",
+    mapDescriptionKey: "supermercadoSPAR",
   },
   {
     name: "Orbitur Sitava Milfontes",
     category: "Alojamento",
     coords: [37.779722, -8.783333],
     description: "poi.orbitur.description",
-    image: "https://placehold.co/600x400/8A2BE2/FFFFFF?text=Orbitur+Sitava",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/foz%20do%20mira.jpg",
+    mapDescriptionKey: "orbiturSitavaMilfontes",
   },
   {
     name: "Campiférias",
     category: "Alojamento",
     coords: [37.7289368, -8.7849212],
     description: "poi.campiferias.description",
-    image: "https://placehold.co/600x400/8A2BE2/FFFFFF?text=Campif%C3%A9rias",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/foz%20do%20mira.jpg",
+    mapDescriptionKey: "campifrias",
   },
   {
     name: "Camping Milfontes",
     category: "Alojamento",
     coords: [37.7303001, -8.7858204],
     description: "poi.camping.description",
-    image: "https://i.imgur.com/0QwQw0A.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/foz%20do%20mira.jpg",
+    mapDescriptionKey: "campingMilfontes",
   },
   {
     name: "Ponte sobre o Rio Mira",
     category: "Atividades e Outros",
     coords: [37.7248386, -8.7824351],
     description: "poi.ponte.description",
-    image: "https://i.imgur.com/13QwQw0N.jpg",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Ponte%20sobre%20o%20Rio%20Mira.jpg",
+    mapDescriptionKey: "ponteSobreORioMira",
   },
   {
     name: "Passeios de Barco no Rio Mira",
     category: "Atividades e Outros",
     coords: [37.7225, -8.788],
     description: "poi.barco.description",
-    image: "https://i.imgur.com/11QwQw0L.jpg",
-  },
-  {
-    name: "Trilhos da Rota Vicentina",
-    category: "Atividades e Outros",
-    coords: [37.74, -8.795],
-    description: "poi.vicentina.description",
-    image: "https://placehold.co/600x400/FF4500/FFFFFF?text=Rota+Vicentina",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/foz%20do%20mira.jpg",
+    mapDescriptionKey: "passeiosDeBarcoNoRioMira",
   },
   {
     name: "Spots de Surf e Kayak",
     category: "Atividades e Outros",
     coords: [37.72, -8.789],
     description: "poi.surfkayak.description",
-    image: "https://placehold.co/600x400/FF4500/FFFFFF?text=Surf+%26+Kayak",
+    image:
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Spots%20de%20Surf%20e%20Kayak.jpg",
+    mapDescriptionKey: "spotsDeSurfEKayak",
   },
 ];
 
@@ -335,8 +409,11 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
           style={mapStyle}
         >
           <TileLayer
-            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            options={{
+              attribution:
+                '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }}
           />
           {pointsOfInterest.map((poi) => (
             <Marker key={poi.name} position={poi.coords as [number, number]}>
@@ -354,8 +431,9 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
                       marginBottom: 5,
                     }}
                   />
-                  <br />
-                  {t(poi.description)}
+                  <div style={{ fontSize: 14, color: "#444", marginBottom: 4 }}>
+                    {t(`mapDescriptions.${poi.mapDescriptionKey}`)}
+                  </div>
                 </div>
               </Popup>
             </Marker>
