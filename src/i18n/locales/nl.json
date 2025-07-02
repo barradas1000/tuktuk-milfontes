@@ -242,11 +242,21 @@
     "milsuper": "Een supermarkt met een breed assortiment producten voor de dagelijkse behoeften.",
     "meuSuper": "Een gemakswinkel, ideaal voor snelle en essentiële boodschappen.",
     "amanhecer": "Een zaak die gespecialiseerd is in verse groenten en fruit, met een gevarieerd aanbod.",
-    "spar": "Een supermarkt met een compleet aanbod aan voedingsmiddelen en kruidenierswaren.",
+    "supermercadoSPAR": "Een supermarkt met een compleet aanbod aan voedingsmiddelen en kruidenierswaren.",
+    "campifrias": "Camping bij de markt en visplein.",
     "jardimParagemDosAutocarros": "Bushalte naast de tuin.",
     "frutasECompanhiaAmanhecer": "Lokale winkel met vers fruit, groenten en dagelijkse benodigdheden.",
     "campingMilfontes": "Camping met uitstekende faciliteiten, dicht bij het centrum van Milfontes en de natuur.",
     "restauranteOasis": "Restaurant met uitzicht op zee in Milfontes.",
-    "portinhoDoCanal": "Traditionele vissershaven en recreatiegebied."
+    "portinhoDoCanal": "Traditionele vissershaven en recreatiegebied.",
+    "ponteSobreORioMira": "Brug over de Mira-rivier in Milfontes.",
+    "estaturaDoArcanjo": "Een artistieke en ecologische kreet, gemaakt van gerecycled ijzer, die ons uitdaagt om na te denken en te handelen voor de planeet.",
+    "spotsDeSurfEKayak": "Verhuur van kajaks en kano's.",
+    "restauranteHSMilfontesBeach": "Hotel en restaurant met uitzicht op de monding van de Mira.",
+    "mercadoDeVilaNovaDeMilfontes": "Vis- en fruitmarkt."
+  },
+  "aerialViewMilfontes": {
+    "title": "Luchtfoto van Milfontes",
+    "description": "Luchtfoto op een wintermiddag boven Vila Nova de Milfontes, Alentejo - Portugal."
   }
 }

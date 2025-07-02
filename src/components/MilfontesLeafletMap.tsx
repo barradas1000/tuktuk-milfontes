@@ -247,8 +247,7 @@ const pointsOfInterest = [
     category: "Comércio",
     coords: [37.752948, -8.755478],
     description: "poi.brunheiras.description",
-    image:
-      "https://tuktuk-milfontes.vercel.app/lovable-uploads/Mercado%20das%20Brunheiras.jpeg",
+    image: "/lovable-uploads/Mercado das Brunheiras.jpeg",
     mapDescriptionKey: "mercadoDasBrunheiras",
   },
   {

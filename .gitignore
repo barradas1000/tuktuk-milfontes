@@ -49,3 +49,6 @@ yarn.lock
 
 # Testes
 coverage/
+
+# Variáveis de ambiente locais
+.env

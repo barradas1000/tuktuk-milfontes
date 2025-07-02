@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import "./VideoModal.css";
+import { useTranslation } from "react-i18next";
 
 const VideoModal: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <>
@@ -13,7 +15,7 @@ const VideoModal: React.FC = () => {
       >
         <img
           src="/lovable-uploads/imagem-videio-aereo.jpg"
-          alt="Vista aérea de Milfontes"
+          alt={t("aerialViewMilfontes.title")}
           className="video-thumbnail"
         />
       </div>
@@ -25,7 +27,7 @@ const VideoModal: React.FC = () => {
           >
             <iframe
               src="https://www.youtube.com/embed/6nlJW9-RiqM?autoplay=1&rel=0&modestbranding=1&playsinline=1"
-              title="Vista aérea de Vila Nova de Milfontes"
+              title={t("aerialViewMilfontes.title")}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               frameBorder={0}

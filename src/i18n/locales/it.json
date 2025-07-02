@@ -210,11 +210,21 @@
     "milsuper": "Un supermercato che offre una vasta gamma di prodotti per le esigenze quotidiane.",
     "meuSuper": "Un supermercato di convenienza, ideale per acquisti rapidi ed essenziali.",
     "amanhecer": "Un negozio specializzato in frutta e verdura fresca, con una selezione varia.",
-    "spar": "Un supermercato che offre una gamma completa di prodotti alimentari e di drogheria.",
+    "supermercadoSPAR": "Un supermercato che offre una gamma completa di prodotti alimentari e di drogheria.",
+    "campifrias": "Campeggio vicino al mercato e alla piazza del pesce.",
     "jardimParagemDosAutocarros": "Fermata dell'autobus accanto al giardino.",
     "frutasECompanhiaAmanhecer": "Negozio locale con frutta fresca, verdura e prodotti essenziali quotidiani.",
     "campingMilfontes": "Campeggio con ottime strutture, vicino al centro di Milfontes e alla natura.",
     "restauranteOasis": "Ristorante con vista mare a Milfontes.",
-    "portinhoDoCanal": "Porto di pesca tradizionale e zona ricreativa."
+    "portinhoDoCanal": "Porto di pesca tradizionale e zona ricreativa.",
+    "ponteSobreORioMira": "Ponte sul fiume Mira a Milfontes.",
+    "estaturaDoArcanjo": "Un grido artistico ed ecologico, realizzato in ferro riciclato, che ci invita a pensare e agire per il pianeta.",
+    "spotsDeSurfEKayak": "Noleggio di kayak e canoe.",
+    "restauranteHSMilfontesBeach": "Hotel e ristorante con vista sulla foce del fiume Mira.",
+    "mercadoDeVilaNovaDeMilfontes": "Mercato del pesce e della frutta."
+  },
+  "aerialViewMilfontes": {
+    "title": "Vista Aerea di Milfontes",
+    "description": "Vista aerea in un pomeriggio d'inverno su Vila Nova de Milfontes, Alentejo - Portogallo."
   }
 }

@@ -257,7 +257,7 @@
     "restauranteAChoupana": "Restaurante em frente ao mar, especializado em grelhados, sempre com peixe fresco.",
     "tascaDoCelso": "Um restaurante acolhedor e popular, famoso pela sua comida caseira e ambiente familiar.",
     "aManjedoura": "Take-away · Jantar no local · Com esplanada.",
-    "restauranteRitual": "Restaurante e Tapas-Bar onde a tranquilidade do Alentejo litoral se funde com um ambiente refinado e cosmopolita, impregnado de histórias e viagens pelo mundo fora.",
+    "restauranteRitual": "Restaurante e Tapas-Bar com um ambiente refinado e cosmopolita.",
     "patioAlentejano": "Um restaurante com um pátio agradável, que serve pratos tradicionais alentejanos num ambiente descontraído.",
     "restauranteHSBeach": "Um restaurante com vista para o mar, que serve uma variedade de pratos, incluindo marisco fresco.",
     "mercadoMilfontes": "Um mercado tradicional onde se pode encontrar produtos frescos locais e artesanato.",
@@ -265,13 +265,21 @@
     "milsuper": "Um supermercado que oferece uma vasta gama de produtos para as necessidades diárias.",
     "meuSuper": "Um supermercado de conveniência, ideal para compras rápidas e essenciais.",
     "amanhecer": "Um estabelecimento especializado em frutas e legumes frescos, com uma seleção variada.",
-    "spar": "Um supermercado que oferece uma gama completa de produtos alimentares e de mercearia.",
+    "supermercadoSPAR": "Um supermercado que oferece uma gama completa de produtos alimentares e de mercearia.",
+    "campifrias": "Camping perto ao mercado e praça de peixe",
     "jardimParagemDosAutocarros": "Paragem de autocarros junto ao jardim.",
     "frutasECompanhiaAmanhecer": "Mercearia local com frutas frescas, legumes e produtos essenciais para o dia a dia.",
     "campingMilfontes": "Parque de campismo com excelentes infraestruturas, próximo do centro de Milfontes e da natureza.",
-    "restauranteOasis": "Restaurante com vista para o mar em Milfontes.",
+    "restauranteOasis": "Restaurante com vista panorâmica de Milfontes.",
     "portinhoDoCanal": "Porto de pesca tradicional e zona de lazer.",
-    "restauranteOasis": "Restaurante com vista para o mar em Milfontes.",
-    "portinhoDoCanal": "Porto de pesca tradicional e zona de lazer."
+    "ponteSobreORioMira": "Ponte sobre o Rio Mira em Milfontes",
+    "estaturaDoArcanjo": "Um grito artístico e ecológico, feito em ferro reciclado, que nos desafia a pensar e agir em prol do planeta.",
+    "spotsDeSurfEKayak": "Aluguer de Caiaques e canoagem ",
+    "restauranteHSMilfontesBeach": " Hotel e restaurante com vista para a foz do rio Mira",
+    "mercadoDeVilaNovaDeMilfontes": "Mercado do peixe e frutas"
+  },
+  "aerialViewMilfontes": {
+    "title": "Vista Aérea de Milfontes",
+    "description": "Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes, Alentejo - Portugal."
   }
 }
