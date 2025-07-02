@@ -95,10 +95,13 @@ const Auth = () => {
       );
 
       if (error) {
-        if (error.message.includes("already registered")) {
-          setError("Este email já está registrado");
-        } else if (error.message.includes("Password should be at least")) {
-          setError("A senha deve ter pelo menos 6 caracteres");
+        if (
+          error.message.includes("already registered") ||
+          error.message.includes("User already registered")
+        ) {
+          setError(
+            "Este email já está registado. Por favor, faça login ou recupere a senha."
+          );
         } else {
           setError(error.message);
         }
