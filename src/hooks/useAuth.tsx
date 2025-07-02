@@ -16,12 +16,12 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (
     email: string,
     password: string,
     fullName: string
-  ) => Promise<{ error: any }>;
+  ) => Promise<{ error: { message: string } | Error | null }>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
 }
@@ -54,14 +54,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         // Fetch user profile
         setTimeout(async () => {
           try {
-            const { data: profileData, error } = await (supabase as any)
+            const { data: profileData, error } = await supabase
               .from("profiles")
               .select("*")
               .eq("id", session.user.id)
               .single();
 
             if (!error && profileData) {
-              setProfile(profileData);
+              setProfile(profileData as Profile);
             }
           } catch (err) {
             console.error("Error fetching profile:", err);
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string, fullName: string) => {
     // Verifica se o email está na whitelist
-    if (!allowedAdmins.includes(email.toLowerCase())) {
+    if (!allowedAdmins.includes(email.trim().toLowerCase())) {
       return {
         error: {
           message: "Email não autorizado para registo de administrador.",
