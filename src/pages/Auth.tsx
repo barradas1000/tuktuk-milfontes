@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { allowedAdmins } from "@/hooks/useAuth";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -128,6 +129,12 @@ const Auth = () => {
     setSuccess(null);
 
     try {
+      if (!allowedAdmins.includes(resetEmail.trim().toLowerCase())) {
+        setError("Email não autorizado para recuperação de senha.");
+        setIsResettingPassword(false);
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
         redirectTo: `${window.location.origin}/reset-password`,
       });

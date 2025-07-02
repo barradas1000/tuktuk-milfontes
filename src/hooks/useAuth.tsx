@@ -29,7 +29,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Lista de emails autorizados para registo de admin
-const allowedAdmins = [
+export const allowedAdmins = [
   "sonia.santos.scps82@gmail.com",
   "diogo.carias@outlook.pt",
   "carlosbarradas111@gmail.com",
