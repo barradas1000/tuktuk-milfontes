@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Session } from "@supabase/supabase-js";
-
+import { allowedAdmins } from "@/constants/allowedAdmins";
 interface Profile {
   id: string;
   email: string;
@@ -28,12 +28,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Lista de emails autorizados para registo de admin
-export const allowedAdmins = [
-  "sonia.santos.scps82@gmail.com",
-  "diogo.carias@outlook.pt",
-  "carlosbarradas111@gmail.com",
-];
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
