@@ -609,50 +609,49 @@ const Index = () => {
           </div>
 
           {/* Video Section */}
-          <div className="text-center mb-8">
-            <h3 className="text-3xl font-bold text-blue-900 mb-6">
-              Vista Aérea de Milfontes
-            </h3>
-            <p className="text-lg text-gray-600 mb-8 max-w-4xl mx-auto">
-              Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes,
-              Alentejo - Portugal.
-            </p>
-
-            <div className="video-responsive-container">
-              <div className="video-responsive">
-                <iframe
-                  src="https://www.youtube.com/embed/6nlJW9-RiqM?si=h37DP-O8n6hw1Uvi&amp;controls=1&amp;rel=0&amp;modestbranding=1&amp;playsinline=1"
-                  title="Vista aérea de Vila Nova de Milfontes"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                  loading="lazy"
-                ></iframe>
-              </div>
-            </div>
-
-            <div className="mt-6 text-sm text-gray-500 max-w-4xl mx-auto">
-              <p>
-                Este vídeo é cortesia do canal{" "}
-                <a
-                  href="https://www.youtube.com/@AndreInacio"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-amber-600 hover:text-amber-700 underline font-semibold"
-                >
-                  AndreInacio
-                </a>
-                . Assista o vídeo original{" "}
-                <a
-                  href="https://www.youtube.com/watch?v=6nlJW9-RiqM&t=29s"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-amber-600 hover:text-amber-700 underline font-semibold"
-                >
-                  aqui: Vila Nova de Milfontes aerial view @Alentejo - Portugal
-                </a>
-                .
+          <div className="text-center mb-8 flex justify-center">
+            <div>
+              <h3 className="text-3xl font-bold text-blue-900 mb-6">
+                Vista Aérea de Milfontes
+              </h3>
+              <p className="text-lg text-gray-600 mb-8 max-w-4xl mx-auto">
+                Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes, Alentejo - Portugal.
               </p>
+              <div className="video-responsive-container">
+                <div className="video-responsive">
+                  <iframe
+                    src="https://www.youtube.com/embed/6nlJW9-RiqM?si=h37DP-O8n6hw1Uvi&amp;controls=1&amp;rel=0&amp;modestbranding=1&amp;playsinline=1"
+                    title="Vista aérea de Vila Nova de Milfontes"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                    loading="lazy"
+                  ></iframe>
+                </div>
+              </div>
+              <div className="mt-6 text-sm text-gray-500 max-w-4xl mx-auto">
+                <p>
+                  Este vídeo é cortesia do canal{" "}
+                  <a
+                    href="https://www.youtube.com/@AndreInacio"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-600 hover:text-amber-700 underline font-semibold"
+                  >
+                    AndreInacio
+                  </a>
+                  . Assista o vídeo original{" "}
+                  <a
+                    href="https://www.youtube.com/watch?v=6nlJW9-RiqM&t=29s"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-600 hover:text-amber-700 underline font-semibold"
+                  >
+                    aqui: Vila Nova de Milfontes aerial view @Alentejo - Portugal
+                  </a>
+                  .
+                </p>
+              </div>
             </div>
           </div>
         </div>
