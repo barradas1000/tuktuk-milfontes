@@ -619,7 +619,7 @@ const Index = () => {
             </p>
 
             <div className="relative w-full max-w-4xl mx-auto">
-              <div className="aspect-video rounded-xl overflow-hidden shadow-2xl bg-gray-900">
+              <div className="rounded-xl overflow-hidden shadow-2xl bg-gray-900 aspect-[4/3] sm:aspect-video">
                 <iframe
                   width="100%"
                   height="100%"
@@ -631,7 +631,7 @@ const Index = () => {
                   allowFullScreen
                   className="w-full h-full"
                   loading="lazy"
-                  style={{ minHeight: "300px" }}
+                  style={{ minHeight: "200px" }}
                 ></iframe>
               </div>
             </div>
