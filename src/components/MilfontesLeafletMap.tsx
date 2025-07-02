@@ -401,62 +401,63 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
 
   return (
     <div id="milfontes-leaflet-map" style={{ position: "relative" }}>
-      <button
-        onClick={handleExit}
-        style={{
-          position: "absolute",
-          top: 16,
-          right: 16,
-          zIndex: 1000,
-          background: "#fff",
-          border: "1px solid #ccc",
-          borderRadius: 4,
-          padding: "8px 16px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
-      >
-        {t("map.exitMap")}
-      </button>
       <div style={{ position: "relative", width: "100%", margin: "auto" }}>
-        <div style={titleStyle}>{t("map.description")}</div>
-        <MapContainer
-          center={[37.725, -8.783]}
-          zoom={14}
-          scrollWheelZoom={true}
-          style={mapStyle}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            options={{
-              attribution:
-                '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-            }}
-          />
-          {pointsOfInterest.map((poi) => (
-            <Marker key={poi.name} position={poi.coords as [number, number]}>
-              <Popup>
-                <div style={{ textAlign: "center" }}>
-                  <b>{poi.name}</b>
-                  <br />
-                  <img
-                    src={poi.image}
-                    alt={poi.name}
-                    style={{
-                      width: 200,
-                      height: "auto",
-                      borderRadius: 5,
-                      marginBottom: 5,
-                    }}
-                  />
-                  <div style={{ fontSize: 14, color: "#444", marginBottom: 4 }}>
-                    {t(`mapDescriptions.${poi.mapDescriptionKey}`)}
+        <div style={{ position: "relative" }}>
+          <MapContainer
+            center={[37.725, -8.783]}
+            zoom={14}
+            scrollWheelZoom={true}
+            style={mapStyle}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution="© OpenStreetMap contributors"
+            />
+            {pointsOfInterest.map((poi) => (
+              <Marker key={poi.name} position={poi.coords as [number, number]}>
+                <Popup>
+                  <div style={{ textAlign: "center" }}>
+                    <b>{poi.name}</b>
+                    <br />
+                    <img
+                      src={poi.image}
+                      alt={poi.name}
+                      style={{
+                        width: 200,
+                        height: "auto",
+                        borderRadius: 5,
+                        marginBottom: 5,
+                      }}
+                    />
+                    <div
+                      style={{ fontSize: 14, color: "#444", marginBottom: 4 }}
+                    >
+                      {t(`mapDescriptions.${poi.mapDescriptionKey}`)}
+                    </div>
                   </div>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+          <button
+            onClick={handleExit}
+            style={{
+              position: "absolute",
+              bottom: 24,
+              right: 24,
+              zIndex: 2000,
+              background: "#fff",
+              border: "1px solid #ccc",
+              borderRadius: 4,
+              padding: "8px 16px",
+              cursor: "pointer",
+              fontWeight: "bold",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+            }}
+          >
+            {t("map.exitMap")}
+          </button>
+        </div>
       </div>
     </div>
   );
