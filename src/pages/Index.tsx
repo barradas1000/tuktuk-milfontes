@@ -618,20 +618,15 @@ const Index = () => {
               Alentejo - Portugal.
             </p>
 
-            <div className="relative w-full max-w-4xl mx-auto">
-              <div className="rounded-xl overflow-hidden shadow-2xl bg-gray-900 aspect-[4/3] sm:aspect-video">
+            <div className="video-responsive-container">
+              <div className="video-responsive">
                 <iframe
-                  width="100%"
-                  height="100%"
                   src="https://www.youtube.com/embed/6nlJW9-RiqM?si=h37DP-O8n6hw1Uvi&amp;controls=1&amp;rel=0&amp;modestbranding=1&amp;playsinline=1"
                   title="Vista aérea de Vila Nova de Milfontes"
-                  frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
-                  className="w-full h-full"
                   loading="lazy"
-                  style={{ minHeight: "200px" }}
                 ></iframe>
               </div>
             </div>
