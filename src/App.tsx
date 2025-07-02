@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 const Admin = lazy(() => import("./pages/Admin"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 import "./i18n";
 
 const queryClient = new QueryClient();
@@ -35,6 +36,14 @@ const App = () => (
               element={
                 <Suspense fallback={<div>Carregando...</div>}>
                   <Auth />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <Suspense fallback={<div>Carregando...</div>}>
+                  <ResetPassword />
                 </Suspense>
               }
             />

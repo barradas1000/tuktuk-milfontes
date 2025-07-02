@@ -73,7 +73,7 @@ const Auth = () => {
       } else {
         navigate("/admin");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError("Erro ao fazer login. Tente novamente.");
       console.error("Login error:", err);
     } finally {
@@ -113,7 +113,7 @@ const Auth = () => {
         setSignupPassword("");
         setSignupFullName("");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError("Erro ao criar conta. Tente novamente.");
       console.error("Signup error:", err);
     } finally {
@@ -129,7 +129,7 @@ const Auth = () => {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/login?reset=true`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
 
       if (error) {
@@ -141,7 +141,7 @@ const Auth = () => {
         setResetEmail("");
         setShowResetForm(false);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setError("Erro ao enviar email de recuperação. Tente novamente.");
       console.error("Reset password error:", err);
     } finally {
