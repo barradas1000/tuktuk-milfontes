@@ -31,7 +31,7 @@ const App = () => (
               }
             />
             <Route
-              path="/auth"
+              path="/login"
               element={
                 <Suspense fallback={<div>Carregando...</div>}>
                   <Auth />
