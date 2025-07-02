@@ -42,6 +42,7 @@ import ReservationForm from "@/components/ReservationForm";
 import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import LanguageSelector from "@/components/LanguageSelector";
 import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
+import VideoModal from "../components/VideoModal";
 
 const Index = () => {
   console.log("Index component rendering");
@@ -618,18 +619,7 @@ const Index = () => {
                 Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes,
                 Alentejo - Portugal.
               </p>
-              <div className="video-responsive-container">
-                <div className="video-responsive">
-                  <iframe
-                    src="https://www.youtube.com/embed/6nlJW9-RiqM?si=h37DP-O8n6hw1Uvi&amp;controls=1&amp;rel=0&amp;modestbranding=1&amp;playsinline=1"
-                    title="Vista aérea de Vila Nova de Milfontes"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                    loading="lazy"
-                  ></iframe>
-                </div>
-              </div>
+              <VideoModal />
               <div className="mt-6 text-sm text-gray-500 max-w-4xl mx-auto">
                 <p>
                   Este vídeo é cortesia do canal{" "}
