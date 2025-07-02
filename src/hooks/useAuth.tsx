@@ -1,7 +1,6 @@
-
-import { useState, useEffect, createContext, useContext } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { User, Session } from '@supabase/supabase-js';
+import { useState, useEffect, createContext, useContext } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 
 interface Profile {
   id: string;
@@ -18,12 +17,23 @@ interface AuthContextType {
   profile: Profile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (
+    email: string,
+    password: string,
+    fullName: string
+  ) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Lista de emails autorizados para registo de admin
+const allowedAdmins = [
+  "sonia.santos.scps82@gmail.com",
+  "diogo.carias@outlook.pt",
+  "carlosbarradas111@gmail.com",
+];
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,36 +43,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Fetch user profile
-          setTimeout(async () => {
-            try {
-              const { data: profileData, error } = await (supabase as any)
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-              
-              if (!error && profileData) {
-                setProfile(profileData);
-              }
-            } catch (err) {
-              console.error('Error fetching profile:', err);
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.email);
+      setSession(session);
+      setUser(session?.user ?? null);
+
+      if (session?.user) {
+        // Fetch user profile
+        setTimeout(async () => {
+          try {
+            const { data: profileData, error } = await (supabase as any)
+              .from("profiles")
+              .select("*")
+              .eq("id", session.user.id)
+              .single();
+
+            if (!error && profileData) {
+              setProfile(profileData);
             }
-          }, 0);
-        } else {
-          setProfile(null);
-        }
-        
-        setLoading(false);
+          } catch (err) {
+            console.error("Error fetching profile:", err);
+          }
+        }, 0);
+      } else {
+        setProfile(null);
       }
-    );
+
+      setLoading(false);
+    });
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -75,7 +85,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    console.log('Attempting sign in for:', email);
+    console.log("Attempting sign in for:", email);
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -84,9 +94,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    console.log('Attempting sign up for:', email);
+    // Verifica se o email está na whitelist
+    if (!allowedAdmins.includes(email.toLowerCase())) {
+      return {
+        error: {
+          message: "Email não autorizado para registo de administrador.",
+        },
+      };
+    }
+    console.log("Attempting sign up for:", email);
     const redirectUrl = `${window.location.origin}/auth`;
-    
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -94,19 +112,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
-        }
-      }
+          role: "admin",
+        },
+      },
     });
     return { error };
   };
 
   const signOut = async () => {
-    console.log('Signing out...');
+    console.log("Signing out...");
     await supabase.auth.signOut();
     setProfile(null);
   };
 
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = profile?.role === "admin";
 
   const value = {
     user,
@@ -125,7 +144,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

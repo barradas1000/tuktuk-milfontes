@@ -1,15 +1,20 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Lock, Eye, EyeOff } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -17,29 +22,29 @@ const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState('login');
+  const [activeTab, setActiveTab] = useState("login");
 
   // Password visibility states
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
 
   // Login form state
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
 
   // Signup form state
-  const [signupEmail, setSignupEmail] = useState('');
-  const [signupPassword, setSignupPassword] = useState('');
-  const [signupFullName, setSignupFullName] = useState('');
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [signupFullName, setSignupFullName] = useState("");
 
   // Reset password state
-  const [resetEmail, setResetEmail] = useState('');
+  const [resetEmail, setResetEmail] = useState("");
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
 
   useEffect(() => {
     if (user && !loading) {
-      navigate('/admin');
+      navigate("/admin");
     }
   }, [user, loading, navigate]);
 
@@ -53,24 +58,24 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const { error } = await signIn(loginEmail, loginPassword);
-      
+
       if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          setError('Email ou senha incorretos');
-        } else if (error.message.includes('Email not confirmed')) {
-          setError('Por favor, confirme seu email antes de fazer login');
+        if (error.message.includes("Invalid login credentials")) {
+          setError("Email ou senha incorretos");
+        } else if (error.message.includes("Email not confirmed")) {
+          setError("Por favor, confirme seu email antes de fazer login");
         } else {
           setError(error.message);
         }
       } else {
-        navigate('/admin');
+        navigate("/admin");
       }
     } catch (err: any) {
-      setError('Erro ao fazer login. Tente novamente.');
-      console.error('Login error:', err);
+      setError("Erro ao fazer login. Tente novamente.");
+      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -81,27 +86,33 @@ const Auth = () => {
     setIsLoading(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
-      const { error } = await signUp(signupEmail, signupPassword, signupFullName);
-      
+      const { error } = await signUp(
+        signupEmail,
+        signupPassword,
+        signupFullName
+      );
+
       if (error) {
-        if (error.message.includes('already registered')) {
-          setError('Este email já está registrado');
-        } else if (error.message.includes('Password should be at least')) {
-          setError('A senha deve ter pelo menos 6 caracteres');
+        if (error.message.includes("already registered")) {
+          setError("Este email já está registrado");
+        } else if (error.message.includes("Password should be at least")) {
+          setError("A senha deve ter pelo menos 6 caracteres");
         } else {
           setError(error.message);
         }
       } else {
-        setSuccess('Conta criada com sucesso! Verifique seu email para confirmar a conta.');
-        setSignupEmail('');
-        setSignupPassword('');
-        setSignupFullName('');
+        setSuccess(
+          "Conta criada com sucesso! Verifique seu email para confirmar a conta."
+        );
+        setSignupEmail("");
+        setSignupPassword("");
+        setSignupFullName("");
       }
     } catch (err: any) {
-      setError('Erro ao criar conta. Tente novamente.');
-      console.error('Signup error:', err);
+      setError("Erro ao criar conta. Tente novamente.");
+      console.error("Signup error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -112,22 +123,24 @@ const Auth = () => {
     setIsResettingPassword(true);
     setError(null);
     setSuccess(null);
-    
+
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/auth?reset=true`,
+        redirectTo: `${window.location.origin}/login?reset=true`,
       });
-      
+
       if (error) {
-        setError('Erro ao enviar email de recuperação: ' + error.message);
+        setError("Erro ao enviar email de recuperação: " + error.message);
       } else {
-        setSuccess('Email de recuperação enviado! Verifique sua caixa de entrada.');
-        setResetEmail('');
+        setSuccess(
+          "Email de recuperação enviado! Verifique sua caixa de entrada."
+        );
+        setResetEmail("");
         setShowResetForm(false);
       }
     } catch (err: any) {
-      setError('Erro ao enviar email de recuperação. Tente novamente.');
-      console.error('Reset password error:', err);
+      setError("Erro ao enviar email de recuperação. Tente novamente.");
+      console.error("Reset password error:", err);
     } finally {
       setIsResettingPassword(false);
     }
@@ -146,25 +159,33 @@ const Auth = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Lock className="mx-auto h-12 w-12 text-blue-600 mb-4" />
-          <h1 className="text-3xl font-bold text-gray-900">Área Administrativa</h1>
-          <p className="text-gray-600 mt-2">Faça login para acessar o painel administrativo</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Área Administrativa
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Faça login para acessar o painel administrativo
+          </p>
         </div>
 
         <Card>
           <CardHeader>
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="w-full"
+            >
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Entrar</TabsTrigger>
                 <TabsTrigger value="signup">Criar Conta</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="login">
                 <CardTitle>Fazer Login</CardTitle>
                 <CardDescription>
                   Entre com suas credenciais para acessar o sistema
                 </CardDescription>
               </TabsContent>
-              
+
               <TabsContent value="signup">
                 <CardTitle>Criar Conta</CardTitle>
                 <CardDescription>
@@ -173,17 +194,21 @@ const Auth = () => {
               </TabsContent>
             </Tabs>
           </CardHeader>
-          
+
           <CardContent>
             {error && (
               <Alert className="mb-4 border-red-200 bg-red-50">
-                <AlertDescription className="text-red-800">{error}</AlertDescription>
+                <AlertDescription className="text-red-800">
+                  {error}
+                </AlertDescription>
               </Alert>
             )}
-            
+
             {success && (
               <Alert className="mb-4 border-green-200 bg-green-50">
-                <AlertDescription className="text-green-800">{success}</AlertDescription>
+                <AlertDescription className="text-green-800">
+                  {success}
+                </AlertDescription>
               </Alert>
             )}
 
@@ -191,9 +216,11 @@ const Auth = () => {
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="text-center mb-4">
                   <h3 className="text-lg font-medium">Recuperar Senha</h3>
-                  <p className="text-sm text-gray-600">Digite seu email para receber o link de recuperação</p>
+                  <p className="text-sm text-gray-600">
+                    Digite seu email para receber o link de recuperação
+                  </p>
                 </div>
-                
+
                 <div>
                   <Label htmlFor="reset-email">Email</Label>
                   <Input
@@ -206,31 +233,39 @@ const Auth = () => {
                     disabled={isResettingPassword}
                   />
                 </div>
-                
+
                 <div className="flex space-x-2">
-                  <Button 
-                    type="button" 
-                    variant="outline" 
+                  <Button
+                    type="button"
+                    variant="outline"
                     onClick={() => setShowResetForm(false)}
                     className="flex-1"
                     disabled={isResettingPassword}
                   >
                     Cancelar
                   </Button>
-                  <Button type="submit" className="flex-1" disabled={isResettingPassword}>
+                  <Button
+                    type="submit"
+                    className="flex-1"
+                    disabled={isResettingPassword}
+                  >
                     {isResettingPassword ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Enviando...
                       </>
                     ) : (
-                      'Enviar Email'
+                      "Enviar Email"
                     )}
                   </Button>
                 </div>
               </form>
             ) : (
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <Tabs
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+              >
                 <TabsContent value="login">
                   <form onSubmit={handleSignIn} className="space-y-4">
                     <div>
@@ -245,7 +280,7 @@ const Auth = () => {
                         disabled={isLoading}
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="login-password">Senha</Label>
                       <div className="relative">
@@ -262,7 +297,9 @@ const Auth = () => {
                         <button
                           type="button"
                           className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                          onClick={() => setShowLoginPassword(!showLoginPassword)}
+                          onClick={() =>
+                            setShowLoginPassword(!showLoginPassword)
+                          }
                         >
                           {showLoginPassword ? (
                             <EyeOff className="h-4 w-4 text-gray-400" />
@@ -272,18 +309,22 @@ const Auth = () => {
                         </button>
                       </div>
                     </div>
-                    
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
                       {isLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Entrando...
                         </>
                       ) : (
-                        'Entrar'
+                        "Entrar"
                       )}
                     </Button>
-                    
+
                     <div className="text-center">
                       <button
                         type="button"
@@ -295,7 +336,7 @@ const Auth = () => {
                     </div>
                   </form>
                 </TabsContent>
-                
+
                 <TabsContent value="signup">
                   <form onSubmit={handleSignUp} className="space-y-4">
                     <div>
@@ -310,7 +351,7 @@ const Auth = () => {
                         disabled={isLoading}
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="signup-email">Email</Label>
                       <Input
@@ -323,7 +364,7 @@ const Auth = () => {
                         disabled={isLoading}
                       />
                     </div>
-                    
+
                     <div>
                       <Label htmlFor="signup-password">Senha</Label>
                       <div className="relative">
@@ -341,7 +382,9 @@ const Auth = () => {
                         <button
                           type="button"
                           className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                          onClick={() => setShowSignupPassword(!showSignupPassword)}
+                          onClick={() =>
+                            setShowSignupPassword(!showSignupPassword)
+                          }
                         >
                           {showSignupPassword ? (
                             <EyeOff className="h-4 w-4 text-gray-400" />
@@ -351,15 +394,19 @@ const Auth = () => {
                         </button>
                       </div>
                     </div>
-                    
-                    <Button type="submit" className="w-full" disabled={isLoading}>
+
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isLoading}
+                    >
                       {isLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Criando conta...
                         </>
                       ) : (
-                        'Criar Conta'
+                        "Criar Conta"
                       )}
                     </Button>
                   </form>
@@ -368,11 +415,11 @@ const Auth = () => {
             )}
           </CardContent>
         </Card>
-        
+
         <div className="text-center mt-6">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/')}
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/")}
             className="text-gray-600 hover:text-gray-900"
           >
             ← Voltar ao site
