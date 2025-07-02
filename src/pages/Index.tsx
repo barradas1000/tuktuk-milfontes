@@ -615,7 +615,8 @@ const Index = () => {
                 Vista Aérea de Milfontes
               </h3>
               <p className="text-lg text-gray-600 mb-8 max-w-4xl mx-auto">
-                Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes, Alentejo - Portugal.
+                Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes,
+                Alentejo - Portugal.
               </p>
               <div className="video-responsive-container">
                 <div className="video-responsive">
@@ -647,7 +648,8 @@ const Index = () => {
                     rel="noopener noreferrer"
                     className="text-amber-600 hover:text-amber-700 underline font-semibold"
                   >
-                    aqui: Vila Nova de Milfontes aerial view @Alentejo - Portugal
+                    aqui: Vila Nova de Milfontes aerial view @Alentejo -
+                    Portugal
                   </a>
                   .
                 </p>

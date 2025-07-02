@@ -41,15 +41,20 @@
   color: #888;
 }
 
-.video-responsive-container {
+..video-responsive-container {
   position: relative;
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 0 auto; /* Centraliza o contêiner */
   border-radius: 16px;
   overflow: hidden;
   background: #18181b;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  /* Adicione flexbox para centralizar o conteúdo do iframe */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px; /* Altura mínima para o contêiner */
 }
 
 .video-responsive {
@@ -57,6 +62,10 @@
   height: 0;
   padding-bottom: 56.25%; /* 16:9 para todos os ecrãs */
   position: relative;
+  /* Flexbox pode não ser estritamente necessário aqui, mas não atrapalha */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .video-responsive iframe {
@@ -68,4 +77,7 @@
   border: 0;
   background: #18181b;
   border-radius: 16px;
+  /* Garantir que o iframe se centralize, embora position:absolute já faça isso com top/left/width/height:100% */
+  margin: auto; /* Centraliza se houver algum espaço extra */
+  display: block; /* Garante que se comporte como um bloco */
 }
