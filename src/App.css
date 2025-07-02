@@ -45,34 +45,38 @@
   position: relative;
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto; /* Garante que o contêiner principal esteja centralizado horizontalmente */
+  margin: 0 auto;
   border-radius: 16px;
-  overflow: hidden; /* Importante para cortar qualquer conteúdo que exceda o raio da borda */
+  overflow: hidden;
   background: #18181b;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
-  /* Adicione uma altura mínima para o contêiner, útil antes do iframe carregar */
-  min-height: 200px; /* Ajuste conforme a altura mínima desejada */
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  min-height: 200px;
+}
+
+@media (max-width: 640px) {
+  .video-responsive-container {
+    max-width: 100vw;
+    border-radius: 0;
+  }
 }
 
 .video-responsive {
-  position: relative; /* Essencial para que o iframe posicionado absolutamente se refira a este pai */
+  position: relative;
   width: 100%;
-  height: 0; /* A altura é controlada pelo padding-bottom */
-  qualquer display flex ou grid aqui, pois o iframe é posicionado absolutamente */
+  height: 0;
+  padding-bottom: 56.25%; /* 16:9 */
 }
 
 .video-responsive iframe {
-  ; /* Permite posicionar o iframe precisamente */
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100%; /* Faz o iframe ocupar 100% da largura do .video-responsive */
-  height: 100%; /* Faz o iframe ocupar 100% da altura do .video-responsive */
+  width: 100%;
+  height: 100%;
   border: 0;
-  background: #18181b; /* Cor de fundo para o iframe, visível antes do carregamento */
-  border-radius: 16px; /* Aplica o raio da borda ao iframe */
-  /* Remova qualquer margin ou padding que possa estar causando o deslocamento */
+  background: #18181b;
+  border-radius: 16px;
   margin: 0;
   padding: 0;
-  display: block; /* Garante que o iframe se comporte como um bloco, removendo espaços extras */
+  display: block;
 }
-
