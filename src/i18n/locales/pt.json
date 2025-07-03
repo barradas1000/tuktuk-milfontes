@@ -215,7 +215,7 @@
     "exitMap": "Sair do mapa"
   },
   "reservation": {
-    "title": "Reserve o Seu Passeio",
+    "title": "Pedido de reserva:",
     "subtitle": "Preencha os dados e confirme via WhatsApp",
     "name": "Nome Completo",
     "email": "Email",

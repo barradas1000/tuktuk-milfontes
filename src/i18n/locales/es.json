@@ -189,7 +189,7 @@
     "exitMap": "Salir del mapa"
   },
   "reservation": {
-    "title": "Reserva tu Tour",
+    "title": "Solicitud de reserva:",
     "subtitle": "Completa los datos y confirma vía WhatsApp",
     "name": "Nombre Completo",
     "email": "Email",
@@ -208,7 +208,13 @@
     "confirmWhatsApp": "Confirmar vía WhatsApp",
     "reservationSent": "¡Reserva enviada!",
     "reservationDescription": "Serás redirigido a WhatsApp para confirmar tu reserva.",
-    "required": "requerido"
+    "required": "requerido",
+    "whatsappMessages": {
+      "pending": "Hola {{name}}, hemos recibido su solicitud de reserva y pronto nos pondremos en contacto para confirmarla.",
+      "confirmed": "Hola {{name}}, ¡su reserva ha sido confirmada! Esperamos darle la bienvenida. Si tiene alguna duda, estamos a su disposición.",
+      "cancelled": "Hola {{name}}, lamentablemente su reserva ha sido cancelada. Si necesita reprogramar o tiene alguna pregunta, por favor contáctenos.",
+      "completed": "Hola {{name}}, ¡gracias por realizar el tour con nosotros! Esperamos que haya tenido una excelente experiencia."
+    }
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Cerca del pueblo e ideal para familias, es conocida por sus aguas tranquilas y el paisaje del estuario del Mira.",

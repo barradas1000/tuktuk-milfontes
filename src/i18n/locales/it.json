@@ -160,7 +160,7 @@
     "exitMap": "Esci dalla mappa"
   },
   "reservation": {
-    "title": "Prenota il tuo Tour",
+    "title": "Richiesta di prenotazione:",
     "subtitle": "Compila i dettagli e conferma via WhatsApp",
     "name": "Nome Completo",
     "email": "Email",
@@ -179,7 +179,13 @@
     "confirmWhatsApp": "Conferma via WhatsApp",
     "reservationSent": "Prenotazione inviata!",
     "reservationDescription": "Sarai reindirizzato a WhatsApp per confermare la tua prenotazione.",
-    "required": "richiesto"
+    "required": "richiesto",
+    "whatsappMessages": {
+      "pending": "Ciao {{name}}, abbiamo ricevuto la tua richiesta di prenotazione e ti contatteremo presto per la conferma.",
+      "confirmed": "Ciao {{name}}, la tua prenotazione è stata confermata! Non vediamo l'ora di accoglierti. Se hai domande, siamo a tua disposizione.",
+      "cancelled": "Ciao {{name}}, purtroppo la tua prenotazione è stata annullata. Se hai bisogno di riprogrammare o hai domande, contattaci pure.",
+      "completed": "Ciao {{name}}, grazie per aver fatto il tour con noi! Speriamo che tu abbia vissuto una bellissima esperienza."
+    }
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Vicino al villaggio e ideale per le famiglie, è conosciuta per le sue acque calme e il paesaggio dell'estuario del Mira.",

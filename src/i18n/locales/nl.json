@@ -192,7 +192,7 @@
     "exitMap": "Kaart sluiten"
   },
   "reservation": {
-    "title": "Boek uw Tour",
+    "title": "Reserveringsaanvraag:",
     "subtitle": "Vul de details in en bevestig via WhatsApp",
     "name": "Volledige Naam",
     "email": "Email",
@@ -211,7 +211,13 @@
     "confirmWhatsApp": "Bevestigen via WhatsApp",
     "reservationSent": "Reservering verzonden!",
     "reservationDescription": "U wordt doorgestuurd naar WhatsApp om uw reservering te bevestigen.",
-    "required": "vereist"
+    "required": "vereist",
+    "whatsappMessages": {
+      "pending": "Hallo {{name}}, we hebben uw reserveringsaanvraag ontvangen en nemen binnenkort contact met u op voor bevestiging.",
+      "confirmed": "Hallo {{name}}, uw reservering is bevestigd! We kijken ernaar uit u te verwelkomen. Als u vragen heeft, staan we voor u klaar.",
+      "cancelled": "Hallo {{name}}, helaas is uw reservering geannuleerd. Als u opnieuw wilt plannen of vragen heeft, neem dan contact met ons op.",
+      "completed": "Hallo {{name}}, bedankt dat u met ons de tour heeft gedaan! We hopen dat u een geweldige ervaring heeft gehad."
+    }
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Dicht bij het dorp en ideaal voor gezinnen, bekend om het kalme water en het landschap van de Mira-estuarium.",

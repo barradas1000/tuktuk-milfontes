@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Calendar, Users, Clock, MessageCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import i18n from "i18next";
 
 const ReservationForm = () => {
   console.log("ReservationForm rendering");
@@ -93,7 +94,7 @@ const ReservationForm = () => {
     }
 
     // Abrir WhatsApp normalmente
-    const phoneNumber = "351968784043";
+    const phoneNumber = "351965748022";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
     )}`;

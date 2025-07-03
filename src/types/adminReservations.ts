@@ -1,4 +1,3 @@
-
 export interface AdminReservation {
   id: string;
   customer_name: string;
@@ -9,9 +8,10 @@ export interface AdminReservation {
   number_of_people: number;
   tour_type: string;
   special_requests?: string;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  status: "pending" | "confirmed" | "cancelled" | "completed";
   total_price: number;
   created_at: string;
+  language?: string;
 }
 
 export interface AvailabilitySlot {

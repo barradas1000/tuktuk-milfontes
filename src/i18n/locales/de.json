@@ -160,7 +160,7 @@
     "exitMap": "Karte verlassen"
   },
   "reservation": {
-    "title": "Buchen Sie Ihre Tour",
+    "title": "Reservierungsanfrage:",
     "subtitle": "Füllen Sie die Details aus und bestätigen Sie über WhatsApp",
     "name": "Vollständiger Name",
     "email": "E-Mail",
@@ -179,7 +179,13 @@
     "confirmWhatsApp": "Über WhatsApp bestätigen",
     "reservationSent": "Reservierung gesendet!",
     "reservationDescription": "Sie werden zu WhatsApp weitergeleitet, um Ihre Reservierung zu bestätigen.",
-    "required": "erforderlich"
+    "required": "erforderlich",
+    "whatsappMessages": {
+      "pending": "Hallo {{name}}, wir haben Ihre Reservierungsanfrage erhalten und werden Sie in Kürze zur Bestätigung kontaktieren.",
+      "confirmed": "Hallo {{name}}, Ihre Reservierung wurde bestätigt! Wir freuen uns darauf, Sie begrüßen zu dürfen. Bei Fragen stehen wir Ihnen gerne zur Verfügung.",
+      "cancelled": "Hallo {{name}}, leider wurde Ihre Reservierung storniert. Wenn Sie einen neuen Termin vereinbaren oder Fragen haben, kontaktieren Sie uns bitte.",
+      "completed": "Hallo {{name}}, vielen Dank, dass Sie mit uns die Tour gemacht haben! Wir hoffen, Sie hatten eine tolle Erfahrung."
+    }
   },
   "mapDescriptions": {
     "praiaDaFranquia": "In der Nähe des Dorfes und ideal für Familien, bekannt für ihr ruhiges Wasser und die Landschaft des Mira-Mündungsgebiets.",
