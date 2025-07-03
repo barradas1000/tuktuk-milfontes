@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -15,16 +15,29 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Extrai o access_token da query string
   const params = new URLSearchParams(location.search);
   const accessToken = params.get("access_token");
   const type = params.get("type");
 
+  // Debug: Log dos parâmetros recebidos
+  useEffect(() => {
+    console.log("ResetPassword - URL:", window.location.href);
+    console.log("ResetPassword - accessToken:", accessToken);
+    console.log("ResetPassword - type:", type);
+    console.log("ResetPassword - search params:", location.search);
+  }, [accessToken, type, location.search]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
+    console.log("Submitting form with:", { accessToken, type });
+
     if (!password || !confirmPassword) {
       setError("Preencha ambos os campos de senha.");
       return;
@@ -34,22 +47,30 @@ const ResetPassword = () => {
       return;
     }
     if (!accessToken || type !== "recovery") {
+      console.log("Token validation failed:", { accessToken, type });
       setError("Link inválido ou expirado.");
       return;
     }
+
     setLoading(true);
-    // Atualiza a senha usando o access_token
-    const { error } = await supabase.auth.updateUser(
-      { password },
-     
-    );
-    if (error) {
-      setError("Erro ao redefinir senha: " + error.message);
-    } else {
-      setSuccess("Senha redefinida com sucesso! Faça login com a nova senha.");
-      setTimeout(() => navigate("/login"), 2000);
+    try {
+      // Atualiza a senha usando o access_token
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) {
+        console.error("Update user error:", error);
+        setError("Erro ao redefinir senha: " + error.message);
+      } else {
+        setSuccess(
+          "Senha redefinida com sucesso! Faça login com a nova senha."
+        );
+        setTimeout(() => navigate("/login"), 2000);
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+      setError("Erro inesperado ao redefinir senha.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -82,27 +103,53 @@ const ResetPassword = () => {
               </Alert>
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+              <div className="relative">
                 <Input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Nova senha"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
                   disabled={loading}
+                  className="pr-10"
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword((v) => !v)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
               </div>
-              <div>
+              <div className="relative">
                 <Input
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   placeholder="Confirmar nova senha"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   minLength={6}
                   disabled={loading}
+                  className="pr-10"
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? (

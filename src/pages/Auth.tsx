@@ -15,7 +15,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Lock, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { allowedAdmins } from "@/hooks/useAuth";
+import { allowedAdmins } from "@/constants/allowedAdmins";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -129,8 +129,24 @@ const Auth = () => {
     setSuccess(null);
 
     try {
-      if (!allowedAdmins.includes(resetEmail.trim().toLowerCase())) {
+      const email = resetEmail.trim().toLowerCase();
+      if (!allowedAdmins.includes(email)) {
         setError("Email não autorizado para recuperação de senha.");
+        setIsResettingPassword(false);
+        return;
+      }
+
+      // Verifica se o utilizador já tem conta criada no Supabase Auth
+      const { data, error: fetchError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", email)
+        .single();
+
+      if (fetchError || !data) {
+        setError(
+          "Este email ainda não criou a sua conta de acesso, crie primeiro a sua conta "
+        );
         setIsResettingPassword(false);
         return;
       }
@@ -173,7 +189,7 @@ const Auth = () => {
             Área Administrativa
           </h1>
           <p className="text-gray-600 mt-2">
-            Faça login para acessar o painel administrativo
+            Faça login para acessar o painel administrativo da aplicaçãoTuktuk-milfontes.
           </p>
         </div>
 

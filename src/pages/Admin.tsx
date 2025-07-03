@@ -1,22 +1,22 @@
-
-import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import AdminDashboard from '@/components/admin/AdminDashboard';
-import { Loader2 } from 'lucide-react';
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import AdminDashboard from "@/components/admin/AdminDashboard";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const Admin = () => {
-  console.log('Admin page component rendering...');
+  console.log("Admin page component rendering...");
   const navigate = useNavigate();
-  const { user, loading, isAdmin } = useAuth();
+  const { user, loading, isAdmin, signOut } = useAuth();
 
   useEffect(() => {
     if (!loading) {
       if (!user) {
-        console.log('No user found, redirecting to auth');
-        navigate('/auth');
+        console.log("No user found, redirecting to auth");
+        navigate("/auth");
       } else if (!isAdmin) {
-        console.log('User is not admin, access denied');
+        console.log("User is not admin, access denied");
         // You could redirect to a "not authorized" page or show an error
         // For now, we'll still allow access but could be restricted
       }
@@ -38,8 +38,18 @@ const Admin = () => {
     return null; // Will redirect to auth
   }
 
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
+
   return (
-    <div>
+    <div className="relative min-h-screen">
+      <div className="absolute top-4 right-4 z-10">
+        <Button variant="outline" onClick={handleLogout}>
+          Terminar Sessão
+        </Button>
+      </div>
       <AdminDashboard />
     </div>
   );
