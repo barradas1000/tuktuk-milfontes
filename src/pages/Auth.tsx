@@ -189,7 +189,7 @@ const Auth = () => {
             Área Administrativa
           </h1>
           <p className="text-gray-600 mt-2">
-            Faça login para acessar o painel administrativo da aplicaçãoTuktuk-milfontes.
+            Faça login para acessar o painel administrativo da aplicação Tuktuk-milfontes.
           </p>
         </div>
 
