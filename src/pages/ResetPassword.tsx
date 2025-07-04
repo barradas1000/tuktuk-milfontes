@@ -17,26 +17,46 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isValidSession, setIsValidSession] = useState(false);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
 
-  // Extrai o access_token da query string
-  const params = new URLSearchParams(location.search);
-  const accessToken = params.get("access_token");
-  const type = params.get("type");
-
-  // Debug: Log dos parâmetros recebidos
+  // Captura a sessão da URL usando getSessionFromUrl()
   useEffect(() => {
-    console.log("ResetPassword - URL:", window.location.href);
-    console.log("ResetPassword - accessToken:", accessToken);
-    console.log("ResetPassword - type:", type);
-    console.log("ResetPassword - search params:", location.search);
-  }, [accessToken, type, location.search]);
+    const handleSessionFromUrl = async () => {
+      console.log("ResetPassword - URL:", window.location.href);
+      console.log("ResetPassword - search params:", location.search);
+
+      try {
+        const { data, error } = await supabase.auth.getSessionFromUrl();
+
+        if (error) {
+          console.error("Erro ao obter sessão da URL:", error);
+          setError("Link inválido ou expirado. " + error.message);
+          setIsValidSession(false);
+        } else if (data.session) {
+          console.log("Sessão válida obtida:", data.session);
+          setIsValidSession(true);
+        } else {
+          console.log("Nenhuma sessão encontrada na URL");
+          setError("Link inválido ou expirado.");
+          setIsValidSession(false);
+        }
+      } catch (err) {
+        console.error("Erro inesperado ao processar URL:", err);
+        setError("Erro ao processar link de recuperação.");
+        setIsValidSession(false);
+      } finally {
+        setIsCheckingSession(false);
+      }
+    };
+
+    handleSessionFromUrl();
+  }, [location.search]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-
-    console.log("Submitting form with:", { accessToken, type });
 
     if (!password || !confirmPassword) {
       setError("Preencha ambos os campos de senha.");
@@ -46,15 +66,14 @@ const ResetPassword = () => {
       setError("As senhas não coincidem.");
       return;
     }
-    if (!accessToken || type !== "recovery") {
-      console.log("Token validation failed:", { accessToken, type });
-      setError("Link inválido ou expirado.");
+    if (!isValidSession) {
+      setError("Sessão inválida. Solicite um novo link de recuperação.");
       return;
     }
 
     setLoading(true);
     try {
-      // Atualiza a senha usando o access_token
+      // Atualiza a senha usando a sessão atual
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
         console.error("Update user error:", error);
@@ -72,6 +91,18 @@ const ResetPassword = () => {
       setLoading(false);
     }
   };
+
+  // Mostra loading enquanto verifica a sessão
+  if (isCheckingSession) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="text-center">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-600 mb-4" />
+          <p className="text-gray-600">Verificando link de recuperação...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
@@ -102,66 +133,68 @@ const ResetPassword = () => {
                 </AlertDescription>
               </Alert>
             )}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Nova senha"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  disabled={loading}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword((v) => !v)}
-                  tabIndex={-1}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
+            {isValidSession && (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Nova senha"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    disabled={loading}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowPassword((v) => !v)}
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirmar nova senha"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={6}
+                    disabled={loading}
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={() => setShowConfirmPassword((v) => !v)}
+                    tabIndex={-1}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-400" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Redefinindo...
+                    </>
                   ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
+                    "Redefinir Senha"
                   )}
-                </button>
-              </div>
-              <div className="relative">
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  placeholder="Confirmar nova senha"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  disabled={loading}
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowConfirmPassword((v) => !v)}
-                  tabIndex={-1}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4 text-gray-400" />
-                  ) : (
-                    <Eye className="h-4 w-4 text-gray-400" />
-                  )}
-                </button>
-              </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Redefinindo...
-                  </>
-                ) : (
-                  "Redefinir Senha"
-                )}
-              </Button>
-            </form>
+                </Button>
+              </form>
+            )}
           </CardContent>
         </Card>
         <div className="text-center mt-6">

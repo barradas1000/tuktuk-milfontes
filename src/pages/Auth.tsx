@@ -152,7 +152,7 @@ const Auth = () => {
       }
 
       const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: "https://tuktuk-milfontes.vercel.app/reset-password",
       });
 
       if (error) {
@@ -189,7 +189,8 @@ const Auth = () => {
             Área Administrativa
           </h1>
           <p className="text-gray-600 mt-2">
-            Faça login para acessar o painel administrativo da aplicação Tuktuk-milfontes.
+            Faça login para acessar o painel administrativo da aplicação
+            Tuktuk-milfontes.
           </p>
         </div>
 
