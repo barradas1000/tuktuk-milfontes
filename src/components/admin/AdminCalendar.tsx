@@ -255,6 +255,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   const isSelected =
                     format(props.date, "yyyy-MM-dd") ===
                     format(calendarDate, "yyyy-MM-dd");
+                  const isToday =
+                    format(props.date, "yyyy-MM-dd") ===
+                    format(new Date(), "yyyy-MM-dd");
                   const textColor = "text-black";
                   return (
                     <Tooltip>
@@ -265,6 +268,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                             `h-10 w-10 flex items-center justify-center rounded-full transition-all duration-150 ` +
                             (isSelected
                               ? "ring-2 ring-blue-500 bg-blue-100 font-bold "
+                              : "") +
+                            (isToday
+                              ? "ring-2 ring-purple-600 ring-offset-2 "
                               : "") +
                             (status === "inactive"
                               ? "bg-blue-200 "
