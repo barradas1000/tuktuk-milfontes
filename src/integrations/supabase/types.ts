@@ -144,6 +144,98 @@ export type Database = {
         }
         Relationships: []
       }
+      conductors: {
+        Row: {
+          id: string
+          name: string
+          whatsapp: string
+          is_active: boolean
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          whatsapp: string
+          is_active?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          whatsapp?: string
+          is_active?: boolean
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      active_conductors: {
+        Row: {
+          id: string
+          conductor_id: string
+          is_active: boolean
+          activated_at: string | null
+          deactivated_at: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          conductor_id: string
+          is_active?: boolean
+          activated_at?: string | null
+          deactivated_at?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          conductor_id?: string
+          is_active?: boolean
+          activated_at?: string | null
+          deactivated_at?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "active_conductors_conductor_id_fkey"
+            columns: ["conductor_id"]
+            isOneToOne: false
+            referencedRelation: "conductors"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      blocked_periods: {
+        Row: {
+          id: string
+          date: string
+          start_time: string | null
+          end_time: string | null
+          reason: string | null
+          created_by: string
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          date: string
+          start_time?: string | null
+          end_time?: string | null
+          reason?: string | null
+          created_by: string
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          date?: string
+          start_time?: string | null
+          end_time?: string | null
+          reason?: string | null
+          created_by?: string
+          created_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

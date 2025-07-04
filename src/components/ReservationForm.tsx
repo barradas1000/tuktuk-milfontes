@@ -16,6 +16,7 @@ import { Calendar, Users, Clock, MessageCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import i18n from "i18next";
+import { mockBlockedPeriods } from '@/data/mockReservations';
 
 const ReservationForm = () => {
   console.log("ReservationForm rendering");
@@ -43,9 +44,38 @@ const ReservationForm = () => {
     { id: "fishermen", name: t("tours.fishermen.title"), price: 10 },
   ];
 
+  const isDayBlocked = (date: string) => {
+    return mockBlockedPeriods.some(
+      (b) => b.date === date && !b.startTime && !b.endTime
+    );
+  };
+  const isTimeBlocked = (date: string, time: string) => {
+    return mockBlockedPeriods.some(
+      (b) => b.date === date && b.startTime === time
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
+
+    // Checagem de bloqueio
+    if (isDayBlocked(formData.date)) {
+      toast({
+        title: t('reservation.blockedDayTitle') || 'Dia indisponível',
+        description: t('reservation.blockedDayDescription') || 'Não é possível reservar neste dia.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    if (isTimeBlocked(formData.date, formData.time)) {
+      toast({
+        title: t('reservation.blockedTimeTitle') || 'Horário indisponível',
+        description: t('reservation.blockedTimeDescription') || 'Não é possível reservar neste horário.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     // Gerar mensagem WhatsApp
     const selectedTour = tourTypes.find(

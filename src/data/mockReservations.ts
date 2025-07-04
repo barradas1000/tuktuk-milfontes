@@ -30,3 +30,20 @@ export const mockReservations: AdminReservation[] = [
     created_at: new Date().toISOString()
   }
 ];
+
+export const mockBlockedPeriods = [
+  {
+    id: 'block-1',
+    date: '2024-07-01',
+    reason: 'Manutenção',
+    createdBy: 'admin',
+  },
+  {
+    id: 'block-2',
+    date: '2024-07-02',
+    startTime: '12:00',
+    endTime: '15:00',
+    reason: 'Almoço prolongado',
+    createdBy: 'admin',
+  },
+];

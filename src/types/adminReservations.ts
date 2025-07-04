@@ -30,3 +30,12 @@ export interface ReservationStatistics {
   monthlyReservations: number;
   totalRevenue: number;
 }
+
+export interface BlockedPeriod {
+  id: string;
+  date: string; // formato yyyy-MM-dd
+  startTime?: string; // formato HH:mm, opcional para bloqueio de dia inteiro
+  endTime?: string; // formato HH:mm, opcional para bloqueio de dia inteiro
+  reason?: string;
+  createdBy: string;
+}
