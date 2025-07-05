@@ -181,10 +181,13 @@
     "reservationDescription": "Vous serez redirigé vers WhatsApp pour confirmer votre réservation.",
     "required": "obligatoire",
     "whatsappMessages": {
-      "pending": "Bonjour {{name}}, nous avons bien reçu votre demande de réservation et nous vous contacterons bientôt pour la confirmation.",
-      "confirmed": "Bonjour {{name}}, votre réservation a été confirmée ! Nous avons hâte de vous accueillir. Si vous avez des questions, nous sommes à votre disposition.",
-      "cancelled": "Bonjour {{name}}, malheureusement votre réservation a été annulée. Si vous souhaitez reprogrammer ou avez des questions, n'hésitez pas à nous contacter.",
-      "completed": "Bonjour {{name}}, merci d'avoir fait la visite avec nous ! Nous espérons que vous avez passé un excellent moment."
+      "pending": "Bonjour {{name}}, nous avons bien reçu votre demande de réservation pour le tour '{{tour_type}}' le {{reservation_date}} à {{reservation_time}}. Pour confirmer, le paiement de €{{total_price}} est requis. Vous pouvez effectuer un virement à l'IBAN PT50 1234 5678 9012 3456 7890 1 ou payer en espèces sur place. Après le paiement, votre réservation sera automatiquement confirmée.",
+      "confirmed": "Bonjour {{name}}, votre réservation pour le tour '{{tour_type}}' est confirmée pour le {{reservation_date}} à {{reservation_time}} ! Retrouvez-nous au centre de Milfontes, à côté du jardin public. Toute question, nous sommes à votre disposition.",
+      "cancelled": "Bonjour {{name}}, nous regrettons de vous informer que votre réservation pour le tour '{{tour_type}}' du {{reservation_date}} à {{reservation_time}} a été annulée. Si vous souhaitez reprogrammer ou avez des questions, n'hésitez pas à nous contacter.",
+      "completed": "Bonjour {{name}}, merci d'avoir fait la visite avec nous ! Nous espérons que vous avez passé un moment fantastique à Milfontes. Recommandez-nous à vos amis et à votre famille. À la prochaine !",
+      "payment_reminder": "Bonjour {{name}}, nous vous rappelons que votre réservation pour le {{reservation_date}} à {{reservation_time}} n'est pas encore confirmée. Pour garantir votre place, veuillez effectuer le paiement de €{{total_price}} dès que possible.",
+      "weather_update": "Bonjour {{name}}, en raison des conditions météorologiques prévues pour le {{reservation_date}}, nous pourrions avoir besoin de reprogrammer votre tour. Nous vous contacterons plus près de la date pour confirmer.",
+      "pickup_reminder": "Bonjour {{name}}, nous vous rappelons que votre tour est programmé pour demain, le {{reservation_date}}, à {{reservation_time}}. Retrouvez-nous au centre de Milfontes, à côté du jardin public, 10 minutes avant l'heure programmée."
     }
   },
   "mapDescriptions": {

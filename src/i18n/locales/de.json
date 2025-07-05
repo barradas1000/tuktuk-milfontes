@@ -181,10 +181,13 @@
     "reservationDescription": "Sie werden zu WhatsApp weitergeleitet, um Ihre Reservierung zu bestätigen.",
     "required": "erforderlich",
     "whatsappMessages": {
-      "pending": "Hallo {{name}}, wir haben Ihre Reservierungsanfrage erhalten und werden Sie in Kürze zur Bestätigung kontaktieren.",
-      "confirmed": "Hallo {{name}}, Ihre Reservierung wurde bestätigt! Wir freuen uns darauf, Sie begrüßen zu dürfen. Bei Fragen stehen wir Ihnen gerne zur Verfügung.",
-      "cancelled": "Hallo {{name}}, leider wurde Ihre Reservierung storniert. Wenn Sie einen neuen Termin vereinbaren oder Fragen haben, kontaktieren Sie uns bitte.",
-      "completed": "Hallo {{name}}, vielen Dank, dass Sie mit uns die Tour gemacht haben! Wir hoffen, Sie hatten eine tolle Erfahrung."
+      "pending": "Hallo {{name}}, wir haben Ihre Reservierungsanfrage für die Tour '{{tour_type}}' am {{reservation_date}} um {{reservation_time}} erhalten. Zur Bestätigung ist eine Zahlung von €{{total_price}} erforderlich. Sie können eine Überweisung an IBAN PT50 1234 5678 9012 3456 7890 1 vornehmen oder bar vor Ort bezahlen. Nach der Zahlung wird Ihre Reservierung automatisch bestätigt.",
+      "confirmed": "Hallo {{name}}, Ihre Reservierung für die Tour '{{tour_type}}' ist für den {{reservation_date}} um {{reservation_time}} bestätigt! Treffen Sie uns im Zentrum von Milfontes, neben dem öffentlichen Garten. Bei Fragen stehen wir Ihnen zur Verfügung.",
+      "cancelled": "Hallo {{name}}, wir müssen Ihnen leider mitteilen, dass Ihre Reservierung für die Tour '{{tour_type}}' am {{reservation_date}} um {{reservation_time}} storniert wurde. Wenn Sie umbuchen oder Fragen haben, kontaktieren Sie uns bitte.",
+      "completed": "Hallo {{name}}, vielen Dank, dass Sie die Tour mit uns gemacht haben! Wir hoffen, Sie hatten eine fantastische Erfahrung in Milfontes. Empfehlen Sie uns an Ihre Freunde und Familie. Bis zum nächsten Mal!",
+      "payment_reminder": "Hallo {{name}}, wir erinnern Sie daran, dass Ihre Reservierung für den {{reservation_date}} um {{reservation_time}} noch nicht bestätigt ist. Um Ihren Platz zu sichern, führen Sie bitte die Zahlung von €{{total_price}} so bald wie möglich durch.",
+      "weather_update": "Hallo {{name}}, aufgrund der für den {{reservation_date}} vorhergesagten Wetterbedingungen müssen wir möglicherweise Ihre Tour umbuchen. Wir werden uns näher am Datum bei Ihnen melden, um zu bestätigen.",
+      "pickup_reminder": "Hallo {{name}}, wir erinnern Sie daran, dass Ihre Tour für morgen, den {{reservation_date}}, um {{reservation_time}} geplant ist. Treffen Sie uns im Zentrum von Milfontes, neben dem öffentlichen Garten, 10 Minuten vor der geplanten Zeit."
     }
   },
   "mapDescriptions": {

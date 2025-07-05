@@ -234,7 +234,16 @@
     "confirmWhatsApp": "Confirmar via WhatsApp",
     "reservationSent": "Reserva enviada!",
     "reservationDescription": "Será redirecionado para o WhatsApp para confirmar a sua reserva.",
-    "required": "obrigatório"
+    "required": "obrigatório",
+    "whatsappMessages": {
+      "pending": "Olá {{name}}, recebemos o seu pedido de reserva. Para confirmar, é necessário efetuar o pagamento de €{{total_price}}. Pode fazer a transferência para o IBAN PT50 1234 5678 9012 3456 7890 1 ou pagar em dinheiro no local. Após o pagamento, a sua reserva será confirmada automaticamente.",
+      "confirmed": "Olá {{name}}, a sua reserva para o passeio '{{tour_type}}' está confirmada para o dia {{reservation_date}} às {{reservation_time}}. Encontre-nos no centro de Milfontes, junto ao jardim público. Qualquer dúvida, estamos à disposição!",
+      "cancelled": "Olá {{name}}, lamentamos informar que a sua reserva para o passeio '{{tour_type}}' no dia {{reservation_date}} às {{reservation_time}} foi cancelada. Se precisar reagendar ou tiver alguma dúvida, entre em contacto connosco.",
+      "completed": "Olá {{name}}, obrigado por ter feito o passeio connosco! Esperamos que tenha tido uma experiência fantástica em Milfontes. Recomende-nos aos seus amigos e familiares. Até à próxima!",
+      "payment_reminder": "Olá {{name}}, recordamos que a sua reserva para o dia {{reservation_date}} às {{reservation_time}} ainda não está confirmada. Para garantir o seu lugar, efetue o pagamento de €{{total_price}} o mais brevemente possível.",
+      "weather_update": "Olá {{name}}, devido às condições meteorológicas previstas para {{reservation_date}}, poderemos ter de reagendar o seu passeio. Entraremos em contacto mais próximo da data para confirmar.",
+      "pickup_reminder": "Olá {{name}}, recordamos que o seu passeio está marcado para amanhã, {{reservation_date}}, às {{reservation_time}}. Encontre-nos no centro de Milfontes, junto ao jardim público, 10 minutos antes da hora marcada."
+    }
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Próxima à vila e ideal para famílias, é conhecida pelas suas águas calmas e paisagem do estuário do Mira.",

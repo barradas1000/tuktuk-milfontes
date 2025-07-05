@@ -213,10 +213,13 @@
     "reservationDescription": "U wordt doorgestuurd naar WhatsApp om uw reservering te bevestigen.",
     "required": "vereist",
     "whatsappMessages": {
-      "pending": "Hallo {{name}}, we hebben uw reserveringsaanvraag ontvangen en nemen binnenkort contact met u op voor bevestiging.",
-      "confirmed": "Hallo {{name}}, uw reservering is bevestigd! We kijken ernaar uit u te verwelkomen. Als u vragen heeft, staan we voor u klaar.",
-      "cancelled": "Hallo {{name}}, helaas is uw reservering geannuleerd. Als u opnieuw wilt plannen of vragen heeft, neem dan contact met ons op.",
-      "completed": "Hallo {{name}}, bedankt dat u met ons de tour heeft gedaan! We hopen dat u een geweldige ervaring heeft gehad."
+      "pending": "Hallo {{name}}, we hebben uw reserveringsaanvraag ontvangen voor de tour '{{tour_type}}' op {{reservation_date}} om {{reservation_time}}. Voor bevestiging is betaling van €{{total_price}} vereist. U kunt een overboeking maken naar IBAN PT50 1234 5678 9012 3456 7890 1 of contant betalen ter plaatse. Na betaling wordt uw reservering automatisch bevestigd.",
+      "confirmed": "Hallo {{name}}, uw reservering voor de tour '{{tour_type}}' is bevestigd voor {{reservation_date}} om {{reservation_time}}! Ontmoet ons in het centrum van Milfontes, naast de openbare tuin. Eventuele vragen, we staan tot uw beschikking.",
+      "cancelled": "Hallo {{name}}, we moeten u helaas informeren dat uw reservering voor de tour '{{tour_type}}' op {{reservation_date}} om {{reservation_time}} is geannuleerd. Als u opnieuw wilt boeken of vragen heeft, neem dan contact met ons op.",
+      "completed": "Hallo {{name}}, bedankt dat u de tour met ons heeft gedaan! We hopen dat u een fantastische ervaring heeft gehad in Milfontes. Beveel ons aan bij uw vrienden en familie. Tot de volgende keer!",
+      "payment_reminder": "Hallo {{name}}, we herinneren u eraan dat uw reservering voor {{reservation_date}} om {{reservation_time}} nog niet is bevestigd. Om uw plek te garanderen, voer de betaling van €{{total_price}} zo spoedig mogelijk uit.",
+      "weather_update": "Hallo {{name}}, vanwege de weersomstandigheden die voor {{reservation_date}} worden voorspeld, moeten we mogelijk uw tour opnieuw inplannen. We nemen contact met u op dichter bij de datum om te bevestigen.",
+      "pickup_reminder": "Hallo {{name}}, we herinneren u eraan dat uw tour gepland staat voor morgen, {{reservation_date}}, om {{reservation_time}}. Ontmoet ons in het centrum van Milfontes, naast de openbare tuin, 10 minuten voor de geplande tijd."
     }
   },
   "mapDescriptions": {

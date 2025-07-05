@@ -181,10 +181,13 @@
     "reservationDescription": "Sarai reindirizzato a WhatsApp per confermare la tua prenotazione.",
     "required": "richiesto",
     "whatsappMessages": {
-      "pending": "Ciao {{name}}, abbiamo ricevuto la tua richiesta di prenotazione e ti contatteremo presto per la conferma.",
-      "confirmed": "Ciao {{name}}, la tua prenotazione è stata confermata! Non vediamo l'ora di accoglierti. Se hai domande, siamo a tua disposizione.",
-      "cancelled": "Ciao {{name}}, purtroppo la tua prenotazione è stata annullata. Se hai bisogno di riprogrammare o hai domande, contattaci pure.",
-      "completed": "Ciao {{name}}, grazie per aver fatto il tour con noi! Speriamo che tu abbia vissuto una bellissima esperienza."
+      "pending": "Ciao {{name}}, abbiamo ricevuto la tua richiesta di prenotazione per il tour '{{tour_type}}' il {{reservation_date}} alle {{reservation_time}}. Per confermare, è necessario il pagamento di €{{total_price}}. Puoi fare un bonifico all'IBAN PT50 1234 5678 9012 3456 7890 1 o pagare in contanti in loco. Dopo il pagamento, la tua prenotazione sarà confermata automaticamente.",
+      "confirmed": "Ciao {{name}}, la tua prenotazione per il tour '{{tour_type}}' è confermata per il {{reservation_date}} alle {{reservation_time}}! Incontraci nel centro di Milfontes, accanto al giardino pubblico. Qualsiasi domanda, siamo a tua disposizione.",
+      "cancelled": "Ciao {{name}}, ci dispiace informarti che la tua prenotazione per il tour '{{tour_type}}' del {{reservation_date}} alle {{reservation_time}} è stata annullata. Se hai bisogno di riprogrammare o hai domande, contattaci.",
+      "completed": "Ciao {{name}}, grazie per aver fatto il tour con noi! Speriamo che tu abbia avuto un'esperienza fantastica a Milfontes. Raccomandaci ai tuoi amici e familiari. Alla prossima!",
+      "payment_reminder": "Ciao {{name}}, ti ricordiamo che la tua prenotazione per il {{reservation_date}} alle {{reservation_time}} non è ancora confermata. Per garantire il tuo posto, effettua il pagamento di €{{total_price}} il prima possibile.",
+      "weather_update": "Ciao {{name}}, a causa delle condizioni meteorologiche previste per il {{reservation_date}}, potremmo dover riprogrammare il tuo tour. Ti contatteremo più vicino alla data per confermare.",
+      "pickup_reminder": "Ciao {{name}}, ti ricordiamo che il tuo tour è programmato per domani, {{reservation_date}}, alle {{reservation_time}}. Incontraci nel centro di Milfontes, accanto al giardino pubblico, 10 minuti prima dell'orario programmato."
     }
   },
   "mapDescriptions": {

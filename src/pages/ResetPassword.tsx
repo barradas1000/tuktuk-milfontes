@@ -25,25 +25,88 @@ const ResetPassword = () => {
     const handleSessionFromUrl = async () => {
       console.log("ResetPassword - URL:", window.location.href);
       console.log("ResetPassword - search params:", location.search);
+      console.log("ResetPassword - hash:", window.location.hash);
+
+      // Verifica se há parâmetros na URL
+      const urlParams = new URLSearchParams(location.search);
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+
+      console.log("URL Params:", Object.fromEntries(urlParams.entries()));
+      console.log("Hash Params:", Object.fromEntries(hashParams.entries()));
 
       try {
+        // Primeiro, tenta o método oficial do Supabase
         const { data, error } = await supabase.auth.getSessionFromUrl();
 
         if (error) {
           console.error("Erro ao obter sessão da URL:", error);
+          console.error("Detalhes do erro:", {
+            message: error.message,
+            status: error.status,
+            name: error.name,
+          });
+
+          // Tenta método alternativo se o primeiro falhar
+          console.log("Tentando método alternativo...");
+          const accessToken =
+            urlParams.get("access_token") || hashParams.get("access_token");
+          const type = urlParams.get("type") || hashParams.get("type");
+
+          if (accessToken && type === "recovery") {
+            console.log("Token encontrado via método alternativo");
+            setIsValidSession(true);
+            return;
+          }
+
           setError("Link inválido ou expirado. " + error.message);
           setIsValidSession(false);
         } else if (data.session) {
           console.log("Sessão válida obtida:", data.session);
+          console.log("User ID:", data.session.user.id);
+          console.log(
+            "Access Token:",
+            data.session.access_token ? "Presente" : "Ausente"
+          );
           setIsValidSession(true);
         } else {
           console.log("Nenhuma sessão encontrada na URL");
-          setError("Link inválido ou expirado.");
+          console.log("Data recebida:", data);
+
+          // Tenta método alternativo
+          const accessToken =
+            urlParams.get("access_token") || hashParams.get("access_token");
+          const type = urlParams.get("type") || hashParams.get("type");
+
+          if (accessToken && type === "recovery") {
+            console.log("Token encontrado via método alternativo");
+            setIsValidSession(true);
+            return;
+          }
+
+          setError(
+            "Link inválido ou expirado. Nenhuma sessão válida encontrada."
+          );
           setIsValidSession(false);
         }
       } catch (err) {
         console.error("Erro inesperado ao processar URL:", err);
-        setError("Erro ao processar link de recuperação.");
+        console.error("Tipo do erro:", typeof err);
+        console.error("Stack trace:", err instanceof Error ? err.stack : "N/A");
+
+        // Última tentativa com método alternativo
+        const accessToken =
+          urlParams.get("access_token") || hashParams.get("access_token");
+        const type = urlParams.get("type") || hashParams.get("type");
+
+        if (accessToken && type === "recovery") {
+          console.log("Token encontrado via método alternativo após erro");
+          setIsValidSession(true);
+          return;
+        }
+
+        setError(
+          "Erro ao processar link de recuperação. Tente novamente ou solicite um novo link."
+        );
         setIsValidSession(false);
       } finally {
         setIsCheckingSession(false);
@@ -197,7 +260,7 @@ const ResetPassword = () => {
             )}
           </CardContent>
         </Card>
-        <div className="text-center mt-6">
+        <div className="text-center mt-6 space-y-2">
           <Button
             variant="ghost"
             onClick={() => navigate("/login")}
@@ -205,6 +268,17 @@ const ResetPassword = () => {
           >
             ← Voltar ao login
           </Button>
+          {error && (
+            <div className="mt-4">
+              <Button
+                variant="outline"
+                onClick={() => navigate("/login")}
+                className="text-blue-600 hover:text-blue-700"
+              >
+                Solicitar novo link de recuperação
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

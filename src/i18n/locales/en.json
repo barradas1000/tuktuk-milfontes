@@ -236,10 +236,13 @@
     "reservationDescription": "You will be redirected to WhatsApp to confirm your reservation.",
     "required": "required",
     "whatsappMessages": {
-      "pending": "Hello {{name}}, we have received your reservation request and will contact you soon for confirmation.",
-      "confirmed": "Hello {{name}}, your reservation has been confirmed! We look forward to welcoming you. If you have any questions, we are at your disposal.",
-      "cancelled": "Hello {{name}}, unfortunately your reservation has been cancelled. If you need to reschedule or have any questions, please contact us.",
-      "completed": "Hello {{name}}, thank you for taking the tour with us! We hope you had a great experience."
+      "pending": "Hello {{name}}, we have received your reservation request for the tour '{{tour_type}}' on {{reservation_date}} at {{reservation_time}}. To confirm, payment of €{{total_price}} is required. You can make a transfer to IBAN PT50 1234 5678 9012 3456 7890 1 or pay in cash on site. After payment, your reservation will be automatically confirmed.",
+      "confirmed": "Hello {{name}}, your reservation for the tour '{{tour_type}}' is confirmed for {{reservation_date}} at {{reservation_time}}! Meet us in the center of Milfontes, next to the public garden. Any questions, we are at your disposal.",
+      "cancelled": "Hello {{name}}, we regret to inform you that your reservation for the tour '{{tour_type}}' on {{reservation_date}} at {{reservation_time}} has been cancelled. If you need to reschedule or have any questions, please contact us.",
+      "completed": "Hello {{name}}, thank you for taking the tour with us! We hope you had a fantastic experience in Milfontes. Recommend us to your friends and family. See you next time!",
+      "payment_reminder": "Hello {{name}}, we remind you that your reservation for {{reservation_date}} at {{reservation_time}} is not yet confirmed. To secure your spot, please make the payment of €{{total_price}} as soon as possible.",
+      "weather_update": "Hello {{name}}, due to weather conditions forecast for {{reservation_date}}, we may need to reschedule your tour. We will contact you closer to the date to confirm.",
+      "pickup_reminder": "Hello {{name}}, we remind you that your tour is scheduled for tomorrow, {{reservation_date}}, at {{reservation_time}}. Meet us in the center of Milfontes, next to the public garden, 10 minutes before the scheduled time."
     }
   },
   "mapDescriptions": {

@@ -140,7 +140,15 @@ export const fetchBlockedPeriods = async (): Promise<BlockedPeriod[]> => {
       return [];
     }
 
-    return data || [];
+    // Mapear os campos do banco para a interface TypeScript
+    return (data || []).map((item: any) => ({
+      id: item.id,
+      date: item.date,
+      startTime: item.start_time,
+      endTime: item.end_time,
+      reason: item.reason,
+      createdBy: item.created_by,
+    }));
   } catch (error) {
     console.error("Error fetching blocked periods:", error);
     return [];
@@ -151,9 +159,18 @@ export const createBlockedPeriod = async (
   blockedPeriod: Omit<BlockedPeriod, "id">
 ): Promise<BlockedPeriod> => {
   try {
+    // Mapear os campos da interface para o banco de dados
+    const dbBlockedPeriod = {
+      date: blockedPeriod.date,
+      start_time: blockedPeriod.startTime,
+      end_time: blockedPeriod.endTime,
+      reason: blockedPeriod.reason,
+      created_by: blockedPeriod.createdBy,
+    };
+
     const { data, error } = await (supabase as any)
       .from("blocked_periods")
-      .insert(blockedPeriod)
+      .insert(dbBlockedPeriod)
       .select()
       .single();
 
@@ -162,7 +179,15 @@ export const createBlockedPeriod = async (
       throw error;
     }
 
-    return data;
+    // Mapear de volta para a interface TypeScript
+    return {
+      id: data.id,
+      date: data.date,
+      startTime: data.start_time,
+      endTime: data.end_time,
+      reason: data.reason,
+      createdBy: data.created_by,
+    };
   } catch (error) {
     console.error("Error creating blocked period:", error);
     throw error;
@@ -191,6 +216,8 @@ export const deleteBlockedPeriodsByDate = async (
   startTime?: string
 ): Promise<void> => {
   try {
+    console.log("Deletando bloqueios para data:", date, "horário:", startTime);
+
     let query = (supabase as any)
       .from("blocked_periods")
       .delete()
@@ -202,12 +229,14 @@ export const deleteBlockedPeriodsByDate = async (
       query = query.is("start_time", null);
     }
 
-    const { error } = await query;
+    const { error, count } = await query;
 
     if (error) {
       console.error("Error deleting blocked periods by date:", error);
       throw error;
     }
+
+    console.log("Bloqueios deletados com sucesso. Count:", count);
   } catch (error) {
     console.error("Error deleting blocked periods by date:", error);
     throw error;
