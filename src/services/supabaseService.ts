@@ -61,6 +61,34 @@ export const updateReservationInSupabase = async (
   }
 };
 
+export const updateManualPaymentInSupabase = async (
+  id: string,
+  manualPayment: number
+) => {
+  console.log("Updating manual payment in Supabase:", { id, manualPayment });
+
+  try {
+    const { data, error } = await (supabase as any)
+      .from("reservations")
+      .update({
+        manual_payment: manualPayment,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select();
+
+    if (error) {
+      console.error("Error updating manual payment:", error);
+      throw error;
+    }
+
+    return data?.[0];
+  } catch (error) {
+    console.error("Error updating manual payment:", error);
+    throw error;
+  }
+};
+
 // --- Novas funções para condutores ---
 export const fetchActiveConductors = async (): Promise<string[]> => {
   try {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -29,6 +29,8 @@ import {
   Clock,
   Users,
   Euro,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useAdminReservations } from "@/hooks/useAdminReservations";
 import { format } from "date-fns";
@@ -49,13 +51,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+import { checkAvailability } from "@/services/availabilityService";
 
 const AdminReservationsList = () => {
-  const { reservations, updateReservation, isUpdating } =
+  const { reservations, updateReservation, updateManualPayment, isUpdating } =
     useAdminReservations();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -67,27 +71,85 @@ const AdminReservationsList = () => {
     tourType: "",
     numberOfPeople: "2",
     message: "",
+    totalPrice: "",
   });
   const [loading, setLoading] = useState(false);
+  const [editingPayment, setEditingPayment] = useState<string | null>(null);
+  const [manualPaymentValue, setManualPaymentValue] = useState("");
   const { t } = useTranslation();
 
   const tourTypes = [
-    { id: "panoramic", name: "Passeio panorâmico pela vila" },
-    { id: "furnas", name: "Vila Nova de Milfontes → Praia das Furnas" },
-    { id: "bridge", name: "Travessia da ponte" },
-    { id: "sunset", name: "Pôr do Sol Romântico" },
-    { id: "night", name: "Passeio noturno" },
-    { id: "fishermen", name: "Rota dos Pescadores" },
+    { id: "panoramic", name: "Passeio panorâmico pela vila", basePrice: 10 },
+    {
+      id: "furnas",
+      name: "Vila Nova de Milfontes → Praia das Furnas",
+      basePrice: 15,
+    },
+    { id: "bridge", name: "Travessia da ponte", basePrice: 8 },
+    { id: "sunset", name: "Pôr do Sol Romântico", basePrice: 12 },
+    { id: "night", name: "Passeio noturno", basePrice: 14 },
+    { id: "fishermen", name: "Rota dos Pescadores", basePrice: 16 },
   ];
+
+  // Função para calcular preço automaticamente
+  const calculatePrice = (tourType: string, numberOfPeople: string) => {
+    const tour = tourTypes.find((t) => t.id === tourType);
+    if (!tour) return 0;
+
+    const people = parseInt(numberOfPeople) || 1;
+    return tour.basePrice * people;
+  };
+
+  // Função para traduzir tipos de tour para nomes amigáveis
+  const getTourDisplayName = (tourType: string) => {
+    const tour = tourTypes.find((t) => t.id === tourType);
+    return tour ? tour.name : tourType;
+  };
+
+  // Função para obter o preço base do tour
+  const getTourBasePrice = (tourType: string) => {
+    const tour = tourTypes.find((t) => t.id === tourType);
+    return tour ? tour.basePrice : 0;
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+
+    // Calcular preço automaticamente quando tour ou número de pessoas mudar
+    if (field === "tourType" || field === "numberOfPeople") {
+      const newTourType = field === "tourType" ? value : formData.tourType;
+      const newNumberOfPeople =
+        field === "numberOfPeople" ? value : formData.numberOfPeople;
+      const calculatedPrice = calculatePrice(newTourType, newNumberOfPeople);
+      setFormData((prev) => ({
+        ...prev,
+        totalPrice: calculatedPrice.toString(),
+      }));
+    }
   };
 
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
+      // Verificar disponibilidade antes de criar a reserva
+      const availability = await checkAvailability(
+        formData.date,
+        formData.time,
+        Number(formData.numberOfPeople)
+      );
+
+      if (!availability.isAvailable) {
+        toast({
+          title: "Horário Indisponível",
+          description: `Este horário já está reservado por outro cliente. Cada horário pode ter apenas uma reserva por vez.`,
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.from("reservations").insert([
         {
           customer_name: formData.name,
@@ -98,6 +160,7 @@ const AdminReservationsList = () => {
           number_of_people: Number(formData.numberOfPeople),
           tour_type: formData.tourType,
           special_requests: formData.message,
+          total_price: Number(formData.totalPrice) || 0,
           status: "pending",
         },
       ]);
@@ -119,6 +182,7 @@ const AdminReservationsList = () => {
           tourType: "",
           numberOfPeople: "2",
           message: "",
+          totalPrice: "",
         });
       }
     } catch (err: unknown) {
@@ -132,8 +196,16 @@ const AdminReservationsList = () => {
     }
   };
 
-  const filteredReservations =
-    reservations?.filter((reservation) => {
+  // Constantes de paginação
+  const ITEMS_PER_PAGE = 10;
+
+  // Filtragem e ordenação das reservas
+  const filteredAndSortedReservations = useMemo(() => {
+    if (!reservations || reservations.length === 0) {
+      return [];
+    }
+
+    const filtered = reservations.filter((reservation) => {
       const matchesSearch =
         reservation.customer_name
           .toLowerCase()
@@ -141,7 +213,9 @@ const AdminReservationsList = () => {
         reservation.customer_email
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        reservation.tour_type.toLowerCase().includes(searchTerm.toLowerCase());
+        getTourDisplayName(reservation.tour_type)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
 
       const matchesStatus =
         statusFilter === "all" || reservation.status === statusFilter;
@@ -157,10 +231,61 @@ const AdminReservationsList = () => {
       }
 
       return matchesSearch && matchesStatus && matchesDate;
-    }) || [];
+    });
+
+    // Ordenar por data (mais recentes primeiro) e depois por hora
+    const sorted = [...filtered].sort((a, b) => {
+      const dateA = new Date(`${a.reservation_date} ${a.reservation_time}`);
+      const dateB = new Date(`${b.reservation_date} ${b.reservation_time}`);
+      return dateB.getTime() - dateA.getTime();
+    });
+
+    return sorted;
+  }, [reservations, searchTerm, statusFilter, dateFilter]);
+
+  // Calcular paginação
+  const totalPages = Math.ceil(
+    filteredAndSortedReservations.length / ITEMS_PER_PAGE
+  );
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const currentReservations = filteredAndSortedReservations.slice(
+    startIndex,
+    endIndex
+  );
+
+  // Resetar página quando os filtros mudarem
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, dateFilter]);
 
   const handleStatusUpdate = (id: string, newStatus: string) => {
     updateReservation({ id, status: newStatus });
+  };
+
+  const handleManualPaymentUpdate = async (id: string, value: number) => {
+    try {
+      // Use the mutation from the hook instead of direct supabase call
+      updateManualPayment({ id, manualPayment: value });
+      setEditingPayment(null);
+      setManualPaymentValue("");
+    } catch (err: unknown) {
+      toast({
+        title: "Erro ao atualizar pagamento",
+        description: err instanceof Error ? err.message : String(err),
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startEditingPayment = (id: string, currentValue: number = 0) => {
+    setEditingPayment(id);
+    setManualPaymentValue(currentValue.toString());
+  };
+
+  const cancelEditingPayment = () => {
+    setEditingPayment(null);
+    setManualPaymentValue("");
   };
 
   const getStatusBadge = (status: string) => {
@@ -376,6 +501,38 @@ const AdminReservationsList = () => {
                   </SelectContent>
                 </Select>
               </div>
+              <div>
+                <Label>Valor Total (€) *</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={formData.totalPrice}
+                    onChange={(e) =>
+                      handleInputChange("totalPrice", e.target.value)
+                    }
+                    placeholder="0.00"
+                    className="flex-1"
+                  />
+                  <div className="text-sm text-gray-500 whitespace-nowrap">
+                    {formData.tourType && formData.numberOfPeople && (
+                      <span>
+                        (€
+                        {calculatePrice(
+                          formData.tourType,
+                          formData.numberOfPeople
+                        ).toFixed(2)}
+                        )
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Valor calculado automaticamente baseado no tour e número de
+                  pessoas
+                </p>
+              </div>
               <div className="md:col-span-2">
                 <Label>Mensagem</Label>
                 <Textarea
@@ -409,7 +566,7 @@ const AdminReservationsList = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Pesquisar por nome, email ou tour..."
+                placeholder="Pesquisar por nome, email ou tipo de tour..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -458,7 +615,7 @@ const AdminReservationsList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredReservations.length === 0 ? (
+                {currentReservations.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={7}
@@ -469,7 +626,7 @@ const AdminReservationsList = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredReservations.map((reservation) => (
+                  currentReservations.map((reservation) => (
                     <TableRow key={reservation.id}>
                       <TableCell>
                         <div>
@@ -487,12 +644,20 @@ const AdminReservationsList = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p className="font-medium">{reservation.tour_type}</p>
-                        {reservation.special_requests && (
-                          <p className="text-sm text-gray-600 italic">
-                            "{reservation.special_requests}"
+                        <div>
+                          <p className="font-medium">
+                            {getTourDisplayName(reservation.tour_type)}
                           </p>
-                        )}
+                          <p className="text-sm text-gray-500">
+                            Base: €
+                            {getTourBasePrice(reservation.tour_type).toFixed(2)}
+                          </p>
+                          {reservation.special_requests && (
+                            <p className="text-sm text-gray-600 italic mt-1">
+                              "{reservation.special_requests}"
+                            </p>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div>
@@ -517,7 +682,64 @@ const AdminReservationsList = () => {
                       <TableCell>
                         <div className="flex items-center gap-1 font-semibold">
                           <Euro className="h-4 w-4 text-gray-400" />
-                          {reservation.total_price}
+                          {editingPayment === reservation.id ? (
+                            <>
+                              <Input
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={manualPaymentValue}
+                                onChange={(e) =>
+                                  setManualPaymentValue(e.target.value)
+                                }
+                                className="w-24 mr-2"
+                              />
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="mr-1"
+                                onClick={() =>
+                                  handleManualPaymentUpdate(
+                                    reservation.id,
+                                    parseFloat(manualPaymentValue)
+                                  )
+                                }
+                                disabled={
+                                  manualPaymentValue === "" ||
+                                  isNaN(Number(manualPaymentValue))
+                                }
+                              >
+                                Salvar
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={cancelEditingPayment}
+                              >
+                                Cancelar
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              {typeof reservation.manual_payment === "number"
+                                ? (reservation.manual_payment || 0).toFixed(2)
+                                : (reservation.total_price || 0).toFixed(2)}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="ml-2"
+                                onClick={() =>
+                                  startEditingPayment(
+                                    reservation.id,
+                                    reservation.manual_payment ??
+                                      (reservation.total_price || 0)
+                                  )
+                                }
+                              >
+                                Editar
+                              </Button>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -534,6 +756,54 @@ const AdminReservationsList = () => {
               </TableBody>
             </Table>
           </div>
+
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-4 px-4 py-3 bg-gray-50 border-t">
+              <div className="text-sm text-gray-700">
+                Mostrando {startIndex + 1} a{" "}
+                {Math.min(endIndex, filteredAndSortedReservations.length)} de{" "}
+                {filteredAndSortedReservations.length} reservas
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Anterior
+                </Button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                    (page) => (
+                      <Button
+                        key={page}
+                        variant={currentPage === page ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(page)}
+                        className="w-8 h-8 p-0"
+                      >
+                        {page}
+                      </Button>
+                    )
+                  )}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  Próximo
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </>

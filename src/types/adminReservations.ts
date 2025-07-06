@@ -10,6 +10,7 @@ export interface AdminReservation {
   special_requests?: string;
   status: "pending" | "confirmed" | "cancelled" | "completed";
   total_price: number;
+  manual_payment?: number;
   created_at: string;
   language?: string;
 }

@@ -80,3 +80,4 @@ async function queryProfiles() {
 
 // Executar a consulta
 queryProfiles();
+ 

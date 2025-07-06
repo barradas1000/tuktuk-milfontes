@@ -12,11 +12,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Users, Clock, MessageCircle } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  Clock,
+  MessageCircle,
+  AlertCircle,
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import i18n from "i18next";
 import { mockBlockedPeriods } from "@/data/mockReservations";
+import { checkAvailability } from "@/services/availabilityService";
+import AlternativeTimesModal from "./AlternativeTimesModal";
+import { Badge } from "@/components/ui/badge";
 
 const ReservationForm = () => {
   console.log("ReservationForm rendering");
@@ -30,6 +39,24 @@ const ReservationForm = () => {
     time: "",
     tourType: "",
     numberOfPeople: "2",
+    message: "",
+  });
+
+  const [availabilityInfo, setAvailabilityInfo] = useState({
+    isOpen: false,
+    requestedDate: "",
+    requestedTime: "",
+    requestedPeople: 0,
+    existingPeople: 0,
+    maxCapacity: 1,
+    alternativeTimes: [] as string[],
+  });
+
+  const [availabilityStatus, setAvailabilityStatus] = useState({
+    isChecking: false,
+    isAvailable: true,
+    existingPeople: 0,
+    maxCapacity: 1,
     message: "",
   });
 
@@ -49,6 +76,7 @@ const ReservationForm = () => {
       (b) => b.date === date && !b.startTime && !b.endTime
     );
   };
+
   const isTimeBlocked = (date: string, time: string) => {
     return mockBlockedPeriods.some(
       (b) => b.date === date && b.startTime === time
@@ -70,6 +98,7 @@ const ReservationForm = () => {
       });
       return;
     }
+
     if (isTimeBlocked(formData.date, formData.time)) {
       toast({
         title: t("reservation.blockedTimeTitle") || "Horário indisponível",
@@ -81,6 +110,32 @@ const ReservationForm = () => {
       return;
     }
 
+    // Verificar disponibilidade
+    const availability = await checkAvailability(
+      formData.date,
+      formData.time,
+      Number(formData.numberOfPeople)
+    );
+
+    if (!availability.isAvailable) {
+      // Mostrar modal com horários alternativos
+      setAvailabilityInfo({
+        isOpen: true,
+        requestedDate: formData.date,
+        requestedTime: formData.time,
+        requestedPeople: Number(formData.numberOfPeople),
+        existingPeople: availability.existingReservations,
+        maxCapacity: availability.maxCapacity,
+        alternativeTimes: availability.alternativeTimes,
+      });
+      return;
+    }
+
+    // Se estiver disponível, continuar com a reserva
+    await processReservation();
+  };
+
+  const processReservation = async () => {
     // Gerar mensagem WhatsApp
     const selectedTour = tourTypes.find(
       (tour) => tour.id === formData.tourType
@@ -108,7 +163,6 @@ const ReservationForm = () => {
           tour_type: formData.tourType,
           special_requests: formData.message,
           status: "pending",
-        
           language: i18n.language, // Salvar o idioma do cliente
         },
       ]);
@@ -141,6 +195,69 @@ const ReservationForm = () => {
       description: t("reservation.reservationDescription"),
     });
   };
+
+  const handleSelectAlternative = (alternativeTime: string) => {
+    // Atualizar o formulário com o horário alternativo
+    setFormData((prev) => ({ ...prev, time: alternativeTime }));
+    setAvailabilityInfo((prev) => ({ ...prev, isOpen: false }));
+
+    // Processar a reserva com o novo horário
+    setTimeout(() => {
+      processReservation();
+    }, 100);
+  };
+
+  const handleCloseModal = () => {
+    setAvailabilityInfo((prev) => ({ ...prev, isOpen: false }));
+  };
+
+  const checkAvailabilityInRealTime = async () => {
+    if (!formData.date || !formData.time || !formData.numberOfPeople) {
+      setAvailabilityStatus({
+        isChecking: false,
+        isAvailable: true,
+        existingPeople: 0,
+        maxCapacity: 4,
+        message: "",
+      });
+      return;
+    }
+
+    setAvailabilityStatus((prev) => ({ ...prev, isChecking: true }));
+
+    try {
+      const availability = await checkAvailability(
+        formData.date,
+        formData.time,
+        Number(formData.numberOfPeople)
+      );
+
+      setAvailabilityStatus({
+        isChecking: false,
+        isAvailable: availability.isAvailable,
+        existingPeople: availability.existingReservations,
+        maxCapacity: availability.maxCapacity,
+        message: availability.message,
+      });
+    } catch (error) {
+      setAvailabilityStatus({
+        isChecking: false,
+        isAvailable: true,
+        existingPeople: 0,
+        maxCapacity: 4,
+        message: "Erro ao verificar disponibilidade",
+      });
+    }
+  };
+
+  // Verificar disponibilidade quando mudar data, hora ou número de pessoas
+  React.useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      checkAvailabilityInRealTime();
+    }, 500); // Debounce de 500ms
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.date, formData.time, formData.numberOfPeople]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -263,6 +380,63 @@ const ReservationForm = () => {
             </div>
           </div>
 
+          {/* Status de Disponibilidade */}
+          {formData.date && formData.time && formData.numberOfPeople && (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-semibold text-gray-800">
+                  Status de Disponibilidade
+                </h4>
+                {availabilityStatus.isChecking ? (
+                  <div className="flex items-center gap-2 text-blue-600">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                    <span className="text-sm">Verificando...</span>
+                  </div>
+                ) : (
+                  <Badge
+                    variant={
+                      availabilityStatus.isAvailable ? "default" : "destructive"
+                    }
+                    className={
+                      availabilityStatus.isAvailable
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }
+                  >
+                    {availabilityStatus.isAvailable
+                      ? "Disponível"
+                      : "Indisponível"}
+                  </Badge>
+                )}
+              </div>
+
+              {!availabilityStatus.isChecking && (
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-gray-500" />
+                    <span className="text-gray-600">
+                      Pessoas já reservadas: {availabilityStatus.existingPeople}{" "}
+                      / {availabilityStatus.maxCapacity}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-600">
+                      Sua reserva: {formData.numberOfPeople} pessoas
+                    </span>
+                  </div>
+                  {availabilityStatus.message && (
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4 text-gray-500" />
+                      <span className="text-gray-600">
+                        {availabilityStatus.message}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="tourType" className="text-blue-900 font-semibold">
               {t("reservation.tourType")} *
@@ -309,6 +483,14 @@ const ReservationForm = () => {
           </Button>
         </form>
       </CardContent>
+
+      <AlternativeTimesModal
+        isOpen={availabilityInfo.isOpen}
+        onClose={handleCloseModal}
+        onSelectTime={handleSelectAlternative}
+        selectedDate={availabilityInfo.requestedDate}
+        alternativeTimes={availabilityInfo.alternativeTimes}
+      />
     </Card>
   );
 };

@@ -46,7 +46,7 @@ export const calculateStatistics = (reservations: AdminReservation[]): Reservati
     monthlyReservations: reservations.filter(r => r.reservation_date.startsWith(thisMonth)).length,
     totalRevenue: reservations
       .filter(r => r.status === 'confirmed' || r.status === 'completed')
-      .reduce((sum, r) => sum + r.total_price, 0)
+      .reduce((sum, r) => sum + (typeof r.manual_payment === 'number' ? r.manual_payment : r.total_price), 0)
   };
   
   console.log('Statistics calculated:', stats);

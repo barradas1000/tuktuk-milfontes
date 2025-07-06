@@ -22,6 +22,7 @@ import {
 import { useAdminReservations } from '@/hooks/useAdminReservations';
 import AdminCalendar from './AdminCalendar';
 import AdminReservationsList from './AdminReservationsList';
+import AdminReports from './AdminReports';
 
 const AdminDashboard = () => {
   console.log('AdminDashboard component rendering...');
@@ -189,25 +190,7 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="analytics">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Relatórios e Análises
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <TrendingUp className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                    Relatórios em Desenvolvimento
-                  </h3>
-                  <p className="text-gray-500">
-                    Esta secção irá incluir gráficos detalhados, análise de tendências e relatórios de performance.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <AdminReports />
           </TabsContent>
         </Tabs>
       </div>
