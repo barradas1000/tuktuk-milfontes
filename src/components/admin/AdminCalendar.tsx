@@ -696,7 +696,11 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           reason,
           createdBy: userEmail,
         });
-        setBlockedPeriods((prev) => [...prev, newBlock]);
+        setBlockedPeriods((prev) => {
+          const updated = [...prev, newBlock];
+          console.log("Blocked periods updated:", updated);
+          return updated;
+        });
         toast({
           title: `Horário ${time} bloqueado com sucesso!`,
           variant: "success",
@@ -1004,24 +1008,39 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
 
   // --- Dados Computados para Renderização ---
   const selectedDateReservations = useMemo(
-    () => getReservationsByDate(selectedDate),
-    [selectedDate, getReservationsByDate]
+    () => getReservationsByDate(format(calendarDate, "yyyy-MM-dd")),
+    [calendarDate, getReservationsByDate]
   );
-  const availabilitySlots = useMemo(
-    () =>
-      getAvailabilityWithBlocks(
-        selectedDateReservations,
-        blockedPeriods,
-        selectedDate
-      ),
-    [selectedDateReservations, blockedPeriods, selectedDate]
-  );
+  const availabilitySlots = useMemo(() => {
+    const slots = getAvailabilityWithBlocks(
+      selectedDateReservations,
+      blockedPeriods,
+      format(calendarDate, "yyyy-MM-dd")
+    );
+    console.log("Availability slots calculated:", slots);
+    return slots;
+  }, [selectedDateReservations, blockedPeriods, calendarDate]);
 
   // --- Efeitos (Opcional, para sincronizar state inicial ou outros efeitos colaterais) ---
   // Exemplo: Sincronizar calendarDate com selectedDate se este mudar externamente
   useEffect(() => {
     setCalendarDate(new Date(selectedDate));
   }, [selectedDate]);
+
+  // Recarregar dados quando calendarDate mudar
+  useEffect(() => {
+    const loadDataForDate = async () => {
+      try {
+        // Recarregar bloqueios para garantir dados atualizados
+        const data = await fetchBlockedPeriods();
+        setBlockedPeriods(data);
+      } catch (error) {
+        console.error("Error loading data for date:", error);
+      }
+    };
+
+    loadDataForDate();
+  }, [calendarDate]);
 
   // --- Efeitos para carregar dados do Supabase ---
   useEffect(() => {
@@ -1290,6 +1309,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               const slotData = availabilitySlots.find(
                 (s) => s.time === slot
               ) || { time: slot, available: false, reserved: 0, capacity: 0 };
+
               const blocked = isTimeBlocked(calendarDate, slot);
               const blockedByReservation = isBlockedByReservation(
                 calendarDate,
@@ -1298,19 +1318,35 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               const blockedByAdmin = isBlockedByAdmin(calendarDate, slot);
               const isAvailable = slotData.available && !blocked;
 
+              // Determinar a classe CSS baseada no status
+              let cardClass = "";
+              let textClass = "";
+              let statusText = "";
+
+              if (blockedByReservation) {
+                cardClass =
+                  "border-orange-300 bg-orange-50 hover:bg-orange-100";
+                textClass = "text-orange-600";
+                statusText = "Reserva confirmada";
+              } else if (blockedByAdmin) {
+                cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
+                textClass = "text-red-600";
+                statusText = "Bloqueado pelo admin";
+              } else if (isAvailable) {
+                cardClass = "border-green-200 bg-green-50 hover:bg-green-100";
+                textClass = "text-green-600";
+                statusText = "Disponível";
+              } else {
+                cardClass =
+                  "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
+                textClass = "text-gray-500";
+                statusText = "Indisponível";
+              }
+
               return (
                 <div
                   key={slot}
-                  className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1
-                    ${
-                      blockedByReservation
-                        ? "border-orange-300 bg-orange-50 hover:bg-orange-100"
-                        : blockedByAdmin
-                        ? "border-red-300 bg-red-50 hover:bg-red-100"
-                        : isAvailable
-                        ? "border-green-200 bg-green-50 hover:bg-green-100"
-                        : "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300"
-                    }`}
+                  className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
                   title={
                     blockedByReservation
                       ? getTimeBlockReason(calendarDate, slot)
@@ -1352,24 +1388,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   <div className="text-xs text-gray-600">
                     {slotData.reserved}/{slotData.capacity} pessoas
                   </div>
-                  <div
-                    className={`text-xs font-medium mt-1 ${
-                      blockedByReservation
-                        ? "text-orange-600"
-                        : blockedByAdmin
-                        ? "text-red-600"
-                        : isAvailable
-                        ? "text-green-600"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {blockedByReservation
-                      ? "Reserva confirmada"
-                      : blockedByAdmin
-                      ? "Bloqueado pelo admin"
-                      : isAvailable
-                      ? "Disponível"
-                      : "Indisponível"}
+                  <div className={`text-xs font-medium mt-1 ${textClass}`}>
+                    {statusText}
                   </div>
                 </div>
               );
@@ -1776,14 +1796,15 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               {blockDate && (
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <p className="text-sm text-blue-800">
-                    <strong>Dia selecionado:</strong> {format(blockDate, "dd/MM/yyyy", { locale: pt })}
+                    <strong>Dia selecionado:</strong>{" "}
+                    {format(blockDate, "dd/MM/yyyy", { locale: pt })}
                   </p>
                   <p className="text-xs text-blue-600 mt-1">
                     {format(blockDate, "EEEE", { locale: pt })}
                   </p>
                 </div>
               )}
-              
+
               <div className="space-y-2">
                 <Label htmlFor="block-day-reason">
                   Motivo do bloqueio (opcional):
@@ -1823,7 +1844,10 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                       setBlockDayReason("");
                       toast({
                         title: "Dia bloqueado",
-                        description: `O dia ${format(blockDate, "dd/MM")} foi bloqueado com sucesso.`,
+                        description: `O dia ${format(
+                          blockDate,
+                          "dd/MM"
+                        )} foi bloqueado com sucesso.`,
                         variant: "success",
                       });
                     }
