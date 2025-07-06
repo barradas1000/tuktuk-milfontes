@@ -45,7 +45,7 @@ export const useAdminReservations = () => {
         console.log("Returning mock reservations for admin");
         return mockReservations;
       }
-
+      
       try {
         return await fetchReservationsFromSupabase();
       } catch (error) {
@@ -67,7 +67,7 @@ export const useAdminReservations = () => {
         console.log("Mock update reservation:", { id, status });
         return { id, status };
       }
-
+      
       return await updateReservationInSupabase(id, status);
     },
     onSuccess: (data, variables) => {

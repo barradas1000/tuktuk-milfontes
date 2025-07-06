@@ -76,6 +76,7 @@ const AdminReservationsList = () => {
   const [loading, setLoading] = useState(false);
   const [editingPayment, setEditingPayment] = useState<string | null>(null);
   const [manualPaymentValue, setManualPaymentValue] = useState("");
+  const [currentTime, setCurrentTime] = useState(new Date());
   const { t } = useTranslation();
 
   const tourTypes = [
@@ -258,6 +259,20 @@ const AdminReservationsList = () => {
   React.useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter, dateFilter]);
+
+  // Atualizar relógio a cada segundo
+  React.useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Função para formatar a data e hora atual
+  const formatCurrentDateTime = () => {
+    return format(currentTime, "dd/MM/yyyy HH:mm:ss", { locale: pt });
+  };
 
   const handleStatusUpdate = (id: string, newStatus: string) => {
     updateReservation({ id, status: newStatus });
@@ -556,10 +571,16 @@ const AdminReservationsList = () => {
       </Dialog>
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Gestão de Reservas
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Gestão de Reservas
+            </CardTitle>
+            <div className="flex items-center gap-2 text-sm font-mono bg-gray-100 px-3 py-2 rounded-lg">
+              <Clock className="h-4 w-4 text-blue-600" />
+              <span className="text-gray-700">{formatCurrentDateTime()}</span>
+            </div>
+          </div>
 
           {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-4 mt-4">
