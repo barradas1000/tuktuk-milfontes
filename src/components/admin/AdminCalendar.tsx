@@ -50,20 +50,15 @@ import {
   fetchActiveConductors,
   updateActiveConductors,
   fetchConductors,
+  cleanDuplicateBlockedPeriods,
 } from "@/services/supabaseService";
 import { BlockedPeriod } from "@/types/adminReservations";
 import { AdminReservation } from "@/types/adminReservations";
+import { getAvailabilityWithBlocks, generateDynamicTimeSlots } from "@/utils/reservationUtils";
 
 // --- Helper Functions (pode ser movido para um arquivo separado, ex: utils/time.ts ou utils/format.ts) ---
-const timeSlots = [
-  "09:00",
-  "10:30",
-  "12:00",
-  "14:00",
-  "15:30",
-  "17:00",
-  "18:30",
-];
+// Gera todos os horários de meia em meia hora das 08:00 às 23:00
+const timeSlots = generateDynamicTimeSlots();
 
 // --- Interfaces ---
 interface AdminCalendarProps {
@@ -103,6 +98,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // Estados relacionados a bloqueios
   const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
   const [blockedPeriodsLoading, setBlockedPeriodsLoading] = useState(true);
+  const [debugInfo, setDebugInfo] = useState<string>("");
   const [blockModalOpen, setBlockModalOpen] = useState(false);
   const [blockDate, setBlockDate] = useState<Date | null>(null); // Data atualmente selecionada para bloquear/desbloquear
   const [blockTab, setBlockTab] = useState<"day" | "hour" | null>("day"); // Aba ativa no modal de bloqueio
@@ -129,6 +125,11 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // Novos estados para modais separados
   const [blockDayModalOpen, setBlockDayModalOpen] = useState(false);
   const [blockHourModalOpen, setBlockHourModalOpen] = useState(false);
+  // Estados para modal de tornar horário disponível
+  const [makeAvailableModalOpen, setMakeAvailableModalOpen] = useState(false);
+  const [slotToMakeAvailable, setSlotToMakeAvailable] = useState<string | null>(
+    null
+  );
 
   // --- Estados para bloqueio rápido e anulação de reservas ---
   const [quickBlockInfo, setQuickBlockInfo] = useState("");
@@ -164,6 +165,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const [blockFilterType, setBlockFilterType] = useState<
     "all" | "days" | "hours"
   >("all");
+  const [isCleaningDuplicates, setIsCleaningDuplicates] = useState(false);
 
   // Mapeamento de códigos de tour para nomes amigáveis
   const tourTypes = [
@@ -602,19 +604,19 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const blockTime = useCallback(
     async (date: Date, time: string, reason: string) => {
       const dateString = format(date, "yyyy-MM-dd");
+      // Impedir bloqueio duplicado
+      const alreadyBlocked = blockedPeriods.some(
+        (b) => b.date === dateString && b.startTime === time
+      );
+      if (alreadyBlocked) {
+        toast({
+          title: `Horário já bloqueado`,
+          description: `O horário ${time} já está bloqueado para o dia ${dateString}.`,
+          variant: "destructive",
+        });
+        return;
+      }
       try {
-        console.log("Bloqueando horário:", dateString, time, reason);
-
-        // Verificar se já está bloqueado
-        const alreadyBlocked = blockedPeriods.some(
-          (b) => b.date === dateString && b.startTime === time
-        );
-
-        if (alreadyBlocked) {
-          console.log("Horário já está bloqueado:", time);
-          return;
-        }
-
         const newBlock = await createBlockedPeriod({
           date: dateString,
           startTime: time,
@@ -622,31 +624,81 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           reason,
           createdBy: userEmail,
         });
-
         setBlockedPeriods((prev) => [...prev, newBlock]);
-        console.log("Horário bloqueado com sucesso:", time);
+        toast({
+          title: `Horário ${time} bloqueado com sucesso!`,
+          variant: "success",
+        });
       } catch (error) {
-        console.error("Error blocking time:", error);
-        alert("Erro ao bloquear o horário. Tente novamente.");
+        toast({
+          title: "Erro ao bloquear o horário",
+          description: error instanceof Error ? error.message : String(error),
+          variant: "destructive",
+        });
       }
     },
-    [blockedPeriods, userEmail]
+    [blockedPeriods, userEmail, toast]
   );
 
-  const unblockTime = useCallback(async (date: Date, time: string) => {
-    const dateString = format(date, "yyyy-MM-dd");
-    try {
-      console.log("Desbloqueando horário:", dateString, time);
-      await deleteBlockedPeriodsByDate(dateString, time);
-      setBlockedPeriods((prev) =>
-        prev.filter((b) => !(b.date === dateString && b.startTime === time))
+  const unblockTime = useCallback(
+    async (date: Date, time: string) => {
+      const dateString = format(date, "yyyy-MM-dd");
+      // Verificar se existe reserva para este horário
+      const reservasNoHorario = getReservationsByDate(dateString).filter(
+        (r) => r.reservation_time === time && r.status !== "cancelled"
       );
-      console.log("Horário desbloqueado com sucesso:", dateString, time);
-    } catch (error) {
-      console.error("Error unblocking time:", error);
-      alert("Erro ao desbloquear o horário. Tente novamente.");
-    }
-  }, []);
+      if (reservasNoHorario.length > 0) {
+        toast({
+          title: `Não é possível desbloquear`,
+          description: `Já existe uma reserva para o horário ${time}. Cancele a reserva antes de desbloquear.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      try {
+        console.log("Desbloqueando horário:", dateString, time);
+        await deleteBlockedPeriodsByDate(dateString, time);
+        setBlockedPeriods((prev) =>
+          prev.filter((b) => !(b.date === dateString && b.startTime === time))
+        );
+        console.log("Horário desbloqueado com sucesso:", dateString, time);
+      } catch (error) {
+        console.error("Error unblocking time:", error);
+        alert("Erro ao desbloquear o horário. Tente novamente.");
+      }
+    },
+    [getReservationsByDate, toast]
+  );
+
+  const makeTimeAvailable = useCallback(
+    async (date: Date, time: string) => {
+      const dateString = format(date, "yyyy-MM-dd");
+      try {
+        console.log("Tornando horário disponível:", dateString, time);
+        await deleteBlockedPeriodsByDate(dateString, time);
+        setBlockedPeriods((prev) =>
+          prev.filter((b) => !(b.date === dateString && b.startTime === time))
+        );
+        console.log(
+          "Horário tornado disponível com sucesso:",
+          dateString,
+          time
+        );
+        toast({
+          title: `Horário ${time} tornado disponível!`,
+          variant: "success",
+        });
+      } catch (error) {
+        console.error("Error making time available:", error);
+        toast({
+          title: "Erro ao tornar horário disponível",
+          description: error instanceof Error ? error.message : String(error),
+          variant: "destructive",
+        });
+      }
+    },
+    [toast]
+  );
 
   const handleBlockDaysRange = useCallback(() => {
     if (!blockDaysStart || !blockDaysEnd) return;
@@ -861,8 +913,13 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     [selectedDate, getReservationsByDate]
   );
   const availabilitySlots = useMemo(
-    () => getAvailabilityForDate(selectedDate),
-    [selectedDate, getAvailabilityForDate]
+    () =>
+      getAvailabilityWithBlocks(
+        selectedDateReservations,
+        blockedPeriods,
+        selectedDate
+      ),
+    [selectedDateReservations, blockedPeriods, selectedDate]
   );
 
   // --- Efeitos (Opcional, para sincronizar state inicial ou outros efeitos colaterais) ---
@@ -877,7 +934,11 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
       try {
         setBlockedPeriodsLoading(true);
         const data = await fetchBlockedPeriods();
+        console.log("Blocked periods loaded:", data);
         setBlockedPeriods(data);
+        setDebugInfo(
+          `Carregados ${data.length} bloqueios: ${JSON.stringify(data)}`
+        );
       } catch (error) {
         console.error("Error loading blocked periods:", error);
       } finally {
@@ -908,9 +969,62 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     loadActiveConductors();
   }, []);
 
+  // Função para limpar bloqueios duplicados
+  const handleCleanDuplicates = async () => {
+    setIsCleaningDuplicates(true);
+    try {
+      const removedCount = await cleanDuplicateBlockedPeriods();
+      
+      if (removedCount > 0) {
+        toast({
+          title: "Limpeza concluída",
+          description: `${removedCount} bloqueios duplicados foram removidos.`,
+        });
+        
+        // Recarregar bloqueios após limpeza
+        const updatedData = await fetchBlockedPeriods();
+        setBlockedPeriods(updatedData);
+        setDebugInfo(
+          `Carregados ${updatedData.length} bloqueios após limpeza: ${JSON.stringify(updatedData)}`
+        );
+      } else {
+        toast({
+          title: "Nenhum duplicado encontrado",
+          description: "Todos os bloqueios já estão únicos.",
+        });
+      }
+    } catch (error) {
+      console.error("Error cleaning duplicates:", error);
+      toast({
+        title: "Erro na limpeza",
+        description: "Ocorreu um erro ao limpar bloqueios duplicados.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCleaningDuplicates(false);
+    }
+  };
+
   // --- Renderização do Componente ---
   return (
     <div>
+      {/* Debug info - remover depois */}
+      {debugInfo && (
+        <div className="mb-4 p-2 bg-blue-100 border border-blue-300 rounded text-xs">
+          <strong>Debug:</strong> {debugInfo}
+          <div className="mt-2">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCleanDuplicates}
+              disabled={isCleaningDuplicates}
+              className="text-xs"
+            >
+              {isCleaningDuplicates ? "Limpando..." : "Limpar Duplicados"}
+            </Button>
+          </div>
+        </div>
+      )}
       {/* Painel de seleção de condutores ativos */}
       <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex flex-col gap-3 items-center shadow-md">
         <h2 className="text-lg font-bold text-purple-900 mb-2">
@@ -977,61 +1091,70 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               Clique em um horário para bloquear/desbloquear
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {availabilitySlots.map((slot) => {
-              const blocked = isTimeBlocked(calendarDate, slot.time);
+          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2">
+            {timeSlots.map((slot) => {
+              const slotData = availabilitySlots.find(
+                (s) => s.time === slot
+              ) || { time: slot, available: false, reserved: 0, capacity: 0 };
+              const blocked = isTimeBlocked(calendarDate, slot);
+              const isAvailable = slotData.available && !blocked;
               return (
                 <div
-                  key={slot.time}
-                  className={`p-3 rounded-lg border text-center transition-all duration-200 cursor-pointer hover:scale-105 ${
-                    blocked
-                      ? "border-gray-300 bg-gray-200 opacity-60"
-                      : slot.available
-                      ? "border-green-200 bg-green-50 hover:bg-green-100"
-                      : "border-red-200 bg-red-50 hover:bg-red-100"
-                  }`}
+                  key={slot}
+                  className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1
+                    ${
+                      blocked
+                        ? "border-red-300 bg-red-50 hover:bg-red-100"
+                        : isAvailable
+                        ? "border-green-200 bg-green-50 hover:bg-green-100"
+                        : "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300"
+                    }`}
                   title={
                     blocked
-                      ? `${getTimeBlockReason(
-                          calendarDate,
-                          slot.time
-                        )} - Clique para desbloquear`
-                      : `Clique para bloquear ${slot.time}`
+                      ? getTimeBlockReason(calendarDate, slot)
+                      : isAvailable
+                      ? `Clique para bloquear ${slot}`
+                      : "Clique para tornar disponível"
                   }
                   onClick={() => {
                     if (blocked) {
-                      // Se está bloqueado, desbloquear
-                      unblockTime(calendarDate, slot.time);
+                      unblockTime(calendarDate, slot);
+                    } else if (isAvailable) {
+                      blockTime(calendarDate, slot, ""); // Bloqueia imediatamente sem modal
                     } else {
-                      // Se não está bloqueado, abrir modal para bloquear
-                      setBlockDate(calendarDate);
-                      setBlockHourStart(slot.time);
-                      setBlockHourEnd(slot.time);
-                      setBlockHourModalOpen(true);
+                      // Só abrir o modal se o horário estiver realmente bloqueado (caso especial)
+                      const isActuallyBlocked = blockedPeriods.some(
+                        (b) =>
+                          b.date === format(calendarDate, "yyyy-MM-dd") &&
+                          b.startTime === slot
+                      );
+                      if (isActuallyBlocked) {
+                        setSlotToMakeAvailable(slot);
+                        setMakeAvailableModalOpen(true);
+                      }
                     }
                   }}
                 >
                   <div className="font-semibold flex items-center justify-center gap-1">
-                    {slot.time}{" "}
-                    {blocked && <Lock className="w-4 h-4 inline ml-1" />}
+                    {slot} {blocked && <Lock className="w-4 h-4 inline ml-1" />}
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {slot.reserved}/{slot.capacity} pessoas
+                  <div className="text-xs text-gray-600">
+                    {slotData.reserved}/{slotData.capacity} pessoas
                   </div>
                   <div
                     className={`text-xs font-medium mt-1 ${
                       blocked
                         ? "text-gray-500"
-                        : slot.available
+                        : isAvailable
                         ? "text-green-600"
-                        : "text-red-600"
+                        : "text-gray-500"
                     }`}
                   >
                     {blocked
-                      ? getTimeBlockReason(calendarDate, slot.time)
-                      : slot.available
+                      ? getTimeBlockReason(calendarDate, slot)
+                      : isAvailable
                       ? "Disponível"
-                      : "Completo"}
+                      : "Indisponível"}
                   </div>
                 </div>
               );
@@ -1049,50 +1172,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Bloco dos botões com lógica condicional de cor */}
-          {(() => {
-            // Lógica para variant dos botões
-            const hasBlockedDay = blockedPeriods.some(
-              (b) => !b.startTime && !b.endTime
-            );
-            const hasBlockedHour = blockedPeriods.some((b) => b.startTime);
-            const dayBtnVariant = hasBlockedDay ? "destructive" : "default";
-            const hourBtnVariant = hasBlockedHour ? "destructive" : "default";
-            return (
-              <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-4">
-                <Button
-                  size="sm"
-                  variant={dayBtnVariant}
-                  className="flex flex-col items-center justify-center w-28 min-h-[80px] px-3 py-3 text-xs sm:text-sm whitespace-normal text-center"
-                  onClick={() => setBlockDayModalOpen(true)}
-                >
-                  <Lock className="w-5 h-5 mb-1" />
-                  <span className="leading-tight block w-full">
-                    Bloquear
-                    <br />
-                    Desbloquear
-                    <br />
-                    Dias
-                  </span>
-                </Button>
-                <Button
-                  size="sm"
-                  variant={hourBtnVariant}
-                  className="flex flex-col items-center justify-center w-28 min-h-[80px] px-3 py-3 text-xs sm:text-sm whitespace-normal text-center"
-                  onClick={() => setBlockHourModalOpen(true)}
-                >
-                  <Clock className="w-5 h-5 mb-1" />
-                  <span className="leading-tight block w-full">
-                    Bloquear
-                    <br />
-                    Desbloquear
-                    <br />
-                    Horas
-                  </span>
-                </Button>
-              </div>
-            );
-          })()}
+          {/* Removido bloco dos botões de bloqueio/desbloqueio */}
           <div className="rounded-2xl shadow-xl bg-white p-2">
             <DayPicker
               mode="single"
@@ -1188,112 +1268,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               </div>
             </div>
           </div>
-          {/* Botão de bloqueio rápido do restante do dia, agora abaixo do calendário e legenda */}
-          <div className="flex flex-col items-center mt-4 mb-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              className="flex flex-col items-center justify-center w-32 min-h-[80px] px-3 py-3 text-xs sm:text-sm whitespace-normal text-center border-2 border-purple-400"
-              onClick={async () => {
-                const now = new Date();
-                const todayStr = format(now, "yyyy-MM-dd");
-
-                // Bloqueia todos os horários restantes do dia
-                const remainingSlots = timeSlots.filter((slot) => {
-                  const [h, m] = slot.split(":");
-                  const slotDate = new Date(
-                    now.getFullYear(),
-                    now.getMonth(),
-                    now.getDate(),
-                    Number(h),
-                    Number(m)
-                  );
-                  return slotDate > now;
-                });
-
-                if (remainingSlots.length === 0) {
-                  setQuickBlockInfo(
-                    "Não há horários restantes para bloquear hoje"
-                  );
-                  return;
-                }
-
-                try {
-                  for (const slot of remainingSlots) {
-                    await blockTime(
-                      now,
-                      slot,
-                      "Bloqueio rápido do restante do dia"
-                    );
-                  }
-                  setQuickBlockInfo(
-                    `${remainingSlots.length} horários restantes bloqueados`
-                  );
-                } catch (error) {
-                  setQuickBlockInfo("Erro ao bloquear horários restantes");
-                }
-              }}
-            >
-              <Lock className="w-5 h-5 mb-1 text-purple-600" />
-              <span className="leading-tight block w-full text-purple-700">
-                Bloquear
-                <br />
-                Restante
-                <br />
-                do Dia
-              </span>
-            </Button>
-            {/* Informativo de bloqueio rápido */}
-            {quickBlockInfo && (
-              <div className="text-center text-purple-700 font-semibold mt-2">
-                {quickBlockInfo}
-              </div>
-            )}
-          </div>
-          {/* Se houver reservas hoje, mostrar botão para anular e avisar cliente */}
-          {(() => {
-            const todayStr = format(new Date(), "yyyy-MM-dd");
-            const todayReservations = getReservationsByDate(todayStr);
-            if (todayReservations.length > 0) {
-              return (
-                <div className="flex flex-col items-center gap-2 mb-2">
-                  <div className="text-sm text-red-600 font-semibold">
-                    Há reservas para hoje!
-                  </div>
-                  {todayReservations.map((res) => (
-                    <div
-                      key={res.id}
-                      className="border rounded p-2 w-full max-w-xs bg-gray-50"
-                    >
-                      <div className="font-bold">{res.customer_name}</div>
-                      <div className="text-xs text-gray-700">
-                        {getTourDisplayName(res.tour_type)} -{" "}
-                        {res.reservation_time} - {res.number_of_people} pessoas
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Pagamento: €{res.total_price}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        Pedidos: {res.special_requests || "-"}
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        className="mt-1 w-full"
-                        onClick={() => {
-                          setReservationToCancel(res);
-                          setCancelReservationModalOpen(true);
-                        }}
-                      >
-                        Anular reserva
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              );
-            }
-            return null;
-          })()}
         </CardContent>
       </Card>
 
@@ -1307,10 +1281,15 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         {/* Filtros */}
         <div className="mb-4 flex flex-wrap gap-3 items-center">
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-orange-800">
+            <label
+              className="text-sm font-medium text-orange-800"
+              htmlFor="block-filter-type"
+            >
               Filtrar por:
             </label>
             <select
+              id="block-filter-type"
+              name="block-filter-type"
               value={blockFilterType}
               onChange={(e) =>
                 setBlockFilterType(e.target.value as "all" | "days" | "hours")
@@ -1323,8 +1302,15 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             </select>
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-orange-800">Data:</label>
+            <label
+              className="text-sm font-medium text-orange-800"
+              htmlFor="block-filter-date"
+            >
+              Data:
+            </label>
             <input
+              id="block-filter-date"
+              name="block-filter-date"
               type="date"
               value={blockFilterDate}
               onChange={(e) => setBlockFilterDate(e.target.value)}
@@ -1410,43 +1396,35 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               </div>
             ) : (
               <div className="space-y-2 max-h-32 overflow-y-auto">
-                {getFilteredBlocks()
-                  .filter((b) => b.startTime)
-                  .sort((a, b) => {
-                    const dateCompare =
-                      new Date(a.date).getTime() - new Date(b.date).getTime();
-                    if (dateCompare !== 0) return dateCompare;
-                    return (a.startTime || "").localeCompare(b.startTime || "");
-                  })
-                  .map((block) => (
-                    <div
-                      key={block.id}
-                      className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-100"
-                    >
-                      <div className="flex-1">
-                        <div className="font-medium text-sm">
-                          {format(new Date(block.date), "dd/MM", {
-                            locale: pt,
-                          })}{" "}
-                          às {block.startTime}
-                        </div>
-                        {block.reason && (
-                          <span className="text-xs text-gray-500">
-                            {block.reason}
-                          </span>
-                        )}
+                {[...new Map(getFilteredBlocks().filter((b) => b.startTime).map(block => [block.date + '-' + block.startTime, block])).values()].map((block) => (
+                  <div
+                    key={block.id}
+                    className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-100"
+                  >
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">
+                        {format(new Date(block.date), "dd/MM", {
+                          locale: pt,
+                        })}{" "}
+                        às {block.startTime}
                       </div>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() =>
-                          unblockTime(new Date(block.date), block.startTime!)
-                        }
-                      >
-                        Desbloquear
-                      </Button>
+                      {block.reason && (
+                        <span className="text-xs text-gray-500">
+                          {block.reason}
+                        </span>
+                      )}
                     </div>
-                  ))}
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() =>
+                        unblockTime(new Date(block.date), block.startTime!)
+                      }
+                    >
+                      Desbloquear
+                    </Button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -1586,6 +1564,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                 <span className="font-semibold ml-4">Bloquear vários dias</span>
                 <span>Início:</span>
                 <input
+                  id="block-days-start"
+                  name="block-days-start"
                   type="date"
                   value={blockDaysStart}
                   onChange={(e) => setBlockDaysStart(e.target.value)}
@@ -1593,6 +1573,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                 />
                 <span>Fim:</span>
                 <input
+                  id="block-days-end"
+                  name="block-days-end"
                   type="date"
                   value={blockDaysEnd}
                   onChange={(e) => setBlockDaysEnd(e.target.value)}
@@ -1621,8 +1603,12 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                 </div>
               )}
               <div className="mt-2">
-                <b>Motivo (opcional):</b>
+                <label htmlFor="block-day-reason">
+                  <b>Motivo (opcional):</b>
+                </label>
                 <input
+                  id="block-day-reason"
+                  name="block-day-reason"
                   type="text"
                   className="w-full border rounded p-2 mt-1"
                   value={blockDayReason}
@@ -1650,8 +1636,15 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             <div className="space-y-4 overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
               {/* Seleção de data */}
               <div className="space-y-2">
-                <label className="font-semibold text-sm">Data:</label>
+                <label
+                  className="font-semibold text-sm"
+                  htmlFor="block-hour-date"
+                >
+                  Data:
+                </label>
                 <input
+                  id="block-hour-date"
+                  name="block-hour-date"
                   type="date"
                   value={blockDate ? format(blockDate, "yyyy-MM-dd") : ""}
                   onChange={(e) => setBlockDate(new Date(e.target.value))}
@@ -1693,6 +1686,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   </Button>
                 </div>
                 <input
+                  id="block-hour-reason"
+                  name="block-hour-reason"
                   type="text"
                   placeholder="Motivo (opcional)"
                   className="border rounded p-2 text-sm w-full"
@@ -1755,6 +1750,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   </Button>
                 </div>
                 <input
+                  id="block-hour-range-reason"
+                  name="block-hour-range-reason"
                   type="text"
                   placeholder="Motivo (opcional)"
                   className="border rounded p-2 text-sm w-full"
@@ -1793,35 +1790,37 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                 ) : (
                   <div className="space-y-2 max-h-48 overflow-y-auto border rounded p-2 bg-gray-25">
                     {blockDate &&
-                      getAllDayBlocks(blockDate)
-                        .filter((b) => b.startTime)
-                        .map((block) => (
-                          <div
-                            key={block.id}
-                            className="flex items-center justify-between p-2 bg-white rounded border shadow-sm hover:shadow-md transition-shadow"
-                          >
-                            <div className="flex-1">
-                              <span className="font-medium text-sm">
-                                {block.startTime}
+                      [...new Map(
+                        getAllDayBlocks(blockDate)
+                          .filter((b) => b.startTime)
+                          .map((block) => [block.date + '-' + block.startTime, block])
+                      ).values()].map((block) => (
+                        <div
+                          key={block.id}
+                          className="flex items-center justify-between p-2 bg-white rounded border shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          <div className="flex-1">
+                            <span className="font-medium text-sm">
+                              {block.startTime}
+                            </span>
+                            {block.reason && (
+                              <span className="text-xs text-gray-500 ml-2">
+                                ({block.reason})
                               </span>
-                              {block.reason && (
-                                <span className="text-xs text-gray-500 ml-2">
-                                  ({block.reason})
-                                </span>
-                              )}
-                            </div>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() =>
-                                blockDate &&
-                                unblockTime(blockDate, block.startTime!)
-                              }
-                            >
-                              Desbloquear
-                            </Button>
+                            )}
                           </div>
-                        ))}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() =>
+                              blockDate &&
+                              unblockTime(blockDate, block.startTime!)
+                            }
+                          >
+                            Desbloquear
+                          </Button>
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>
@@ -2155,6 +2154,82 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de confirmação para tornar horário disponível */}
+      <Dialog
+        open={makeAvailableModalOpen}
+        onOpenChange={setMakeAvailableModalOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tornar horário disponível</DialogTitle>
+          </DialogHeader>
+          <p>
+            Deseja tornar o horário <b>{slotToMakeAvailable}</b> disponível?
+          </p>
+          {/* Exibir motivo e data/hora da última alteração, se houver bloqueio */}
+          {slotToMakeAvailable &&
+            (() => {
+              const currentDate = format(calendarDate, "yyyy-MM-dd");
+              console.log("Looking for block:", {
+                date: currentDate,
+                time: slotToMakeAvailable,
+                blockedPeriods: blockedPeriods,
+              });
+
+              const block = blockedPeriods.find(
+                (b) =>
+                  b.date === currentDate && b.startTime === slotToMakeAvailable
+              );
+
+              console.log("Found block:", block);
+
+              if (!block) {
+                return (
+                  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                    <div className="text-sm text-yellow-800">
+                      Nenhum bloqueio encontrado para este horário.
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+                  <div className="text-sm text-red-800 font-semibold mb-1">
+                    Motivo da indisponibilidade:
+                  </div>
+                  <div className="text-sm text-gray-700 mb-1">
+                    {block.reason || "(Sem motivo especificado)"}
+                  </div>
+                  {block.createdAt && (
+                    <div className="text-xs text-gray-500">
+                      Última alteração:{" "}
+                      {new Date(block.createdAt).toLocaleString("pt-PT")}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          <DialogFooter>
+            <Button
+              variant="default"
+              onClick={async () => {
+                if (slotToMakeAvailable) {
+                  await makeTimeAvailable(calendarDate, slotToMakeAvailable);
+                }
+                setMakeAvailableModalOpen(false);
+                setSlotToMakeAvailable(null);
+              }}
+            >
+              Tornar Disponível
+            </Button>
+            <DialogClose asChild>
+              <Button variant="outline">Cancelar</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

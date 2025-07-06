@@ -176,6 +176,7 @@ export const fetchBlockedPeriods = async (): Promise<BlockedPeriod[]> => {
       endTime: item.end_time,
       reason: item.reason,
       createdBy: item.created_by,
+      createdAt: item.created_at, // <-- incluir campo de data de criação
     }));
   } catch (error) {
     console.error("Error fetching blocked periods:", error);
@@ -184,7 +185,7 @@ export const fetchBlockedPeriods = async (): Promise<BlockedPeriod[]> => {
 };
 
 export const createBlockedPeriod = async (
-  blockedPeriod: Omit<BlockedPeriod, "id">
+  blockedPeriod: Omit<BlockedPeriod, "id"> & { createdAt?: string }
 ): Promise<BlockedPeriod> => {
   try {
     // Mapear os campos da interface para o banco de dados
@@ -194,6 +195,7 @@ export const createBlockedPeriod = async (
       end_time: blockedPeriod.endTime,
       reason: blockedPeriod.reason,
       created_by: blockedPeriod.createdBy,
+      created_at: blockedPeriod.createdAt, // <-- incluir campo de data de criação se fornecido
     };
 
     const { data, error } = await (supabase as any)
@@ -215,6 +217,7 @@ export const createBlockedPeriod = async (
       endTime: data.end_time,
       reason: data.reason,
       createdBy: data.created_by,
+      createdAt: data.created_at, // <-- incluir campo de data de criação
     };
   } catch (error) {
     console.error("Error creating blocked period:", error);
@@ -267,6 +270,80 @@ export const deleteBlockedPeriodsByDate = async (
     console.log("Bloqueios deletados com sucesso. Count:", count);
   } catch (error) {
     console.error("Error deleting blocked periods by date:", error);
+    throw error;
+  }
+};
+
+export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
+  try {
+    console.log("Iniciando limpeza de bloqueios duplicados...");
+
+    // Buscar todos os bloqueios
+    const { data: allBlockedPeriods, error: fetchError } = await (
+      supabase as any
+    )
+      .from("blocked_periods")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (fetchError) {
+      console.error("Error fetching blocked periods for cleanup:", fetchError);
+      throw fetchError;
+    }
+
+    if (!allBlockedPeriods || allBlockedPeriods.length === 0) {
+      console.log("Nenhum bloqueio encontrado para limpeza");
+      return 0;
+    }
+
+    // Agrupar por data e horário
+    const groupedByDateAndTime: { [key: string]: any[] } = {};
+
+    allBlockedPeriods.forEach((period: any) => {
+      const key = `${period.date}_${period.start_time}`;
+      if (!groupedByDateAndTime[key]) {
+        groupedByDateAndTime[key] = [];
+      }
+      groupedByDateAndTime[key].push(period);
+    });
+
+    // Identificar duplicados (mais de 1 bloqueio para mesma data/horário)
+    const duplicatesToRemove: string[] = [];
+
+    Object.values(groupedByDateAndTime).forEach((periods: any[]) => {
+      if (periods.length > 1) {
+        // Manter o mais recente (primeiro da lista, já ordenado por created_at desc)
+        const toRemove = periods.slice(1); // Remove todos exceto o primeiro
+        toRemove.forEach((period: any) => {
+          duplicatesToRemove.push(period.id);
+        });
+      }
+    });
+
+    if (duplicatesToRemove.length === 0) {
+      console.log("Nenhum bloqueio duplicado encontrado");
+      return 0;
+    }
+
+    console.log(
+      `Encontrados ${duplicatesToRemove.length} bloqueios duplicados para remoção`
+    );
+
+    // Remover duplicados
+    const { error: deleteError, count } = await (supabase as any)
+      .from("blocked_periods")
+      .delete()
+      .in("id", duplicatesToRemove);
+
+    if (deleteError) {
+      console.error("Error deleting duplicate blocked periods:", deleteError);
+      throw deleteError;
+    }
+
+    console.log(`Limpeza concluída: ${count} bloqueios duplicados removidos`);
+    return count || 0;
+  } catch (error) {
+    console.error("Error cleaning duplicate blocked periods:", error);
     throw error;
   }
 };

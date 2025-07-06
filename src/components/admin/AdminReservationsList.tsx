@@ -78,6 +78,9 @@ const AdminReservationsList = () => {
   const [manualPaymentValue, setManualPaymentValue] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date());
   const { t } = useTranslation();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [reservationToDelete, setReservationToDelete] =
+    useState<AdminReservation | null>(null);
 
   const tourTypes = [
     { id: "panoramic", name: "Passeio panorâmico pela vila", basePrice: 10 },
@@ -301,6 +304,30 @@ const AdminReservationsList = () => {
   const cancelEditingPayment = () => {
     setEditingPayment(null);
     setManualPaymentValue("");
+  };
+
+  const handleDeleteReservation = async (reservation: AdminReservation) => {
+    setReservationToDelete(reservation);
+    setDeleteDialogOpen(true);
+  };
+  const confirmDeleteReservation = async () => {
+    if (!reservationToDelete) return;
+    try {
+      await supabase
+        .from("reservations")
+        .delete()
+        .eq("id", reservationToDelete.id);
+      toast({ title: "Reserva eliminada com sucesso" });
+    } catch (err: unknown) {
+      toast({
+        title: "Erro ao eliminar reserva",
+        description: err instanceof Error ? err.message : String(err),
+        variant: "destructive",
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setReservationToDelete(null);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -622,7 +649,148 @@ const AdminReservationsList = () => {
         </CardHeader>
 
         <CardContent>
-          <div className="rounded-md border">
+          {/* Responsivo: Cards em mobile, tabela em desktop */}
+          <div className="block lg:hidden">
+            {currentReservations.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Filter className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Nenhuma reserva encontrada</p>
+              </div>
+            ) : (
+              currentReservations.map((reservation, idx) => {
+                // Alternar cor de fundo
+                const bgColors = [
+                  "bg-gray-50",
+                  "bg-blue-50",
+                  "bg-green-50",
+                  "bg-purple-50",
+                  "bg-yellow-50",
+                ];
+                const bg = bgColors[idx % bgColors.length];
+                return (
+                  <div
+                    key={reservation.id}
+                    className={`mb-4 p-4 rounded-xl border shadow-sm ${bg}`}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-bold text-lg">
+                        {reservation.customer_name}
+                      </span>
+                      {getStatusBadge(reservation.status)}
+                    </div>
+                    <div className="flex flex-col gap-1 text-sm mb-2">
+                      <span>
+                        <Phone className="inline h-4 w-4 mr-1 text-gray-400" />{" "}
+                        {reservation.customer_phone}
+                      </span>
+                      <span>
+                        <Mail className="inline h-4 w-4 mr-1 text-gray-400" />{" "}
+                        {reservation.customer_email}
+                      </span>
+                      <span>
+                        <Users className="inline h-4 w-4 mr-1 text-gray-400" />{" "}
+                        {reservation.number_of_people} pessoas
+                      </span>
+                      <span>
+                        <Clock className="inline h-4 w-4 mr-1 text-gray-400" />{" "}
+                        {format(
+                          new Date(reservation.reservation_date),
+                          "dd/MM/yyyy",
+                          { locale: pt }
+                        )}{" "}
+                        às {reservation.reservation_time}
+                      </span>
+                      <span>
+                        <b>Tour:</b> {getTourDisplayName(reservation.tour_type)}{" "}
+                        <span className="text-xs text-gray-500">
+                          (Base: €
+                          {getTourBasePrice(reservation.tour_type).toFixed(2)})
+                        </span>
+                      </span>
+                      {reservation.special_requests && (
+                        <span className="italic text-gray-600">
+                          "{reservation.special_requests}"
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 font-semibold mb-2">
+                      <Euro className="h-4 w-4 text-gray-400" />
+                      {editingPayment === reservation.id ? (
+                        <>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={manualPaymentValue}
+                            onChange={(e) =>
+                              setManualPaymentValue(e.target.value)
+                            }
+                            className="w-24 mr-2"
+                          />
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="mr-1"
+                            onClick={() =>
+                              handleManualPaymentUpdate(
+                                reservation.id,
+                                parseFloat(manualPaymentValue)
+                              )
+                            }
+                            disabled={
+                              manualPaymentValue === "" ||
+                              isNaN(Number(manualPaymentValue))
+                            }
+                          >
+                            Salvar
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={cancelEditingPayment}
+                          >
+                            Cancelar
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          {typeof reservation.manual_payment === "number"
+                            ? (reservation.manual_payment || 0).toFixed(2)
+                            : (reservation.total_price || 0).toFixed(2)}
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="ml-2"
+                            onClick={() =>
+                              startEditingPayment(
+                                reservation.id,
+                                reservation.manual_payment ??
+                                  (reservation.total_price || 0)
+                              )
+                            }
+                          >
+                            Editar
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {getActionButtons(reservation)}
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteReservation(reservation)}
+                      >
+                        Eliminar Reserva
+                      </Button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          {/* Tabela tradicional em desktop */}
+          <div className="hidden lg:block rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -769,6 +937,13 @@ const AdminReservationsList = () => {
                       <TableCell>
                         <div className="flex gap-2">
                           {getActionButtons(reservation)}
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteReservation(reservation)}
+                          >
+                            Eliminar Reserva
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -827,6 +1002,26 @@ const AdminReservationsList = () => {
           )}
         </CardContent>
       </Card>
+      {/* Popup de confirmação de eliminação */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Eliminação</DialogTitle>
+          </DialogHeader>
+          <p>
+            Tem a certeza que deseja eliminar a reserva de{" "}
+            <b>{reservationToDelete?.customer_name}</b>?
+          </p>
+          <DialogFooter>
+            <Button variant="destructive" onClick={confirmDeleteReservation}>
+              Eliminar
+            </Button>
+            <DialogClose asChild>
+              <Button variant="outline">Cancelar</Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

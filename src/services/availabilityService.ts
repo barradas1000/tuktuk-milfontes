@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { mockReservations } from "@/data/mockReservations";
 import { checkSupabaseConfiguration } from "./supabaseService";
+import { generateDynamicTimeSlots } from "@/utils/reservationUtils";
 
 export interface AvailabilityCheck {
   isAvailable: boolean;
@@ -18,7 +19,6 @@ export interface ReservationConflict {
   maxCapacity: number;
 }
 
-const TIME_SLOTS = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00', '18:30'];
 const MAX_CAPACITY = 1; // Máximo de 1 reserva por horário (não importa o número de pessoas)
 
 export const checkAvailability = async (
@@ -101,7 +101,8 @@ export const generateAlternativeTimes = async (
   const alternatives: string[] = [];
 
   try {
-    for (const timeSlot of TIME_SLOTS) {
+    const timeSlots = generateDynamicTimeSlots();
+    for (const timeSlot of timeSlots) {
       let existingReservations: any[] = [];
       
       if (isConfigured) {
@@ -139,7 +140,8 @@ export const getAvailabilityForDate = async (date: string): Promise<Record<strin
   const availability: Record<string, number> = {};
 
   try {
-    for (const timeSlot of TIME_SLOTS) {
+    const timeSlots = generateDynamicTimeSlots();
+    for (const timeSlot of timeSlots) {
       let existingReservations: any[] = [];
       
       if (isConfigured) {

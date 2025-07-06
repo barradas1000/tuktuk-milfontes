@@ -39,4 +39,5 @@ export interface BlockedPeriod {
   endTime?: string; // formato HH:mm, opcional para bloqueio de dia inteiro
   reason?: string;
   createdBy: string;
+  createdAt?: string; // Data/hora de criação do bloqueio
 }
