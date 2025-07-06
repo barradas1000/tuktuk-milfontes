@@ -54,11 +54,25 @@ import {
 } from "@/services/supabaseService";
 import { BlockedPeriod } from "@/types/adminReservations";
 import { AdminReservation } from "@/types/adminReservations";
-import { getAvailabilityWithBlocks, generateDynamicTimeSlots } from "@/utils/reservationUtils";
+import {
+  getAvailabilityWithBlocks,
+  generateDynamicTimeSlots,
+} from "@/utils/reservationUtils";
 
 // --- Helper Functions (pode ser movido para um arquivo separado, ex: utils/time.ts ou utils/format.ts) ---
 // Gera todos os horários de meia em meia hora das 08:00 às 23:00
 const timeSlots = generateDynamicTimeSlots();
+
+// CSS personalizado para esconder scrollbar
+const sliderStyles = `
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+`;
 
 // --- Interfaces ---
 interface AdminCalendarProps {
@@ -166,6 +180,10 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     "all" | "days" | "hours"
   >("all");
   const [isCleaningDuplicates, setIsCleaningDuplicates] = useState(false);
+  const [sliderDays, setSliderDays] = useState<Date[]>([]);
+  const [selectedSliderDate, setSelectedSliderDate] = useState<Date>(
+    new Date()
+  );
 
   // Mapeamento de códigos de tour para nomes amigáveis
   const tourTypes = [
@@ -493,6 +511,44 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const isTimeBlocked = useCallback(
     (date: Date, time: string) => {
       const dateString = format(date, "yyyy-MM-dd");
+      // Verificar se há bloqueio manual do admin
+      const adminBlocked = blockedPeriods.some(
+        (b) => b.date === dateString && b.startTime === time
+      );
+      // Verificar se há reserva confirmada
+      const hasConfirmedReservation = getReservationsByDate(dateString).some(
+        (r) => r.reservation_time === time && r.status === "confirmed"
+      );
+      return adminBlocked || hasConfirmedReservation;
+    },
+    [blockedPeriods, getReservationsByDate]
+  );
+
+  /**
+   * Verifica se um horário está bloqueado por reserva confirmada.
+   * @param date A data do horário.
+   * @param time O horário a ser verificado.
+   * @returns boolean
+   */
+  const isBlockedByReservation = useCallback(
+    (date: Date, time: string) => {
+      const dateString = format(date, "yyyy-MM-dd");
+      return getReservationsByDate(dateString).some(
+        (r) => r.reservation_time === time && r.status === "confirmed"
+      );
+    },
+    [getReservationsByDate]
+  );
+
+  /**
+   * Verifica se um horário está bloqueado manualmente pelo admin.
+   * @param date A data do horário.
+   * @param time O horário a ser verificado.
+   * @returns boolean
+   */
+  const isBlockedByAdmin = useCallback(
+    (date: Date, time: string) => {
+      const dateString = format(date, "yyyy-MM-dd");
       return blockedPeriods.some(
         (b) => b.date === dateString && b.startTime === time
       );
@@ -509,12 +565,28 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const getTimeBlockReason = useCallback(
     (date: Date, time: string) => {
       const dateString = format(date, "yyyy-MM-dd");
-      const block = blockedPeriods.find(
+
+      // Verificar se está bloqueado por reserva
+      const confirmedReservation = getReservationsByDate(dateString).find(
+        (r) => r.reservation_time === time && r.status === "confirmed"
+      );
+
+      if (confirmedReservation) {
+        return `Reserva confirmada: ${confirmedReservation.customer_name}`;
+      }
+
+      // Verificar se está bloqueado manualmente pelo admin
+      const adminBlock = blockedPeriods.find(
         (b) => b.date === dateString && b.startTime === time
       );
-      return block?.reason || "Horário bloqueado";
+
+      if (adminBlock) {
+        return adminBlock.reason || "Bloqueado pelo administrador";
+      }
+
+      return "Horário bloqueado";
     },
-    [blockedPeriods]
+    [blockedPeriods, getReservationsByDate]
   );
 
   /**
@@ -777,19 +849,42 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const handleDayClick = useCallback(
     (date: Date | undefined) => {
       if (!date) return;
-      // Se o dia clicado estiver bloqueado, abre o modal de desbloqueio
+
+      // Se o dia clicado estiver bloqueado, desbloqueia diretamente
       if (isDayBlocked(date)) {
-        setBlockDate(date);
-        setBlockDayReason(getDayBlockReason(date)); // Pré-preenche o motivo
-        setBlockDayModalOpen(true);
+        const hasConfirmedReservations = getReservationsByDate(
+          format(date, "yyyy-MM-dd")
+        ).some((r) => r.status === "confirmed");
+
+        if (hasConfirmedReservations) {
+          toast({
+            title: "Não é possível desbloquear",
+            description:
+              "Este dia tem reservas confirmadas. Cancele as reservas primeiro.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // Desbloquear dia diretamente
+        unblockDay(date);
+        toast({
+          title: "Dia desbloqueado",
+          description: `O dia ${format(
+            date,
+            "dd/MM"
+          )} foi desbloqueado com sucesso.`,
+          variant: "success",
+        });
         return;
       }
-      // Caso contrário, abre o quick view e seleciona a data
-      setQuickViewDate(date);
-      setQuickViewOpen(true);
-      handleDateSelect(date);
+
+      // Se o dia não estiver bloqueado, abre modal para bloquear
+      setBlockDate(date);
+      setBlockDayReason(""); // Limpa o motivo
+      setBlockDayModalOpen(true);
     },
-    [isDayBlocked, handleDateSelect, getDayBlockReason]
+    [isDayBlocked, getReservationsByDate, unblockDay, toast]
   );
 
   const openBlockModalForDate = useCallback(
@@ -969,23 +1064,52 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     loadActiveConductors();
   }, []);
 
+  // Gerar os próximos 10 dias para o slider
+  useEffect(() => {
+    const generateNextDays = () => {
+      const today = new Date();
+      const nextDays: Date[] = [];
+
+      for (let i = 0; i < 10; i++) {
+        const nextDay = new Date(today);
+        nextDay.setDate(today.getDate() + i);
+        nextDays.push(nextDay);
+      }
+
+      setSliderDays(nextDays);
+      setSelectedSliderDate(today);
+    };
+
+    generateNextDays();
+  }, []);
+
+  // Função para lidar com seleção de data no slider
+  const handleSliderDateSelect = (date: Date) => {
+    setSelectedSliderDate(date);
+    setCalendarDate(date);
+    const dateString = format(date, "yyyy-MM-dd");
+    onDateSelect(dateString);
+  };
+
   // Função para limpar bloqueios duplicados
   const handleCleanDuplicates = async () => {
     setIsCleaningDuplicates(true);
     try {
       const removedCount = await cleanDuplicateBlockedPeriods();
-      
+
       if (removedCount > 0) {
         toast({
           title: "Limpeza concluída",
           description: `${removedCount} bloqueios duplicados foram removidos.`,
         });
-        
+
         // Recarregar bloqueios após limpeza
         const updatedData = await fetchBlockedPeriods();
         setBlockedPeriods(updatedData);
         setDebugInfo(
-          `Carregados ${updatedData.length} bloqueios após limpeza: ${JSON.stringify(updatedData)}`
+          `Carregados ${
+            updatedData.length
+          } bloqueios após limpeza: ${JSON.stringify(updatedData)}`
         );
       } else {
         toast({
@@ -1008,6 +1132,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // --- Renderização do Componente ---
   return (
     <div>
+      <style>{sliderStyles}</style>
       {/* Debug info - remover depois */}
       {debugInfo && (
         <div className="mb-4 p-2 bg-blue-100 border border-blue-300 rounded text-xs">
@@ -1090,34 +1215,120 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             <div className="text-sm text-gray-600">
               Clique em um horário para bloquear/desbloquear
             </div>
+            <div className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
+              {format(calendarDate, "dd/MM", { locale: pt })}
+            </div>
           </div>
+
+          {/* Slider de dias */}
+          <div className="mb-4">
+            <div className="text-sm font-medium text-gray-700 mb-2">
+              Próximos 10 dias:
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              {sliderDays.map((day, index) => {
+                const isSelected =
+                  format(day, "yyyy-MM-dd") ===
+                  format(selectedSliderDate, "yyyy-MM-dd");
+                const isToday =
+                  format(day, "yyyy-MM-dd") ===
+                  format(new Date(), "yyyy-MM-dd");
+                const dayName = format(day, "EEE", { locale: pt });
+                const dayNumber = format(day, "dd");
+                const month = format(day, "MM");
+
+                return (
+                  <button
+                    key={index}
+                    onClick={() => handleSliderDateSelect(day)}
+                    className={`flex flex-col items-center justify-center min-w-[60px] h-16 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
+                      isSelected
+                        ? "border-blue-500 bg-blue-50 text-blue-700 shadow-md"
+                        : isToday
+                        ? "border-purple-400 bg-purple-50 text-purple-700"
+                        : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    <div className="text-xs font-medium uppercase">
+                      {dayName}
+                    </div>
+                    <div className="text-lg font-bold">{dayNumber}</div>
+                    <div className="text-xs text-gray-500">{month}</div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Legenda dos tipos de bloqueio */}
+          <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
+            <div className="text-sm font-medium text-gray-700 mb-2">
+              Legenda dos horários:
+            </div>
+            <div className="flex flex-wrap gap-4 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-50 border-2 border-green-200 rounded"></div>
+                <span className="text-green-600">Disponível</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-orange-50 border-2 border-orange-300 rounded"></div>
+                <span className="text-orange-600">Reserva confirmada</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-red-50 border-2 border-red-300 rounded"></div>
+                <span className="text-red-600">Bloqueado pelo admin</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-gray-200 border-2 border-gray-400 rounded"></div>
+                <span className="text-gray-500">Indisponível</span>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2">
             {timeSlots.map((slot) => {
               const slotData = availabilitySlots.find(
                 (s) => s.time === slot
               ) || { time: slot, available: false, reserved: 0, capacity: 0 };
               const blocked = isTimeBlocked(calendarDate, slot);
+              const blockedByReservation = isBlockedByReservation(
+                calendarDate,
+                slot
+              );
+              const blockedByAdmin = isBlockedByAdmin(calendarDate, slot);
               const isAvailable = slotData.available && !blocked;
+
               return (
                 <div
                   key={slot}
                   className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1
                     ${
-                      blocked
+                      blockedByReservation
+                        ? "border-orange-300 bg-orange-50 hover:bg-orange-100"
+                        : blockedByAdmin
                         ? "border-red-300 bg-red-50 hover:bg-red-100"
                         : isAvailable
                         ? "border-green-200 bg-green-50 hover:bg-green-100"
                         : "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300"
                     }`}
                   title={
-                    blocked
+                    blockedByReservation
+                      ? getTimeBlockReason(calendarDate, slot)
+                      : blockedByAdmin
                       ? getTimeBlockReason(calendarDate, slot)
                       : isAvailable
                       ? `Clique para bloquear ${slot}`
                       : "Clique para tornar disponível"
                   }
                   onClick={() => {
-                    if (blocked) {
+                    if (blockedByReservation) {
+                      toast({
+                        title: "Não é possível desbloquear",
+                        description:
+                          "Este horário está bloqueado por uma reserva confirmada. Cancele a reserva primeiro.",
+                        variant: "destructive",
+                      });
+                    } else if (blockedByAdmin) {
                       unblockTime(calendarDate, slot);
                     } else if (isAvailable) {
                       blockTime(calendarDate, slot, ""); // Bloqueia imediatamente sem modal
@@ -1143,15 +1354,19 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   </div>
                   <div
                     className={`text-xs font-medium mt-1 ${
-                      blocked
-                        ? "text-gray-500"
+                      blockedByReservation
+                        ? "text-orange-600"
+                        : blockedByAdmin
+                        ? "text-red-600"
                         : isAvailable
                         ? "text-green-600"
                         : "text-gray-500"
                     }`}
                   >
-                    {blocked
-                      ? getTimeBlockReason(calendarDate, slot)
+                    {blockedByReservation
+                      ? "Reserva confirmada"
+                      : blockedByAdmin
+                      ? "Bloqueado pelo admin"
                       : isAvailable
                       ? "Disponível"
                       : "Indisponível"}
@@ -1229,7 +1444,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                           ? `${getDayBlockReason(
                               props.date
                             )} - Clique para desbloquear`
-                          : getDayLabel(status)}
+                          : `${getDayLabel(status)} - Clique para bloquear`}
                       </TooltipContent>
                     </Tooltip>
                   );
@@ -1265,6 +1480,12 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   <Lock className="w-2 h-2" />
                 </div>
                 <span>Dia bloqueado (clique para desbloquear)</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-white border border-gray-300 rounded flex items-center justify-center">
+                  <span className="text-xs">+</span>
+                </div>
+                <span>Dia disponível (clique para bloquear)</span>
               </div>
             </div>
           </div>
@@ -1396,7 +1617,16 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               </div>
             ) : (
               <div className="space-y-2 max-h-32 overflow-y-auto">
-                {[...new Map(getFilteredBlocks().filter((b) => b.startTime).map(block => [block.date + '-' + block.startTime, block])).values()].map((block) => (
+                {[
+                  ...new Map(
+                    getFilteredBlocks()
+                      .filter((b) => b.startTime)
+                      .map((block) => [
+                        block.date + "-" + block.startTime,
+                        block,
+                      ])
+                  ).values(),
+                ].map((block) => (
                   <div
                     key={block.id}
                     className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-100"
@@ -1533,94 +1763,73 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           </DialogContent>
         </Dialog>
 
-        {/* Modal de bloqueio/desbloqueio de dias */}
+        {/* Modal de bloqueio de dias */}
         <Dialog open={blockDayModalOpen} onOpenChange={setBlockDayModalOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Bloquear/Desbloquear Dias</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <Lock className="h-5 w-5" />
+                Bloquear Dia
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="flex flex-row flex-wrap gap-2 items-center">
-                <span className="font-semibold">Dia inteiro</span>
-                {blockDate && isDayBlocked(blockDate) ? (
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => unblockDay(blockDate)}
-                  >
-                    Desbloquear dia
-                  </Button>
-                ) : (
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() =>
-                      blockDate && blockDay(blockDate, blockDayReason)
-                    }
-                  >
-                    Bloquear dia
-                  </Button>
-                )}
-                <span className="font-semibold ml-4">Bloquear vários dias</span>
-                <span>Início:</span>
-                <input
-                  id="block-days-start"
-                  name="block-days-start"
-                  type="date"
-                  value={blockDaysStart}
-                  onChange={(e) => setBlockDaysStart(e.target.value)}
-                  className="border rounded p-1"
+              {blockDate && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Dia selecionado:</strong> {format(blockDate, "dd/MM/yyyy", { locale: pt })}
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    {format(blockDate, "EEEE", { locale: pt })}
+                  </p>
+                </div>
+              )}
+              
+              <div className="space-y-2">
+                <Label htmlFor="block-day-reason">
+                  Motivo do bloqueio (opcional):
+                </Label>
+                <Textarea
+                  id="block-day-reason"
+                  placeholder="Ex: Manutenção, feriado, condições meteorológicas, etc."
+                  value={blockDayReason}
+                  onChange={(e) => setBlockDayReason(e.target.value)}
+                  rows={3}
                 />
-                <span>Fim:</span>
-                <input
-                  id="block-days-end"
-                  name="block-days-end"
-                  type="date"
-                  value={blockDaysEnd}
-                  onChange={(e) => setBlockDaysEnd(e.target.value)}
-                  className="border rounded p-1"
-                />
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <p className="text-sm text-yellow-800">
+                  <strong>Atenção:</strong> Ao bloquear este dia:
+                </p>
+                <ul className="text-sm text-yellow-700 mt-1 list-disc list-inside">
+                  <li>Não será possível fazer novas reservas</li>
+                  <li>Reservas existentes continuarão válidas</li>
+                  <li>O dia ficará marcado como indisponível no calendário</li>
+                </ul>
+              </div>
+
+              <div className="flex justify-end gap-2">
                 <Button
-                  size="sm"
-                  variant="default"
+                  variant="outline"
+                  onClick={() => setBlockDayModalOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button
                   onClick={() => {
-                    if (blockDaysStart && blockDaysEnd) {
-                      const start = new Date(blockDaysStart);
-                      const end = new Date(blockDaysEnd);
-                      const days = eachDayOfInterval({ start, end });
-                      days.forEach((day) => blockDay(day, blockDayReason));
-                    } else if (blockDate) {
+                    if (blockDate) {
                       blockDay(blockDate, blockDayReason);
+                      setBlockDayModalOpen(false);
+                      setBlockDayReason("");
+                      toast({
+                        title: "Dia bloqueado",
+                        description: `O dia ${format(blockDate, "dd/MM")} foi bloqueado com sucesso.`,
+                        variant: "success",
+                      });
                     }
                   }}
                 >
-                  Bloquear dias
-                </Button>
-              </div>
-              {blockDate && isDayBlocked(blockDate) && (
-                <div className="text-xs text-gray-500">
-                  {getDayBlockReason(blockDate)}
-                </div>
-              )}
-              <div className="mt-2">
-                <label htmlFor="block-day-reason">
-                  <b>Motivo (opcional):</b>
-                </label>
-                <input
-                  id="block-day-reason"
-                  name="block-day-reason"
-                  type="text"
-                  className="w-full border rounded p-2 mt-1"
-                  value={blockDayReason}
-                  onChange={(e) => setBlockDayReason(e.target.value)}
-                />
-              </div>
-              <div className="flex justify-end mt-4">
-                <Button
-                  variant="secondary"
-                  onClick={() => setBlockDayModalOpen(false)}
-                >
-                  Fechar
+                  Confirmar Bloqueio
                 </Button>
               </div>
             </div>
@@ -1790,11 +1999,16 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                 ) : (
                   <div className="space-y-2 max-h-48 overflow-y-auto border rounded p-2 bg-gray-25">
                     {blockDate &&
-                      [...new Map(
-                        getAllDayBlocks(blockDate)
-                          .filter((b) => b.startTime)
-                          .map((block) => [block.date + '-' + block.startTime, block])
-                      ).values()].map((block) => (
+                      [
+                        ...new Map(
+                          getAllDayBlocks(blockDate)
+                            .filter((b) => b.startTime)
+                            .map((block) => [
+                              block.date + "-" + block.startTime,
+                              block,
+                            ])
+                        ).values(),
+                      ].map((block) => (
                         <div
                           key={block.id}
                           className="flex items-center justify-between p-2 bg-white rounded border shadow-sm hover:shadow-md transition-shadow"
