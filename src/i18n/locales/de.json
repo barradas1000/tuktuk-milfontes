@@ -59,7 +59,15 @@
     "availableSlots": "Verfügbare Zeitfenster für Buchungen",
     "available": "Verfügbar",
     "occupied": "Besetzt",
-    "reserveSpecificTime": "Um eine bestimmte Zeit zu buchen, verwenden Sie das Reservierungsformular"
+    "reserveSpecificTime": "Um eine bestimmte Zeit zu buchen, verwenden Sie das Reservierungsformular",
+    "morning": "Vormittag (09:30-15:00)",
+    "afternoon": "Nachmittag (15:30-21:30)",
+    "places": "Plätze",
+    "autoUpdated": "Daten automatisch aktualisiert",
+    "lastUpdate": "Letzte Aktualisierung",
+    "noSlotsAvailable": "Keine Slots verfügbar für {{period}}",
+    "allSlotsBooked": "Alle Slots für {{period}} sind bereits gebucht oder blockiert",
+    "contactUs": "Prüfen Sie andere Tage oder kontaktieren Sie uns"
   },
   "testimonials": {
     "title": "Was unsere",

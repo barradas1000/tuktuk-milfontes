@@ -59,7 +59,15 @@
     "availableSlots": "Créneaux disponibles pour réservation",
     "available": "Disponible",
     "occupied": "Occupé",
-    "reserveSpecificTime": "Pour réserver un horaire spécifique, utilisez le formulaire de réservation"
+    "reserveSpecificTime": "Pour réserver un horaire spécifique, utilisez le formulaire de réservation",
+    "morning": "Matin (09:30-15:00)",
+    "afternoon": "Après-midi (15:30-21:30)",
+    "places": "places",
+    "autoUpdated": "Données mises à jour automatiquement",
+    "lastUpdate": "Dernière mise à jour",
+    "noSlotsAvailable": "Aucun créneau disponible pour {{period}}",
+    "allSlotsBooked": "Tous les créneaux pour {{period}} sont déjà réservés ou bloqués",
+    "contactUs": "Consultez d'autres jours ou contactez-nous"
   },
   "testimonials": {
     "title": "Ce que disent nos",

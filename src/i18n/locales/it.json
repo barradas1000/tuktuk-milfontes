@@ -59,7 +59,15 @@
     "availableSlots": "Slot disponibili per prenotazioni",
     "available": "Disponibile",
     "occupied": "Occupato",
-    "reserveSpecificTime": "Per prenotare un orario specifico, usa il modulo di prenotazione"
+    "reserveSpecificTime": "Per prenotare un orario specifico, usa il modulo di prenotazione",
+    "morning": "Mattina (09:30-15:00)",
+    "afternoon": "Pomeriggio (15:30-21:30)",
+    "places": "posti",
+    "autoUpdated": "Dati aggiornati automaticamente",
+    "lastUpdate": "Ultimo aggiornamento",
+    "noSlotsAvailable": "Nessuno slot disponibile per {{period}}",
+    "allSlotsBooked": "Tutti gli slot per {{period}} sono già prenotati o bloccati",
+    "contactUs": "Controlla altri giorni o contattaci"
   },
   "testimonials": {
     "title": "Cosa dicono i nostri",

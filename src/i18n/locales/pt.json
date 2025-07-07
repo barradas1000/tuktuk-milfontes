@@ -59,7 +59,15 @@
     "availableSlots": "Horários disponíveis para reserva",
     "available": "Disponível",
     "occupied": "Ocupado",
-    "reserveSpecificTime": "Para reservar um horário específico, use o formulário de reserva"
+    "reserveSpecificTime": "Para reservar um horário específico, use o formulário de reserva",
+    "morning": "Manhã (09:30-15:00)",
+    "afternoon": "Tarde (15:30-21:30)",
+    "places": "lugares",
+    "autoUpdated": "Dados atualizados automaticamente",
+    "lastUpdate": "Última atualização",
+    "noSlotsAvailable": "Nenhum horário disponível para {{period}}",
+    "allSlotsBooked": "Todos os horários para {{period}} já estão reservados ou bloqueados",
+    "contactUs": "Consulte outros dias ou entre em contacto connosco"
   },
   "testimonials": {
     "title": "O que dizem os nossos",

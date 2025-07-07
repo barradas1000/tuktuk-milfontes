@@ -59,7 +59,15 @@
     "availableSlots": "Beschikbare tijdsslots voor boekingen",
     "available": "Beschikbaar",
     "occupied": "Bezet",
-    "reserveSpecificTime": "Om een specifieke tijd te boeken, gebruik het reserveringsformulier"
+    "reserveSpecificTime": "Om een specifieke tijd te boeken, gebruik het reserveringsformulier",
+    "morning": "Ochtend (09:30-15:00)",
+    "afternoon": "Middag (15:30-21:30)",
+    "places": "plaatsen",
+    "autoUpdated": "Gegevens automatisch bijgewerkt",
+    "lastUpdate": "Laatste update",
+    "noSlotsAvailable": "Geen slots beschikbaar voor {{period}}",
+    "allSlotsBooked": "Alle slots voor {{period}} zijn al geboekt of geblokkeerd",
+    "contactUs": "Controleer andere dagen of neem contact met ons op"
   },
   "testimonials": {
     "title": "Wat onze",

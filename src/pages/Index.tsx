@@ -613,11 +613,10 @@ const Index = () => {
           <div className="text-center mb-8 flex justify-center">
             <div>
               <h3 className="text-3xl font-bold text-blue-900 mb-6">
-                Vista Aérea de Milfontes
+                {t("aerialViewMilfontes.title")}
               </h3>
               <p className="text-lg text-gray-600 mb-8 max-w-4xl mx-auto">
-                Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes,
-                Alentejo - Portugal.
+                {t("aerialViewMilfontes.description")}
               </p>
               <VideoModal />
               <div className="mt-6 text-sm text-gray-500 max-w-4xl mx-auto">

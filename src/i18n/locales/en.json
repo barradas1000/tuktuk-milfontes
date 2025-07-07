@@ -59,7 +59,15 @@
     "availableSlots": "Available slots for booking",
     "available": "Available",
     "occupied": "Occupied",
-    "reserveSpecificTime": "To book a specific time, use the reservation form"
+    "reserveSpecificTime": "To book a specific time, use the reservation form",
+    "morning": "Morning (09:30-15:00)",
+    "afternoon": "Afternoon (15:30-21:30)",
+    "places": "places",
+    "autoUpdated": "Data automatically updated",
+    "lastUpdate": "Last update",
+    "noSlotsAvailable": "No slots available for {{period}}",
+    "allSlotsBooked": "All slots for {{period}} are already booked or blocked",
+    "contactUs": "Check other days or contact us"
   },
   "testimonials": {
     "title": "What our",
