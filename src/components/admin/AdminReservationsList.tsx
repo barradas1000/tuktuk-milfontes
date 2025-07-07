@@ -850,6 +850,16 @@ const AdminReservationsList = () => {
                       </TableCell>
                       <TableCell>
                         <div>
+                          <p className="text-xs text-gray-500">
+                            Feita em:{" "}
+                            {reservation.created_at
+                              ? format(
+                                  new Date(reservation.created_at),
+                                  "dd/MM/yyyy HH:mm",
+                                  { locale: pt }
+                                )
+                              : "—"}
+                          </p>
                           <p className="font-medium">
                             {format(
                               new Date(reservation.reservation_date),
