@@ -26,6 +26,13 @@ import { mockBlockedPeriods } from "@/data/mockReservations";
 import { checkAvailability } from "@/services/availabilityService";
 import AlternativeTimesModal from "./AlternativeTimesModal";
 import { Badge } from "@/components/ui/badge";
+import { fetchActiveConductors } from "@/services/supabaseService";
+
+const allConductors = [
+  { id: "condutor1", whatsapp: "351963496320" },
+  { id: "condutor2", whatsapp: "351968784043" },
+  // ... outros condutores, se existirem
+];
 
 const ReservationForm = () => {
   console.log("ReservationForm rendering");
@@ -183,8 +190,20 @@ const ReservationForm = () => {
       return;
     }
 
-    // Abrir WhatsApp normalmente
-    const phoneNumber = "351965748022";
+    // Buscar condutor ativo
+    let phoneNumber = "351968784043"; // fallback
+    try {
+      const activeConductors = await fetchActiveConductors(); // retorna array de IDs
+      if (activeConductors.length > 0) {
+        const conductor = allConductors.find(
+          (c) => c.id === activeConductors[0]
+        );
+        if (conductor) phoneNumber = conductor.whatsapp;
+      }
+    } catch (e) {
+      // fallback já definido
+    }
+
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
     )}`;

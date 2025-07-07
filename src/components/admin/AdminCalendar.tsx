@@ -1305,88 +1305,57 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           </div>
 
           <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2">
-            {timeSlots.map((slot) => {
-              const slotData = availabilitySlots.find(
-                (s) => s.time === slot
-              ) || { time: slot, available: false, reserved: 0, capacity: 0 };
-
-              const blocked = isTimeBlocked(calendarDate, slot);
-              const blockedByReservation = isBlockedByReservation(
-                calendarDate,
-                slot
-              );
-              const blockedByAdmin = isBlockedByAdmin(calendarDate, slot);
-              const isAvailable = slotData.available && !blocked;
-
-              // Determinar a classe CSS baseada no status
+            {availabilitySlots.map((slot) => {
               let cardClass = "";
               let textClass = "";
               let statusText = "";
 
-              if (blockedByReservation) {
-                cardClass =
-                  "border-orange-300 bg-orange-50 hover:bg-orange-100";
-                textClass = "text-orange-600";
-                statusText = "Reserva confirmada";
-              } else if (blockedByAdmin) {
-                cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
-                textClass = "text-red-600";
-                statusText = "Bloqueado pelo admin";
-              } else if (isAvailable) {
-                cardClass = "border-green-200 bg-green-50 hover:bg-green-100";
-                textClass = "text-green-600";
-                statusText = "Disponível";
-              } else {
-                cardClass =
-                  "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
-                textClass = "text-gray-500";
-                statusText = "Indisponível";
+              switch (slot.status) {
+                case "blocked_by_reservation":
+                  cardClass = "border-orange-300 bg-orange-50 hover:bg-orange-100";
+                  textClass = "text-orange-600";
+                  statusText = "Reserva confirmada";
+                  break;
+                case "blocked_by_admin":
+                  cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
+                  textClass = "text-red-600";
+                  statusText = "Bloqueado pelo admin";
+                  break;
+                case "available":
+                  cardClass = "border-green-200 bg-green-50 hover:bg-green-100";
+                  textClass = "text-green-600";
+                  statusText = "Disponível";
+                  break;
+                default:
+                  cardClass = "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
+                  textClass = "text-gray-500";
+                  statusText = "Indisponível";
               }
 
               return (
                 <div
-                  key={slot}
+                  key={slot.time}
                   className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
-                  title={
-                    blockedByReservation
-                      ? getTimeBlockReason(calendarDate, slot)
-                      : blockedByAdmin
-                      ? getTimeBlockReason(calendarDate, slot)
-                      : isAvailable
-                      ? `Clique para bloquear ${slot}`
-                      : "Clique para tornar disponível"
-                  }
+                  title={slot.reason || statusText}
                   onClick={() => {
-                    if (blockedByReservation) {
+                    if (slot.status === "blocked_by_reservation") {
                       toast({
                         title: "Não é possível desbloquear",
-                        description:
-                          "Este horário está bloqueado por uma reserva confirmada. Cancele a reserva primeiro.",
+                        description: "Este horário está bloqueado por uma reserva confirmada. Cancele a reserva primeiro.",
                         variant: "destructive",
                       });
-                    } else if (blockedByAdmin) {
-                      unblockTime(calendarDate, slot);
-                    } else if (isAvailable) {
-                      blockTime(calendarDate, slot, ""); // Bloqueia imediatamente sem modal
-                    } else {
-                      // Só abrir o modal se o horário estiver realmente bloqueado (caso especial)
-                      const isActuallyBlocked = blockedPeriods.some(
-                        (b) =>
-                          b.date === format(calendarDate, "yyyy-MM-dd") &&
-                          b.startTime === slot
-                      );
-                      if (isActuallyBlocked) {
-                        setSlotToMakeAvailable(slot);
-                        setMakeAvailableModalOpen(true);
-                      }
+                    } else if (slot.status === "blocked_by_admin") {
+                      unblockTime(calendarDate, slot.time);
+                    } else if (slot.status === "available") {
+                      blockTime(calendarDate, slot.time, "");
                     }
                   }}
                 >
                   <div className="font-semibold flex items-center justify-center gap-1">
-                    {slot} {blocked && <Lock className="w-4 h-4 inline ml-1" />}
+                    {slot.time} {(slot.status !== "available" && <Lock className="w-4 h-4 inline ml-1" />)}
                   </div>
                   <div className="text-xs text-gray-600">
-                    {slotData.reserved}/{slotData.capacity} pessoas
+                    {slot.reserved}/{slot.capacity} pessoas
                   </div>
                   <div className={`text-xs font-medium mt-1 ${textClass}`}>
                     {statusText}

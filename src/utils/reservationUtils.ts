@@ -1,8 +1,9 @@
 import {
   AdminReservation,
-  AvailabilitySlot,
   ReservationStatistics,
 } from "@/types/adminReservations";
+import { format } from "date-fns";
+import { pt } from "date-fns/locale";
 
 export const getReservationsByDate = (
   reservations: AdminReservation[],
@@ -49,20 +50,36 @@ export const getAvailabilityForDate = (
     return {
       date,
       time,
-      available: reserved < 4,
+      status: reserved < 4 ? "available" : "unavailable",
       capacity: 4,
       reserved,
     };
   });
 };
 
+export type SlotStatus =
+  | "available"
+  | "blocked_by_admin"
+  | "blocked_by_reservation"
+  | "unavailable";
+
+export interface AvailabilitySlot {
+  date: string;
+  time: string;
+  status: SlotStatus;
+  capacity: number;
+  reserved: number;
+  reason?: string;
+}
+
 export const getAvailabilityWithBlocks = (
   reservations: AdminReservation[],
-  blockedPeriods: { date: string; startTime?: string }[],
+  blockedPeriods: { date: string; startTime?: string; reason?: string }[],
   date: string
 ): AvailabilitySlot[] => {
   const timeSlots = generateDynamicTimeSlots();
   const dateReservations = getReservationsByDate(reservations, date);
+
   return timeSlots.map((time) => {
     const slotReservations = dateReservations.filter(
       (r) => r.reservation_time === time && r.status !== "cancelled"
@@ -71,16 +88,55 @@ export const getAvailabilityWithBlocks = (
       (sum, r) => sum + r.number_of_people,
       0
     );
-    const isBlocked = blockedPeriods.some(
+
+    // Verifica bloqueio por reserva confirmada
+    const hasConfirmedReservation = dateReservations.some(
+      (r) => r.reservation_time === time && r.status === "confirmed"
+    );
+    if (hasConfirmedReservation) {
+      return {
+        date,
+        time,
+        status: "blocked_by_reservation",
+        capacity: 4,
+        reserved,
+        reason: "Reserva confirmada",
+      };
+    }
+
+    // Verifica bloqueio manual do admin
+    const adminBlock = blockedPeriods.find(
       (b) => b.date === date && b.startTime === time
     );
-    return {
-      date,
-      time,
-      available: reserved < 4 && !isBlocked,
-      capacity: 4,
-      reserved,
-    };
+    if (adminBlock) {
+      return {
+        date,
+        time,
+        status: "blocked_by_admin",
+        capacity: 4,
+        reserved,
+        reason: adminBlock.reason,
+      };
+    }
+
+    // Disponível ou indisponível por lotação
+    if (reserved < 4) {
+      return {
+        date,
+        time,
+        status: "available",
+        capacity: 4,
+        reserved,
+      };
+    } else {
+      return {
+        date,
+        time,
+        status: "unavailable",
+        capacity: 4,
+        reserved,
+      };
+    }
   });
 };
 
