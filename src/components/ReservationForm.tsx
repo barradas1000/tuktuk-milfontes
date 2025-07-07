@@ -34,6 +34,17 @@ const allConductors = [
   // ... outros condutores, se existirem
 ];
 
+// Função para interpolar variáveis na mensagem
+function interpolateMessage(
+  message: string,
+  variables: Record<string, string>
+) {
+  return message.replace(
+    /\{\{(\w+)\}\}/g,
+    (match, key) => variables[key] || match
+  );
+}
+
 const ReservationForm = () => {
   console.log("ReservationForm rendering");
   const { t } = useTranslation();
@@ -143,19 +154,27 @@ const ReservationForm = () => {
   };
 
   const processReservation = async () => {
-    // Gerar mensagem WhatsApp
+    // Montar as variáveis para interpolação
     const selectedTour = tourTypes.find(
       (tour) => tour.id === formData.tourType
     );
-    const message = `${t("reservation.title")}:
-    \n📅 ${t("reservation.date")}: ${formData.date}
-⏰ ${t("reservation.time")}: ${formData.time}
-🛺 ${t("reservation.tourType")}: ${selectedTour?.name || "Não especificado"}
-👥 ${t("reservation.numberOfPeople")}: ${formData.numberOfPeople}
-👤 ${t("reservation.name")}: ${formData.name}
-📧 ${t("reservation.email")}: ${formData.email}
-📱 ${t("reservation.phone")}: ${formData.phone}
-💬 ${t("reservation.message")}: ${formData.message}`;
+    const variables = {
+      name: formData.name,
+      tour_type: selectedTour?.name || "",
+      reservation_date: formData.date,
+      reservation_time: formData.time,
+      total_price: selectedTour ? selectedTour.price.toString() : "",
+    };
+
+    // Obter o template da mensagem (do i18n, se disponível)
+    let rawMessage = t("reservation.whatsappMessages.confirmed");
+    if (!rawMessage || rawMessage.includes("reservation.whatsappMessages")) {
+      // fallback para mensagem manual se não houver tradução
+      rawMessage = `Olá {{name}}, a sua reserva para o passeio '{{tour_type}}' está confirmada para o dia {{reservation_date}} às {{reservation_time}}. Encontre-nos no centro de Milfontes, junto ao jardim público. Qualquer dúvida, estamos à disposição!`;
+    }
+
+    // Interpolar a mensagem
+    const message = interpolateMessage(rawMessage, variables);
 
     // Pré-registo no Supabase
     try {
