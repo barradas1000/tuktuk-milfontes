@@ -198,7 +198,10 @@
       "pickup_reminder": "Bonjour {{name}}, nous vous rappelons que votre tour est programmé pour demain, le {{reservation_date}}, à {{reservation_time}}. Retrouvez-nous au centre de Milfontes, à côté du jardin public, 10 minutes avant l'heure programmée."
     },
     "simpleContactMessage": "Bonjour, je souhaite faire une réservation !",
-    "clientReservationMessage": "Bonjour, je souhaite réserver le tour '{{tour_type}}' pour le {{reservation_date}} à {{reservation_time}} pour {{number_of_people}} personnes.\nNom : {{name}}\nEmail : {{email}}\nTéléphone : {{phone}}\nMessage : {{message}}\nDemande faite le : {{created_at}}"
+    "clientReservationMessage": "Bonjour, je souhaite réserver le tour '{{tour_type}}' pour le {{reservation_date}} à {{reservation_time}} pour {{number_of_people}} personnes.\nNom : {{name}}\nEmail : {{email}}\nTéléphone : {{phone}}\nMessage : {{message}}\nDemande faite le : {{created_at}}",
+    "timeUnavailableWithSuggestion": "L’horaire choisi est déjà occupé par une autre visite. Nous vous suggérons le prochain horaire disponible : {{next_available_time}}. Voulez-vous réserver pour ce nouvel horaire ?",
+    "acceptSuggestion": "Accepter la suggestion",
+    "chooseAnotherTime": "Choisir un autre horaire"
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Proche du village et idéale pour les familles, elle est connue pour ses eaux calmes et le paysage de l'estuaire du Mira.",

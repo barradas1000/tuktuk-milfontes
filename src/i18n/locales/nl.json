@@ -229,7 +229,10 @@
       "weather_update": "Hallo {{name}}, vanwege de weersomstandigheden die voor {{reservation_date}} worden voorspeld, moeten we mogelijk uw tour opnieuw inplannen. We nemen contact met u op dichter bij de datum om te bevestigen.",
       "pickup_reminder": "Hallo {{name}}, we herinneren u eraan dat uw tour gepland staat voor morgen, {{reservation_date}}, om {{reservation_time}}. Ontmoet ons in het centrum van Milfontes, naast de openbare tuin, 10 minuten voor de geplande tijd."
     },
-    "simpleContactMessage": "Hallo, ik wil graag een reservering maken!"
+    "simpleContactMessage": "Hallo, ik wil graag een reservering maken!",
+    "timeUnavailableWithSuggestion": "De gekozen tijd is al bezet door een andere tour. We stellen het volgende beschikbare tijdstip voor: {{next_available_time}}. Wilt u voor dit nieuwe tijdstip reserveren?",
+    "acceptSuggestion": "Suggestie accepteren",
+    "chooseAnotherTime": "Kies een andere tijd"
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Dicht bij het dorp en ideaal voor gezinnen, bekend om het kalme water en het landschap van de Mira-estuarium.",

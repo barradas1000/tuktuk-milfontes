@@ -229,7 +229,10 @@
     "simpleContactMessage": "¡Hola! Me gustaría hacer una reserva!",
     "clientReservationMessage": "¡Hola! Me gustaría reservar el tour '{{tour_type}}' para el {{reservation_date}} a las {{reservation_time}} para {{number_of_people}} personas.\nNombre: {{name}}\nEmail: {{email}}\nTeléfono: {{phone}}\nMensaje: {{message}}\nSolicitud realizada el: {{created_at}}",
     "reservationSent": "¡Reserva enviada!",
-    "reservationDescription": "Serás redirigido a WhatsApp para confirmar tu reserva."
+    "reservationDescription": "Serás redirigido a WhatsApp para confirmar tu reserva.",
+    "timeUnavailableWithSuggestion": "La hora seleccionada ya está ocupada por otro tour. Sugerimos el próximo horario disponible: {{next_available_time}}. ¿Le gustaría reservar para este nuevo horario?",
+    "acceptSuggestion": "Aceptar sugerencia",
+    "chooseAnotherTime": "Elegir otra hora"
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Cerca del pueblo e ideal para familias, es conocida por sus aguas tranquilas y el paisaje del estuario del Mira.",

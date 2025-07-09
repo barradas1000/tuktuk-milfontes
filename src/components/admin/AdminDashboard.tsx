@@ -26,8 +26,6 @@ import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 
 const AdminDashboard = () => {
-  console.log("AdminDashboard component rendering...");
-
   const { t } = useTranslation();
   const { getStatistics, reservationsLoading, error, isSupabaseConfigured } =
     useAdminReservations();
@@ -35,13 +33,6 @@ const AdminDashboard = () => {
     new Date().toISOString().split("T")[0]
   );
   const [currentTime, setCurrentTime] = useState(new Date());
-
-  console.log("AdminDashboard state:", {
-    reservationsLoading,
-    error,
-    selectedDate,
-    isSupabaseConfigured,
-  });
 
   // Atualizar relógio a cada segundo
   React.useEffect(() => {
@@ -58,10 +49,8 @@ const AdminDashboard = () => {
   };
 
   const stats = getStatistics();
-  console.log("Dashboard stats:", stats);
 
   if (error) {
-    console.error("Error in AdminDashboard:", error);
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -79,7 +68,6 @@ const AdminDashboard = () => {
   }
 
   if (reservationsLoading) {
-    console.log("Showing loading state...");
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -89,8 +77,6 @@ const AdminDashboard = () => {
       </div>
     );
   }
-
-  console.log("Rendering main dashboard...");
 
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4 md:p-6">
@@ -135,7 +121,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Menu de navegação - TabsList */}
-        <Tabs defaultValue="calendar" className="space-y-4 sm:space-y-6">
+        <Tabs defaultValue="reservations" className="space-y-4 sm:space-y-6">
           <TabsList className="mb-4">
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />

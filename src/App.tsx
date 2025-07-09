@@ -10,6 +10,7 @@ const Admin = lazy(() => import("./pages/Admin"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Instrucoes = lazy(() => import("./pages/Instrucoes"));
 import "./i18n";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,14 @@ const App = () => (
               element={
                 <Suspense fallback={<div>Carregando...</div>}>
                   <Admin />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/instrucoes"
+              element={
+                <Suspense fallback={<div>Carregando...</div>}>
+                  <Instrucoes />
                 </Suspense>
               }
             />

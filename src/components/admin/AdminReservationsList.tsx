@@ -52,6 +52,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { checkAvailability } from "@/services/availabilityService";
+import { useNavigate } from "react-router-dom";
 
 const AdminReservationsList = () => {
   const {
@@ -86,6 +87,7 @@ const AdminReservationsList = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [reservationToDelete, setReservationToDelete] =
     useState<AdminReservation | null>(null);
+  const navigate = useNavigate();
 
   const tourTypes = [
     { id: "panoramic", name: "Passeio panorâmico pela vila", basePrice: 10 },
@@ -1051,6 +1053,15 @@ const AdminReservationsList = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {/* Botão para instruções de uso */}
+      <div className="flex justify-end mt-8">
+        <button
+          onClick={() => navigate("/instrucoes")}
+          className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition-all"
+        >
+          Instruções de uso do sistema de reservas
+        </button>
+      </div>
     </>
   );
 };

@@ -81,12 +81,22 @@ const ReservationForm = () => {
   const { toast } = useToast();
 
   const tourTypes = [
-    { id: "panoramic", name: t("tours.panoramic.title"), price: 10 },
-    { id: "furnas", name: t("tours.furnas.title"), price: 14 },
-    { id: "bridge", name: t("tours.bridge.title"), price: 10 },
-    { id: "sunset", name: t("tours.sunset.title"), price: 25 },
-    { id: "night", name: t("tours.night.title"), price: 8 },
-    { id: "fishermen", name: t("tours.fishermen.title"), price: 10 },
+    {
+      id: "panoramic",
+      name: t("tours.panoramic.title"),
+      price: 10,
+      duration: 45,
+    },
+    { id: "furnas", name: t("tours.furnas.title"), price: 14, duration: 60 },
+    { id: "bridge", name: t("tours.bridge.title"), price: 10, duration: 45 },
+    { id: "sunset", name: t("tours.sunset.title"), price: 25, duration: 90 },
+    { id: "night", name: t("tours.night.title"), price: 8, duration: 35 },
+    {
+      id: "fishermen",
+      name: t("tours.fishermen.title"),
+      price: 10,
+      duration: 45,
+    },
   ];
 
   const isDayBlocked = (date: string) => {
@@ -132,7 +142,8 @@ const ReservationForm = () => {
     const availability = await checkAvailability(
       formData.date,
       formData.time,
-      Number(formData.numberOfPeople)
+      Number(formData.numberOfPeople),
+      formData.tourType // passar o tipo de tour
     );
 
     if (!availability.isAvailable) {
@@ -295,14 +306,55 @@ const ReservationForm = () => {
     }
   };
 
-  // Verificar disponibilidade quando mudar data, hora ou número de pessoas
+  // Verificar disponibilidade quando mudar data, hora, número de pessoas OU tipo de tour
   React.useEffect(() => {
+    // Só verifica se o tour já foi escolhido
+    if (
+      !formData.date ||
+      !formData.time ||
+      !formData.numberOfPeople ||
+      !formData.tourType
+    ) {
+      setAvailabilityStatus({
+        isChecking: false,
+        isAvailable: true,
+        existingPeople: 0,
+        maxCapacity: 1,
+        message: "",
+      });
+      return;
+    }
     const timeoutId = setTimeout(() => {
       checkAvailabilityInRealTime();
     }, 500); // Debounce de 500ms
-
     return () => clearTimeout(timeoutId);
-  }, [formData.date, formData.time, formData.numberOfPeople]);
+  }, [
+    formData.date,
+    formData.time,
+    formData.numberOfPeople,
+    formData.tourType,
+  ]);
+
+  // Abrir o modal de sugestão imediatamente após a verificação de disponibilidade, se necessário
+  React.useEffect(() => {
+    if (
+      !availabilityStatus.isChecking &&
+      !availabilityStatus.isAvailable &&
+      availabilityStatus.alternativeTimes &&
+      availabilityStatus.alternativeTimes.length > 0 &&
+      formData.tourType
+    ) {
+      setAvailabilityInfo({
+        isOpen: true,
+        requestedDate: formData.date,
+        requestedTime: formData.time,
+        requestedPeople: Number(formData.numberOfPeople),
+        existingPeople: availabilityStatus.existingPeople,
+        maxCapacity: availabilityStatus.maxCapacity,
+        alternativeTimes: availabilityStatus.alternativeTimes,
+      });
+    }
+  }, [availabilityStatus, formData.tourType]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -426,61 +478,67 @@ const ReservationForm = () => {
           </div>
 
           {/* Status de Disponibilidade */}
-          {formData.date && formData.time && formData.numberOfPeople && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
-                <h4 className="font-semibold text-gray-800">
-                  Status de Disponibilidade
-                </h4>
-                {availabilityStatus.isChecking ? (
-                  <div className="flex items-center gap-2 text-blue-600">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                    <span className="text-sm">Verificando...</span>
-                  </div>
-                ) : (
-                  <Badge
-                    variant={
-                      availabilityStatus.isAvailable ? "default" : "destructive"
-                    }
-                    className={
-                      availabilityStatus.isAvailable
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }
-                  >
-                    {availabilityStatus.isAvailable
-                      ? "Disponível"
-                      : "Indisponível"}
-                  </Badge>
-                )}
-              </div>
-
-              {!availabilityStatus.isChecking && (
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span className="text-gray-600">
-                      Pessoas já reservadas: {availabilityStatus.existingPeople}{" "}
-                      / {availabilityStatus.maxCapacity}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-gray-600">
-                      Sua reserva: {formData.numberOfPeople} pessoas
-                    </span>
-                  </div>
-                  {availabilityStatus.message && (
-                    <div className="flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4 text-gray-500" />
-                      <span className="text-gray-600">
-                        {availabilityStatus.message}
-                      </span>
+          {formData.date &&
+            formData.time &&
+            formData.numberOfPeople &&
+            formData.tourType && (
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-gray-800">
+                    Status de Disponibilidade
+                  </h4>
+                  {availabilityStatus.isChecking ? (
+                    <div className="flex items-center gap-2 text-blue-600">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      <span className="text-sm">Verificando...</span>
                     </div>
+                  ) : (
+                    <Badge
+                      variant={
+                        availabilityStatus.isAvailable
+                          ? "default"
+                          : "destructive"
+                      }
+                      className={
+                        availabilityStatus.isAvailable
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }
+                    >
+                      {availabilityStatus.isAvailable
+                        ? "Disponível"
+                        : "Indisponível"}
+                    </Badge>
                   )}
                 </div>
-              )}
-            </div>
-          )}
+
+                {!availabilityStatus.isChecking && (
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-gray-500" />
+                      <span className="text-gray-600">
+                        Pessoas já reservadas:{" "}
+                        {availabilityStatus.existingPeople} /{" "}
+                        {availabilityStatus.maxCapacity}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600">
+                        Sua reserva: {formData.numberOfPeople} pessoas
+                      </span>
+                    </div>
+                    {availabilityStatus.message && (
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 text-gray-500" />
+                        <span className="text-gray-600">
+                          {availabilityStatus.message}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
 
           <div className="space-y-2">
             <Label htmlFor="tourType" className="text-blue-900 font-semibold">
@@ -522,6 +580,7 @@ const ReservationForm = () => {
             type="submit"
             size="lg"
             className="w-full bg-green-600 hover:bg-green-700 text-white font-bold text-lg py-4 rounded-xl shadow-xl hover:shadow-green-500/25 transition-all duration-300 hover:scale-105"
+            disabled={!formData.tourType}
           >
             <MessageCircle className="w-6 h-6 mr-3" />
             {t("reservation.confirmWhatsApp")}
