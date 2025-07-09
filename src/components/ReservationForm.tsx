@@ -160,17 +160,24 @@ const ReservationForm = () => {
     );
     const variables = {
       name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
       tour_type: selectedTour?.name || "",
       reservation_date: formData.date,
       reservation_time: formData.time,
+      number_of_people: formData.numberOfPeople,
+      message: formData.message,
       total_price: selectedTour ? selectedTour.price.toString() : "",
+      created_at: new Date().toLocaleString(i18n.language),
     };
 
-    // Obter o template da mensagem de pedido para o admin (do i18n, se disponível)
-    let rawMessage = t("reservation.reservationRequest");
-    if (!rawMessage || rawMessage.includes("reservation.reservationRequest")) {
-      // fallback para mensagem manual se não houver tradução
-      rawMessage = `Novo pedido de reserva:\nNome: {{name}}\nPasseio: {{tour_type}}\nData: {{reservation_date}}\nHora: {{reservation_time}}\nTotal: {{total_price}}€`;
+    // Usar o template de mensagem do cliente
+    let rawMessage = t("reservation.clientReservationMessage");
+    if (
+      !rawMessage ||
+      rawMessage.includes("reservation.clientReservationMessage")
+    ) {
+      rawMessage = `Olá, gostaria de reservar o passeio '{{tour_type}}' para o dia {{reservation_date}} às {{reservation_time}} para {{number_of_people}} pessoas. Nome: {{name}}. {{message}}`;
     }
 
     // Interpolar a mensagem

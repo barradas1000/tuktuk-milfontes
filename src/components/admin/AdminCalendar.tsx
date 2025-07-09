@@ -97,7 +97,7 @@ const FALLBACK_CONDUCTORS = [
 
 const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // --- Hooks de Dados/Serviços ---
-  const { getReservationsByDate, getAvailabilityForDate, updateReservation } =
+  const { getReservationsByDate, getAvailabilityForDate, updateReservation, refetch } =
     useAdminReservations();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -285,15 +285,13 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     try {
       // Atualizar status no banco de dados
       await updateReservation({ id: reservation.id, status: "cancelled" });
-
+      refetch(); // Atualizar reservas após cancelar
       // Fechar modal de anulação
       setCancelReservationModalOpen(false);
       setReservationToCancel(null);
       setCancelReason("");
-
       // Abrir editor de mensagem do WhatsApp
       openWhatsappMessageEditor(reservation, "cancelled");
-
       // Mostrar feedback
       toast({
         title: "Reserva anulada com sucesso",
@@ -398,13 +396,20 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     const clientLanguage = getClientLanguage(reservation);
     const variables = {
       name: reservation.customer_name,
+      email: reservation.customer_email,
+      phone: reservation.customer_phone,
       tour_type: getTourDisplayNameTranslated(
         reservation.tour_type,
         clientLanguage
       ),
       reservation_date: reservation.reservation_date,
       reservation_time: reservation.reservation_time,
-      total_price: reservation.total_price.toString(),
+      number_of_people: reservation.number_of_people?.toString() || "",
+      message: reservation.special_requests || "",
+      total_price: reservation.total_price?.toString() || "",
+      created_at: reservation.created_at
+        ? new Date(reservation.created_at).toLocaleString(clientLanguage)
+        : "",
     };
 
     if (type === "confirmed") {

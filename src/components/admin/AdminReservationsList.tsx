@@ -54,8 +54,13 @@ import i18next from "i18next";
 import { checkAvailability } from "@/services/availabilityService";
 
 const AdminReservationsList = () => {
-  const { reservations, updateReservation, updateManualPayment, isUpdating } =
-    useAdminReservations();
+  const {
+    reservations,
+    updateReservation,
+    updateManualPayment,
+    isUpdating,
+    refetch,
+  } = useAdminReservations();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("all");
@@ -318,6 +323,7 @@ const AdminReservationsList = () => {
         .delete()
         .eq("id", reservationToDelete.id);
       toast({ title: "Reserva eliminada com sucesso" });
+      refetch(); // Atualizar a lista após eliminar
     } catch (err: unknown) {
       toast({
         title: "Erro ao eliminar reserva",
@@ -373,11 +379,24 @@ const AdminReservationsList = () => {
     // Botão WhatsApp
     if (reservation.customer_phone) {
       const lang = reservation.language || "pt";
+      // Montar todas as variáveis relevantes para interpolação
+      const variables = {
+        name: reservation.customer_name,
+        email: reservation.customer_email,
+        phone: reservation.customer_phone,
+        tour_type: getTourDisplayName(reservation.tour_type),
+        reservation_date: reservation.reservation_date,
+        reservation_time: reservation.reservation_time,
+        number_of_people: reservation.number_of_people?.toString() || "",
+        message: reservation.special_requests || "",
+        total_price: reservation.total_price?.toString() || "",
+        created_at: reservation.created_at
+          ? new Date(reservation.created_at).toLocaleString(lang)
+          : "",
+      };
       const mensagem = i18next.getFixedT(lang)(
         `reservation.whatsappMessages.${reservation.status}`,
-        {
-          name: reservation.customer_name,
-        }
+        variables
       );
       buttons.push(
         <Button

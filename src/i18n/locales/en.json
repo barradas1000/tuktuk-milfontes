@@ -251,7 +251,9 @@
       "payment_reminder": "Hello {{name}}, we remind you that your reservation for {{reservation_date}} at {{reservation_time}} is not yet confirmed. To secure your spot, please make the payment of €{{total_price}} as soon as possible.",
       "weather_update": "Hello {{name}}, due to weather conditions forecast for {{reservation_date}}, we may need to reschedule your tour. We will contact you closer to the date to confirm.",
       "pickup_reminder": "Hello {{name}}, we remind you that your tour is scheduled for tomorrow, {{reservation_date}}, at {{reservation_time}}. Meet us in the center of Milfontes, next to the public garden, 10 minutes before the scheduled time."
-    }
+    },
+    "simpleContactMessage": "Hello, I would like to make a reservation!",
+    "clientReservationMessage": "Hello, I would like to book the '{{tour_type}}' tour for {{reservation_date}} at {{reservation_time}} for {{number_of_people}} people.\nName: {{name}}\nEmail: {{email}}\nPhone: {{phone}}\nMessage: {{message}}\nRequest made on: {{created_at}}"
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Close to the village and ideal for families, known for its calm waters and the Mira estuary landscape.",

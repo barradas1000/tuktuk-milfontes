@@ -228,7 +228,8 @@
       "payment_reminder": "Hallo {{name}}, we herinneren u eraan dat uw reservering voor {{reservation_date}} om {{reservation_time}} nog niet is bevestigd. Om uw plek te garanderen, voer de betaling van €{{total_price}} zo spoedig mogelijk uit.",
       "weather_update": "Hallo {{name}}, vanwege de weersomstandigheden die voor {{reservation_date}} worden voorspeld, moeten we mogelijk uw tour opnieuw inplannen. We nemen contact met u op dichter bij de datum om te bevestigen.",
       "pickup_reminder": "Hallo {{name}}, we herinneren u eraan dat uw tour gepland staat voor morgen, {{reservation_date}}, om {{reservation_time}}. Ontmoet ons in het centrum van Milfontes, naast de openbare tuin, 10 minuten voor de geplande tijd."
-    }
+    },
+    "simpleContactMessage": "Hallo, ik wil graag een reservering maken!"
   },
   "mapDescriptions": {
     "praiaDaFranquia": "Dicht bij het dorp en ideaal voor gezinnen, bekend om het kalme water en het landschap van de Mira-estuarium.",
@@ -275,5 +276,6 @@
   "aerialViewMilfontes": {
     "title": "Luchtfoto van Milfontes",
     "description": "Luchtfoto op een wintermiddag boven Vila Nova de Milfontes, Alentejo - Portugal."
-  }
+  },
+  "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}"
 }

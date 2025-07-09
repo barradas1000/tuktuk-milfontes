@@ -142,7 +142,7 @@ const Index = () => {
   ];
 
   const handleWhatsAppContact = () => {
-    const message = "Olá, Daqui Tuktuk-milfontes";
+    const message = t("reservation.simpleContactMessage");
     const phoneNumber = "351968784043";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
