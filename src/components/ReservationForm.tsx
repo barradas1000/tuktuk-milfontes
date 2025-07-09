@@ -166,11 +166,11 @@ const ReservationForm = () => {
       total_price: selectedTour ? selectedTour.price.toString() : "",
     };
 
-    // Obter o template da mensagem (do i18n, se disponível)
-    let rawMessage = t("reservation.whatsappMessages.confirmed");
-    if (!rawMessage || rawMessage.includes("reservation.whatsappMessages")) {
+    // Obter o template da mensagem de pedido para o admin (do i18n, se disponível)
+    let rawMessage = t("reservation.reservationRequest");
+    if (!rawMessage || rawMessage.includes("reservation.reservationRequest")) {
       // fallback para mensagem manual se não houver tradução
-      rawMessage = `Olá {{name}}, a sua reserva para o passeio '{{tour_type}}' está confirmada para o dia {{reservation_date}} às {{reservation_time}}. Encontre-nos no centro de Milfontes, junto ao jardim público. Qualquer dúvida, estamos à disposição!`;
+      rawMessage = `Novo pedido de reserva:\nNome: {{name}}\nPasseio: {{tour_type}}\nData: {{reservation_date}}\nHora: {{reservation_time}}\nTotal: {{total_price}}€`;
     }
 
     // Interpolar a mensagem
