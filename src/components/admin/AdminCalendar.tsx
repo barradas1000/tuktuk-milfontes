@@ -97,8 +97,12 @@ const FALLBACK_CONDUCTORS = [
 
 const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // --- Hooks de Dados/Serviços ---
-  const { getReservationsByDate, getAvailabilityForDate, updateReservation, refetch } =
-    useAdminReservations();
+  const {
+    getReservationsByDate,
+    getAvailabilityForDate,
+    updateReservation,
+    refetch,
+  } = useAdminReservations();
   const { toast } = useToast();
   const { t } = useTranslation();
 
@@ -112,7 +116,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // Estados relacionados a bloqueios
   const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
   const [blockedPeriodsLoading, setBlockedPeriodsLoading] = useState(true);
-  const [debugInfo, setDebugInfo] = useState<string>("");
   const [blockModalOpen, setBlockModalOpen] = useState(false);
   const [blockDate, setBlockDate] = useState<Date | null>(null); // Data atualmente selecionada para bloquear/desbloquear
   const [blockTab, setBlockTab] = useState<"day" | "hour" | null>("day"); // Aba ativa no modal de bloqueio
@@ -1055,9 +1058,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         const data = await fetchBlockedPeriods();
         console.log("Blocked periods loaded:", data);
         setBlockedPeriods(data);
-        setDebugInfo(
-          `Carregados ${data.length} bloqueios: ${JSON.stringify(data)}`
-        );
       } catch (error) {
         console.error("Error loading blocked periods:", error);
       } finally {
@@ -1130,11 +1130,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         // Recarregar bloqueios após limpeza
         const updatedData = await fetchBlockedPeriods();
         setBlockedPeriods(updatedData);
-        setDebugInfo(
-          `Carregados ${
-            updatedData.length
-          } bloqueios após limpeza: ${JSON.stringify(updatedData)}`
-        );
       } else {
         toast({
           title: "Nenhum duplicado encontrado",
@@ -1158,7 +1153,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     <div>
       <style>{sliderStyles}</style>
       {/* Debug info - remover depois */}
-      {debugInfo && (
+      {/* {debugInfo && (
         <div className="mb-4 p-2 bg-blue-100 border border-blue-300 rounded text-xs">
           <strong>Debug:</strong> {debugInfo}
           <div className="mt-2">
@@ -1173,7 +1168,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             </Button>
           </div>
         </div>
-      )}
+      )} */}
       {/* Painel de seleção de condutores ativos */}
       <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex flex-col gap-3 items-center shadow-md">
         <h2 className="text-lg font-bold text-purple-900 mb-2">
@@ -1317,7 +1312,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
 
               switch (slot.status) {
                 case "blocked_by_reservation":
-                  cardClass = "border-orange-300 bg-orange-50 hover:bg-orange-100";
+                  cardClass =
+                    "border-orange-300 bg-orange-50 hover:bg-orange-100";
                   textClass = "text-orange-600";
                   statusText = "Reserva confirmada";
                   break;
@@ -1332,7 +1328,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   statusText = "Disponível";
                   break;
                 default:
-                  cardClass = "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
+                  cardClass =
+                    "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
                   textClass = "text-gray-500";
                   statusText = "Indisponível";
               }
@@ -1346,7 +1343,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     if (slot.status === "blocked_by_reservation") {
                       toast({
                         title: "Não é possível desbloquear",
-                        description: "Este horário está bloqueado por uma reserva confirmada. Cancele a reserva primeiro.",
+                        description:
+                          "Este horário está bloqueado por uma reserva confirmada. Cancele a reserva primeiro.",
                         variant: "destructive",
                       });
                     } else if (slot.status === "blocked_by_admin") {
@@ -1357,7 +1355,10 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   }}
                 >
                   <div className="font-semibold flex items-center justify-center gap-1">
-                    {slot.time} {(slot.status !== "available" && <Lock className="w-4 h-4 inline ml-1" />)}
+                    {slot.time}{" "}
+                    {slot.status !== "available" && (
+                      <Lock className="w-4 h-4 inline ml-1" />
+                    )}
                   </div>
                   <div className="text-xs text-gray-600">
                     {slot.reserved}/{slot.capacity} pessoas
