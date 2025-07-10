@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import type { LatLngExpression } from "leaflet";
 
 // Corrige o ícone padrão do Leaflet no React
 import iconUrl from "leaflet/dist/images/marker-icon.png";
@@ -403,15 +404,12 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
       <div style={{ position: "relative", width: "100%", margin: "auto" }}>
         <div style={{ position: "relative" }}>
           <MapContainer
-            center={[37.725, -8.783]}
+            center={[37.725, -8.783] as LatLngExpression}
             zoom={14}
             scrollWheelZoom={true}
             style={mapStyle}
           >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="© OpenStreetMap contributors"
-            />
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
             {pointsOfInterest.map((poi) => (
               <Marker key={poi.name} position={poi.coords as [number, number]}>
                 <Popup>
