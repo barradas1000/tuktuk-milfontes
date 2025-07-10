@@ -17,6 +17,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { allowedAdmins } from "@/constants/allowedAdmins";
 
+// Função para enviar eventos para a Google Sheet
+async function enviarEventoGoogleSheet(evento: Record<string, unknown>) {
+  const url =
+    "https://script.google.com/macros/s/AKfycbzwLpUUq2LSSC_Lns6bQZWnAcZMB5ustr_mPXRkzaNTBZ9D50r9Occ_QCGcvKap4PTp/exec";
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(evento),
+    });
+  } catch (erro) {
+    console.error("Erro ao enviar evento Google Sheet:", erro);
+  }
+}
+
 const Auth = () => {
   const navigate = useNavigate();
   const { signIn, signUp, user, loading } = useAuth();
@@ -72,6 +87,13 @@ const Auth = () => {
           setError(error.message);
         }
       } else {
+        // Envia o evento para a Google Sheet
+        enviarEventoGoogleSheet({
+          eventType: "acessoAdmin",
+          admin: loginEmail,
+          ip: "",
+          userAgent: navigator.userAgent,
+        });
         navigate("/admin");
       }
     } catch (err: unknown) {

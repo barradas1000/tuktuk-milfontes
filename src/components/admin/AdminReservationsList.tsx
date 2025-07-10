@@ -54,6 +54,21 @@ import i18next from "i18next";
 import { checkAvailability } from "@/services/availabilityService";
 import { useNavigate } from "react-router-dom";
 
+// Função para enviar eventos para a Google Sheet
+async function enviarEventoGoogleSheet(evento: any) {
+  const url =
+    "https://script.google.com/macros/s/AKfycbzwLpUUq2LSSC_Lns6bQZWnAcZMB5ustr_mPXRkzaNTBZ9D50r9Occ_QCGcvKap4PTp/exec";
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(evento),
+    });
+  } catch (erro) {
+    console.error("Erro ao enviar evento Google Sheet:", erro);
+  }
+}
+
 const AdminReservationsList = () => {
   const {
     reservations,
@@ -182,6 +197,23 @@ const AdminReservationsList = () => {
           variant: "destructive",
         });
       } else {
+        // Enviar evento para Google Sheet
+        enviarEventoGoogleSheet({
+          eventType: "reserva",
+          tipo: "manual",
+          cliente: formData.name,
+          email: formData.email,
+          telefone: formData.phone,
+          data: formData.date,
+          hora: formData.time,
+          percurso: getTourDisplayName(formData.tourType),
+          numeroPessoas: formData.numberOfPeople,
+          valorTotal: formData.totalPrice,
+          mensagem: formData.message,
+          estado: "Pendente",
+          condutor: "",
+          observacoes: "Reserva criada manualmente pelo admin",
+        });
         toast({ title: "Reserva adicionada com sucesso" });
         setOpen(false);
         setFormData({

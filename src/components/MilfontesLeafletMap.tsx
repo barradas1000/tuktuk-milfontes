@@ -176,7 +176,7 @@ const pointsOfInterest = [
     coords: [37.719538, -8.790887],
     description: "poi.choupana.description",
     image:
-      "https://tuktuk-milfontes.vercel.app/lovable-uploads/restaurante%20Oasis.jpg",
+      "https://tuktuk-milfontes.vercel.app/lovable-uploads/restaurante%20choupana.webp",
     mapDescriptionKey: "restauranteAChoupana",
   },
   {
