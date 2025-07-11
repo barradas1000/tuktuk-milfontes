@@ -827,6 +827,54 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Social Share Section */}
+      <section className="py-12 bg-gradient-to-br from-amber-50 to-blue-50">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
+            Partilhe esta experiência!
+          </h2>
+          <p className="text-lg text-gray-600 mb-6">
+            Ajude-nos a crescer e inspire outros a descobrir Milfontes de tuk
+            tuk. Siga-nos ou partilhe nas redes sociais:
+          </p>
+          <div className="flex justify-center gap-8 mt-6">
+            <a
+              href="https://www.facebook.com/share/192HyZevo9/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Facebook"
+              className="hover:scale-110 transition-transform"
+            >
+              <Facebook className="w-12 h-12 text-blue-600 hover:text-blue-800" />
+            </a>
+            <a
+              href="https://www.instagram.com/tuktuk.milfontes?igsh=MXIwc3c2YjZuNHpoeA=="
+              target="_blank"
+              rel="noopener"
+              aria-label="Instagram"
+              className="hover:scale-110 transition-transform"
+            >
+              <Instagram className="w-12 h-12 text-pink-500 hover:text-pink-700" />
+            </a>
+            <a
+              href="https://www.youtube.com/watch?v=j6863SgA9fQ"
+              target="_blank"
+              rel="noopener"
+              aria-label="YouTube"
+              className="hover:scale-110 transition-transform"
+            >
+              <svg
+                className="w-12 h-12"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path d="M23.498 6.186a2.994 2.994 0 0 0-2.112-2.12C19.228 3.5 12 3.5 12 3.5s-7.228 0-9.386.566a2.994 2.994 0 0 0-2.112 2.12C0 8.355 0 12 0 12s0 3.645.502 5.814a2.994 2.994 0 0 0 2.112 2.12C4.772 20.5 12 20.5 12 20.5s7.228 0 9.386-.566a2.994 2.994 0 0 0 2.112-2.12C24 15.645 24 12 24 12s0-3.645-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="py-12 px-4 bg-blue-950 text-blue-100 border-t border-blue-900 mt-12">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 text-left">
@@ -896,17 +944,17 @@ const Index = () => {
             </h3>
             <ul className="space-y-1">
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/TermosCondicoes" className="hover:underline">
                   {t("footer.terms")}
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/PoliticaPrivacidade" className="hover:underline">
                   {t("footer.privacy")}
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:underline">
+                <a href="/PoliticaCancelamento" className="hover:underline">
                   {t("footer.cancellation")}
                 </a>
               </li>

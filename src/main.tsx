@@ -2,6 +2,9 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "./i18n";
+import TermosCondicoes from "./pages/TermosCondicoes";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import PoliticaCancelamento from "./pages/PoliticaCancelamento";
 
 if (typeof window !== "undefined") {
   // Hotjar Tracking Code for https://tuktuk-milfontes.vercel.app/

@@ -11,6 +11,9 @@ const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Instrucoes = lazy(() => import("./pages/Instrucoes"));
+import TermosCondicoes from "./pages/TermosCondicoes";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import PoliticaCancelamento from "./pages/PoliticaCancelamento";
 import "./i18n";
 
 const queryClient = new QueryClient();
@@ -55,6 +58,15 @@ const App = () => (
                   <ResetPassword />
                 </Suspense>
               }
+            />
+            <Route path="/TermosCondicoes" element={<TermosCondicoes />} />
+            <Route
+              path="/PoliticaPrivacidade"
+              element={<PoliticaPrivacidade />}
+            />
+            <Route
+              path="/PoliticaCancelamento"
+              element={<PoliticaCancelamento />}
             />
             <Route
               path="*"
