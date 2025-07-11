@@ -20,7 +20,7 @@ import { allowedAdmins } from "@/constants/allowedAdmins";
 // Função para enviar eventos para a Google Sheet
 async function enviarEventoGoogleSheet(evento: Record<string, unknown>) {
   const url =
-    "https://script.google.com/macros/s/AKfycbzwLpUUq2LSSC_Lns6bQZWnAcZMB5ustr_mPXRkzaNTBZ9D50r9Occ_QCGcvKap4PTp/exec";
+    "https://script.google.com/macros/s/AKfycby1FFYXcjqqVv1g3hrGEWB6jPJqVT1S5cGEQ8hlXgTFMuih2DcPD6HAlBH-yALs6dpN/exec";
   try {
     await fetch(url, {
       method: "POST",
