@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
+import "./styles/UserLocation.css";
 import "./i18n";
 import TermosCondicoes from "./pages/TermosCondicoes";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";

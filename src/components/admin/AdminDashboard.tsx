@@ -123,13 +123,16 @@ const AdminDashboard = () => {
         {/* Menu de navegação - TabsList */}
         <Tabs defaultValue="reservations" className="space-y-4 sm:space-y-6">
           <TabsList className="mb-4">
-            {/* Removido: Calendário */}
             <TabsTrigger
               value="reservations"
               className="flex items-center gap-2"
             >
               <Clock className="h-4 w-4" />
               Reservas
+            </TabsTrigger>
+            <TabsTrigger value="calendar" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Calendário
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -234,6 +237,12 @@ const AdminDashboard = () => {
             {/* Removido: <TabsContent value="calendar"> ... </TabsContent> */}
             <TabsContent value="reservations">
               <AdminReservationsList />
+            </TabsContent>
+            <TabsContent value="calendar">
+              <AdminCalendar
+                selectedDate={selectedDate}
+                onDateSelect={setSelectedDate}
+              />
             </TabsContent>
             <TabsContent value="analytics">
               <AdminReports />
