@@ -218,6 +218,32 @@ const ReservationForm = () => {
         });
         return;
       }
+      // Enviar evento para Google Sheet
+      try {
+        const selectedTour = tourTypes.find((tour) => tour.id === formData.tourType);
+        await fetch("https://script.google.com/macros/s/AKfycbzwLpUUq2LSSC_Lns6bQZWnAcZMB5ustr_mPXRkzaNTBZ9D50r9Occ_QCGcvKap4PTp/exec", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventType: "reserva",
+            tipo: "cliente",
+            cliente: formData.name,
+            email: formData.email,
+            telefone: formData.phone,
+            data: formData.date,
+            hora: formData.time,
+            percurso: selectedTour?.name || formData.tourType,
+            numeroPessoas: formData.numberOfPeople,
+            valorTotal: selectedTour ? selectedTour.price.toString() : "",
+            mensagem: formData.message,
+            estado: "Pendente",
+            condutor: "",
+            observacoes: "Reserva criada pelo cliente",
+          }),
+        });
+      } catch (err) {
+        console.error("Erro ao enviar evento Google Sheet:", err);
+      }
     } catch (err) {
       toast({
         title: "Erro ao registar reserva",
