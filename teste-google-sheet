@@ -1,0 +1,44 @@
+<button onclick="enviarTeste()">Enviar Teste</button>
+
+<script>
+  function enviarTeste() {
+    const url = 'https://script.google.com/macros/s/AKfycby1FFYXcjqqVv1g3hrGEWB6jPJqVT1S5cGEQ8hlXgTFMuih2DcPD6HAIBH-yALs6dpN/exec';
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eventType: "reserva",
+        tipo: "teste",
+        cliente: "Teste JS",
+        email: "js@email.com",
+        telefone: "911111111",
+        data: "2024-07-01",
+        hora: "16:00",
+        percurso: "Teste Percurso",
+        numeroPessoas: 1,
+        valorTotal: 10,
+        mensagem: "Teste via JS",
+        estado: "Pendente",
+        condutor: "Condutor 2",
+        observacoes: "Teste via browser"
+      })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
+    .then(data => {
+      console.log('Success:', data);
+      alert('Dados enviados com sucesso!');
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Erro ao enviar dados: ' + error.message);
+    });
+  }
+</script>
