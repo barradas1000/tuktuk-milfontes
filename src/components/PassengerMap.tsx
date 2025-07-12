@@ -12,6 +12,7 @@ import { Coordinates } from "../utils/locationUtils";
 // Corrigir ícones do Leaflet
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import tukTukIconUrl from "../assets/tuktuk-icon.png"; // Adicione um ícone de TukTuk na pasta assets
 
 const DefaultIcon = L.icon({
   iconUrl,
@@ -20,7 +21,15 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
+const TukTukIcon = L.icon({
+  iconUrl: tukTukIconUrl,
+  iconSize: [40, 40],
+  iconAnchor: [20, 40],
+  popupAnchor: [0, -40],
+});
+
 interface DriverLocation {
+  id: string;
   lat: number;
   lng: number;
   isActive: boolean;
@@ -56,9 +65,7 @@ const MapController: React.FC<{
 };
 
 const PassengerMap: React.FC = () => {
-  const [driverLocation, setDriverLocation] = useState<DriverLocation | null>(
-    null
-  );
+  const [activeDrivers, setActiveDrivers] = useState<DriverLocation[]>([]);
   const [userPosition, setUserPosition] = useState<Coordinates | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUserLocation, setShowUserLocation] = useState(false);
@@ -66,65 +73,41 @@ const PassengerMap: React.FC = () => {
   const [userInteracted, setUserInteracted] = useState(false);
 
   useEffect(() => {
-    // Carregar localização inicial
-    const fetchDriverLocation = async () => {
+    // Carregar todos os motoristas ativos
+    const fetchActiveDrivers = async () => {
       try {
-        // Verificar se o Supabase está configurado
         if (
           !import.meta.env.VITE_SUPABASE_URL ||
           !import.meta.env.VITE_SUPABASE_ANON_KEY
         ) {
-          console.warn("Supabase não configurado, usando coordenadas padrão");
-          setDriverLocation({
-            lat: 37.725,
-            lng: -8.783,
-            isActive: false,
-            name: "TukTuk",
-          });
+          setActiveDrivers([]);
           setLoading(false);
           return;
         }
-
         const { data, error } = await supabase
           .from("drivers")
           .select("*")
-          .single();
-
+          .eq("is_active", true);
         if (error) {
-          console.error("Erro ao carregar localização:", error);
-          // Usar coordenadas padrão em caso de erro
-          setDriverLocation({
-            lat: 37.725,
-            lng: -8.783,
-            isActive: false,
-            name: "TukTuk",
-          });
-          return;
-        }
-
-        if (data) {
-          setDriverLocation({
-            lat: data.latitude || 37.725,
-            lng: data.longitude || -8.783,
-            isActive: data.is_active,
-            name: data.name || "TukTuk",
-          });
+          setActiveDrivers([]);
+        } else if (data) {
+          setActiveDrivers(
+            data.map((d: any) => ({
+              id: d.id,
+              lat: d.latitude || 37.725,
+              lng: d.longitude || -8.783,
+              isActive: d.is_active,
+              name: d.name || "TukTuk",
+            }))
+          );
         }
       } catch (error) {
-        console.error("Erro:", error);
-        // Usar coordenadas padrão em caso de erro
-        setDriverLocation({
-          lat: 37.725,
-          lng: -8.783,
-          isActive: false,
-          name: "TukTuk",
-        });
+        setActiveDrivers([]);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchDriverLocation();
+    fetchActiveDrivers();
 
     // Subscrever a atualizações em tempo real
     if (
@@ -138,21 +121,35 @@ const PassengerMap: React.FC = () => {
           { event: "UPDATE", schema: "public", table: "drivers" },
           (payload) => {
             const newData = payload.new as {
+              id: string;
               latitude?: number;
               longitude?: number;
               is_active?: boolean;
               name?: string;
             };
-            setDriverLocation({
-              lat: newData.latitude || 37.725,
-              lng: newData.longitude || -8.783,
-              isActive: newData.is_active || false,
-              name: newData.name || "TukTuk",
+            setActiveDrivers((prev) => {
+              // Remove o antigo se existir
+              const filtered = prev.filter((d) => d.id !== newData.id);
+              // Só adiciona se is_active for true
+              if (newData.is_active) {
+                return [
+                  ...filtered,
+                  {
+                    id: newData.id,
+                    lat: newData.latitude || 37.725,
+                    lng: newData.longitude || -8.783,
+                    isActive: true,
+                    name: newData.name || "TukTuk",
+                  },
+                ];
+              } else {
+                // Se ficou inativo, só remove
+                return filtered;
+              }
             });
           }
         )
         .subscribe();
-
       return () => {
         supabase.removeChannel(channel);
       };
@@ -219,13 +216,12 @@ const PassengerMap: React.FC = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
 
-          {driverLocation?.isActive && (
-            <Marker position={[driverLocation.lat, driverLocation.lng]}>
+          {/* Renderizar apenas o primeiro motorista ativo */}
+          {activeDrivers[0] && (
+            <Marker position={[activeDrivers[0].lat, activeDrivers[0].lng]} icon={TukTukIcon}>
               <Popup>
                 <div className="text-center">
-                  <h3 className="font-bold text-blue-600">
-                    {driverLocation.name}
-                  </h3>
+                  <h3 className="font-bold text-blue-600">{activeDrivers[0].name}</h3>
                   <p className="text-sm text-gray-600">TukTuk disponível</p>
                   <p className="text-xs text-gray-500">
                     Última atualização: {new Date().toLocaleTimeString()}
@@ -238,7 +234,7 @@ const PassengerMap: React.FC = () => {
           {/* Controlador do mapa */}
           <MapController
             userPosition={userPosition}
-            driverLocation={driverLocation}
+            driverLocation={activeDrivers[0] || null}
             userInteracted={userInteracted}
           />
 
@@ -254,20 +250,21 @@ const PassengerMap: React.FC = () => {
           )}
         </MapContainer>
 
-        {/* Calculador de distância */}
+        {/* Calculador de distância apenas para o TukTuk ativo */}
         <div className="absolute top-4 right-4 z-[1000]">
           <DistanceCalculator
             userPosition={userPosition}
-            tuktukPosition={{
-              lat: driverLocation?.lat ?? 0,
-              lng: driverLocation?.lng ?? 0,
-            }}
+            tuktukPosition={
+              activeDrivers[0]
+                ? { lat: activeDrivers[0].lat, lng: activeDrivers[0].lng }
+                : { lat: 0, lng: 0 }
+            }
             showDetails={true}
           />
         </div>
 
         {/* Status do TukTuk */}
-        {!driverLocation?.isActive && (
+        {activeDrivers.length === 0 && (
           <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000]">
             <p className="text-sm">🚫 TukTuk offline</p>
           </div>
