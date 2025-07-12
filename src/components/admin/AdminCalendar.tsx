@@ -13,6 +13,7 @@ import {
   Eye,
   Lock,
   Phone,
+  Radio,
 } from "lucide-react";
 
 // --- UI Components ---
@@ -40,6 +41,7 @@ import { useSession } from "@supabase/auth-helpers-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 
 // --- Hooks & Data ---
 import { useAdminReservations } from "@/hooks/useAdminReservations";
@@ -58,6 +60,7 @@ import {
   getAvailabilityWithBlocks,
   generateDynamicTimeSlots,
 } from "@/utils/reservationUtils";
+import ToggleTrackingButton from "../ToggleTrackingButton";
 
 // --- Helper Functions (pode ser movido para um arquivo separado, ex: utils/time.ts ou utils/format.ts) ---
 // Gera todos os horários de meia em meia hora das 08:00 às 23:00
@@ -176,6 +179,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const [activeConductors, setActiveConductors] = useState<string[]>([]);
   const [conductorsLoading, setConductorsLoading] = useState(true);
   const [conductors, setConductors] = useState(FALLBACK_CONDUCTORS);
+  // Novo estado para seleção do motorista para rastreamento
+  const [selectedDriverId, setSelectedDriverId] = useState<string>("");
 
   // Estados para filtros de bloqueios
   const [blockFilterDate, setBlockFilterDate] = useState<string>("");
@@ -1219,6 +1224,61 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           WhatsApp responsável:{" "}
           <span className="text-purple-700">{getCurrentWhatsapp()}</span>
         </div>
+        {/* Bloco de rastreamento em tempo real */}
+        <Card className="mt-6 w-full max-w-md mx-auto bg-blue-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-blue-900">
+              <Radio className="w-5 h-5 text-blue-600" /> Rastreamento em Tempo Real
+            </CardTitle>
+            <div className="text-gray-700 text-sm mt-1">
+              Ative o envio da localização do TukTuk para aparecer no mapa dos passageiros.
+            </div>
+          </CardHeader>
+          <CardContent>
+            {activeConductors.length === 0 ? (
+              <div className="text-red-600 font-semibold flex items-center gap-2">
+                <AlertCircle className="w-5 h-5" />
+                Ative um condutor para habilitar o rastreamento.
+              </div>
+            ) : activeConductors.length === 1 ? (
+              <>
+                <div className="mb-2 text-gray-700">
+                  Motorista selecionado: <b>{conductors.find(c => c.id === activeConductors[0])?.name}</b>
+                </div>
+                <ToggleTrackingButton driverId={activeConductors[0]} />
+              </>
+            ) : (
+              <>
+                <div className="mb-2 text-gray-700">
+                  Selecione o motorista para rastreamento:
+                </div>
+                <Select
+                  value={selectedDriverId || activeConductors[0]}
+                  onValueChange={setSelectedDriverId}
+                >
+                  <SelectTrigger className="mb-2">
+                    <SelectValue placeholder="Escolha o motorista" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {conductors.filter(c => activeConductors.includes(c.id)).map(c => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name} ({c.whatsapp})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedDriverId && (
+                  <>
+                    <div className="mb-2 text-gray-700">
+                      Motorista selecionado: <b>{conductors.find(c => c.id === selectedDriverId)?.name}</b>
+                    </div>
+                    <ToggleTrackingButton driverId={selectedDriverId} />
+                  </>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Disponibilidade por Horário Card */}

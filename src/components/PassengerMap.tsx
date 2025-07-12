@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabase";
 import { UserLocationMarker } from "./UserLocationMarker";
 import { LocationPermissionButton } from "./LocationPermissionButton";
 import { DistanceCalculator } from "./DistanceCalculator";
+import { LocationDebug } from "./LocationDebug";
 import { Coordinates } from "../utils/locationUtils";
 
 // Corrigir ícones do Leaflet
@@ -68,6 +69,22 @@ const PassengerMap: React.FC = () => {
     // Carregar localização inicial
     const fetchDriverLocation = async () => {
       try {
+        // Verificar se o Supabase está configurado
+        if (
+          !import.meta.env.VITE_SUPABASE_URL ||
+          !import.meta.env.VITE_SUPABASE_ANON_KEY
+        ) {
+          console.warn("Supabase não configurado, usando coordenadas padrão");
+          setDriverLocation({
+            lat: 37.725,
+            lng: -8.783,
+            isActive: false,
+            name: "TukTuk",
+          });
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await supabase
           .from("drivers")
           .select("*")
@@ -75,6 +92,13 @@ const PassengerMap: React.FC = () => {
 
         if (error) {
           console.error("Erro ao carregar localização:", error);
+          // Usar coordenadas padrão em caso de erro
+          setDriverLocation({
+            lat: 37.725,
+            lng: -8.783,
+            isActive: false,
+            name: "TukTuk",
+          });
           return;
         }
 
@@ -88,6 +112,13 @@ const PassengerMap: React.FC = () => {
         }
       } catch (error) {
         console.error("Erro:", error);
+        // Usar coordenadas padrão em caso de erro
+        setDriverLocation({
+          lat: 37.725,
+          lng: -8.783,
+          isActive: false,
+          name: "TukTuk",
+        });
       } finally {
         setLoading(false);
       }
@@ -96,26 +127,36 @@ const PassengerMap: React.FC = () => {
     fetchDriverLocation();
 
     // Subscrever a atualizações em tempo real
-    const channel = supabase
-      .channel("driver_location")
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "drivers" },
-        (payload) => {
-          const newData = payload.new as any;
-          setDriverLocation({
-            lat: newData.latitude || 37.725,
-            lng: newData.longitude || -8.783,
-            isActive: newData.is_active,
-            name: newData.name || "TukTuk",
-          });
-        }
-      )
-      .subscribe();
+    if (
+      import.meta.env.VITE_SUPABASE_URL &&
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    ) {
+      const channel = supabase
+        .channel("driver_location")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "drivers" },
+          (payload) => {
+            const newData = payload.new as {
+              latitude?: number;
+              longitude?: number;
+              is_active?: boolean;
+              name?: string;
+            };
+            setDriverLocation({
+              lat: newData.latitude || 37.725,
+              lng: newData.longitude || -8.783,
+              isActive: newData.is_active || false,
+              name: newData.name || "TukTuk",
+            });
+          }
+        )
+        .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
   }, []);
 
   // Detecta interação manual do usuário com o mapa
@@ -250,6 +291,9 @@ const PassengerMap: React.FC = () => {
           Centralizar mapa
         </button>
       </div>
+
+      {/* Componente de debug para desenvolvimento */}
+      {import.meta.env.DEV && <LocationDebug />}
     </>
   );
 };

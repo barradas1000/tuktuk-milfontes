@@ -9,7 +9,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 import { generateDynamicTimeSlots } from "@/utils/reservationUtils";
 import { format } from "date-fns";
 import { pt, enUS, es, fr, de, it, nl } from "date-fns/locale";
@@ -191,7 +191,9 @@ const AvailabilityCalendar = () => {
           {t("availability.availableSlots")}
         </p>
         <p className="text-sm text-gray-500">
-          {format(new Date(today), "EEEE, d 'de' MMMM", { locale: currentLocale })}
+          {format(new Date(today), "EEEE, d 'de' MMMM", {
+            locale: currentLocale,
+          })}
         </p>
       </CardHeader>
 

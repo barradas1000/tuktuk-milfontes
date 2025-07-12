@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useGeolocation } from "../hooks/useGeolocation";
 
+import { GeolocationPosition as CustomGeolocationPosition } from "../hooks/useGeolocation";
+
 interface LocationPermissionButtonProps {
-  onLocationGranted?: (position: GeolocationPosition) => void;
+  onLocationGranted?: (position: CustomGeolocationPosition) => void;
   onLocationDenied?: () => void;
   className?: string;
   children?: React.ReactNode;
@@ -82,12 +84,17 @@ export const LocationPermissionButton: React.FC<
 
   const detectMobileOS = () => {
     const userAgent =
-      navigator.userAgent || navigator.vendor || (window as any).opera;
+      navigator.userAgent ||
+      navigator.vendor ||
+      (window as unknown as { opera?: string }).opera;
 
     if (/android/i.test(userAgent)) {
       return "android";
     }
-    if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
+    if (
+      /iPad|iPhone|iPod/.test(userAgent) &&
+      !(window as unknown as { MSStream?: unknown }).MSStream
+    ) {
       return "ios";
     }
     return "desktop";
@@ -269,7 +276,7 @@ export const LocationPermissionButton: React.FC<
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .location-permission-container {
           display: flex;
           flex-direction: column;
