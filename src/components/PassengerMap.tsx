@@ -145,54 +145,75 @@ const PassengerMap: React.FC = () => {
   }
 
   return (
-    <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
-      <MapContainer
-        center={[37.725, -8.783]}
-        zoom={14}
-        style={{ height: "100%", width: "100%" }}
-        ref={handleMapReady}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-
-        {driverLocation?.isActive && (
-          <Marker position={[driverLocation.lat, driverLocation.lng]}>
-            <Popup>
-              <div className="text-center">
-                <h3 className="font-bold text-blue-600">
-                  {driverLocation.name}
-                </h3>
-                <p className="text-sm text-gray-600">TukTuk disponível</p>
-                <p className="text-xs text-gray-500">
-                  Última atualização: {new Date().toLocaleTimeString()}
-                </p>
-              </div>
-            </Popup>
-          </Marker>
-        )}
-
-        {/* Controlador do mapa */}
-        <MapController
-          userPosition={userPosition}
-          driverLocation={driverLocation}
-        />
-
-        {/* Marcador da localização do usuário */}
-        {showUserLocation && mapRef.current && (
-          <UserLocationMarker
-            map={mapRef.current}
-            onPositionChange={setUserPosition}
-            onError={handleLocationDenied}
-            autoCenter={false}
-            showAccuracy={true}
+    <>
+      <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
+        <MapContainer
+          center={[37.725, -8.783]}
+          zoom={14}
+          style={{ height: "100%", width: "100%" }}
+          ref={handleMapReady}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-        )}
-      </MapContainer>
 
-      {/* Botão de localização do usuário */}
-      <div className="absolute top-4 left-4 z-[1000]">
+          {driverLocation?.isActive && (
+            <Marker position={[driverLocation.lat, driverLocation.lng]}>
+              <Popup>
+                <div className="text-center">
+                  <h3 className="font-bold text-blue-600">
+                    {driverLocation.name}
+                  </h3>
+                  <p className="text-sm text-gray-600">TukTuk disponível</p>
+                  <p className="text-xs text-gray-500">
+                    Última atualização: {new Date().toLocaleTimeString()}
+                  </p>
+                </div>
+              </Popup>
+            </Marker>
+          )}
+
+          {/* Controlador do mapa */}
+          <MapController
+            userPosition={userPosition}
+            driverLocation={driverLocation}
+          />
+
+          {/* Marcador da localização do usuário */}
+          {showUserLocation && mapRef.current && (
+            <UserLocationMarker
+              map={mapRef.current}
+              onPositionChange={setUserPosition}
+              onError={handleLocationDenied}
+              autoCenter={false}
+              showAccuracy={true}
+            />
+          )}
+        </MapContainer>
+
+        {/* Calculador de distância */}
+        <div className="absolute top-4 right-4 z-[1000]">
+          <DistanceCalculator
+            userPosition={userPosition}
+            tuktukPosition={{
+              lat: driverLocation?.lat ?? 0,
+              lng: driverLocation?.lng ?? 0,
+            }}
+            showDetails={true}
+          />
+        </div>
+
+        {/* Status do TukTuk */}
+        {!driverLocation?.isActive && (
+          <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000]">
+            <p className="text-sm">🚫 TukTuk offline</p>
+          </div>
+        )}
+      </div>
+
+      {/* Botão de localização do usuário FORA do mapa */}
+      <div className="mt-4 flex justify-start">
         <LocationPermissionButton
           onLocationGranted={handleLocationGranted}
           onLocationDenied={handleLocationDenied}
@@ -201,38 +222,7 @@ const PassengerMap: React.FC = () => {
           📍 Localizar-me
         </LocationPermissionButton>
       </div>
-
-      {/* Calculador de distância */}
-      {userPosition && driverLocation?.isActive && (
-        <div className="absolute top-4 right-4 z-[1000]">
-          <DistanceCalculator
-            userPosition={userPosition}
-            tuktukPosition={{
-              lat: driverLocation.lat,
-              lng: driverLocation.lng,
-            }}
-            showDetails={true}
-          />
-        </div>
-      )}
-
-      {/* Status do TukTuk */}
-      {!driverLocation?.isActive && (
-        <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000]">
-          <p className="text-sm">🚫 TukTuk offline</p>
-        </div>
-      )}
-
-      {/* Informações adicionais */}
-      <div className="absolute bottom-4 right-4 bg-white bg-opacity-90 rounded-lg p-3 text-xs text-gray-600 z-[1000] max-w-48">
-        <p className="font-semibold mb-1">ℹ️ Como usar:</p>
-        <ul className="space-y-1">
-          <li>• Clique em "Localizar-me" para ver sua posição</li>
-          <li>• A distância é calculada automaticamente</li>
-          <li>• Alerta quando o TukTuk estiver próximo</li>
-        </ul>
-      </div>
-    </div>
+    </>
   );
 };
 
