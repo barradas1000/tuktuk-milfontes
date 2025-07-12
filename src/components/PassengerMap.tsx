@@ -30,25 +30,26 @@ interface DriverLocation {
 const MapController: React.FC<{
   userPosition: Coordinates | null;
   driverLocation: DriverLocation | null;
-}> = ({ userPosition, driverLocation }) => {
+  userInteracted: boolean;
+}> = ({ userPosition, driverLocation, userInteracted }) => {
   const map = useMap();
 
   useEffect(() => {
-    if (userPosition && driverLocation?.isActive) {
+    if (userPosition && driverLocation?.isActive && !userInteracted) {
       // Calcular zoom ideal para mostrar ambos os pontos
       const bounds = L.latLngBounds([
         [userPosition.lat, userPosition.lng],
         [driverLocation.lat, driverLocation.lng],
       ]);
       map.fitBounds(bounds, { padding: [20, 20] });
-    } else if (userPosition) {
+    } else if (userPosition && !userInteracted) {
       // Se só temos posição do usuário, centralizar nele
       map.setView([userPosition.lat, userPosition.lng], 15);
-    } else if (driverLocation?.isActive) {
+    } else if (driverLocation?.isActive && !userInteracted) {
       // Se só temos posição do motorista, centralizar nele
       map.setView([driverLocation.lat, driverLocation.lng], 14);
     }
-  }, [userPosition, driverLocation, map]);
+  }, [userPosition, driverLocation, map, userInteracted]);
 
   return null;
 };
@@ -61,6 +62,7 @@ const PassengerMap: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showUserLocation, setShowUserLocation] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
+  const [userInteracted, setUserInteracted] = useState(false);
 
   useEffect(() => {
     // Carregar localização inicial
@@ -116,6 +118,19 @@ const PassengerMap: React.FC = () => {
     };
   }, []);
 
+  // Detecta interação manual do usuário com o mapa
+  useEffect(() => {
+    if (!mapRef.current) return;
+    const map = mapRef.current;
+    const onUserInteraction = () => setUserInteracted(true);
+    map.on("zoomstart", onUserInteraction);
+    map.on("movestart", onUserInteraction);
+    return () => {
+      map.off("zoomstart", onUserInteraction);
+      map.off("movestart", onUserInteraction);
+    };
+  }, [mapRef.current]);
+
   const handleLocationGranted = (position: GeolocationPosition) => {
     setUserPosition({
       lat: position.coords.latitude,
@@ -131,6 +146,11 @@ const PassengerMap: React.FC = () => {
 
   const handleMapReady = (map: L.Map) => {
     mapRef.current = map;
+  };
+
+  // Função para centralizar o mapa novamente
+  const handleRecenter = () => {
+    setUserInteracted(false);
   };
 
   if (loading) {
@@ -178,6 +198,7 @@ const PassengerMap: React.FC = () => {
           <MapController
             userPosition={userPosition}
             driverLocation={driverLocation}
+            userInteracted={userInteracted}
           />
 
           {/* Marcador da localização do usuário */}
@@ -213,7 +234,7 @@ const PassengerMap: React.FC = () => {
       </div>
 
       {/* Botão de localização do usuário FORA do mapa */}
-      <div className="mt-4 flex justify-start">
+      <div className="mt-4 flex flex-col gap-2 items-start">
         <LocationPermissionButton
           onLocationGranted={handleLocationGranted}
           onLocationDenied={handleLocationDenied}
@@ -221,6 +242,13 @@ const PassengerMap: React.FC = () => {
         >
           📍 Localizar-me
         </LocationPermissionButton>
+        <button
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition-colors"
+          onClick={handleRecenter}
+          type="button"
+        >
+          Centralizar mapa
+        </button>
       </div>
     </>
   );
