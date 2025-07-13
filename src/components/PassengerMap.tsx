@@ -329,7 +329,7 @@ const PassengerMap: React.FC = () => {
       </div>
 
       {/* Botão de localização do usuário FORA do mapa */}
-      <div className="mt-4 flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+      <div className="mt-4 flex flex-col gap-2 items-start">
         <LocationPermissionButton
           onLocationGranted={handleLocationGranted}
           onLocationDenied={handleLocationDenied}
@@ -344,18 +344,6 @@ const PassengerMap: React.FC = () => {
         >
           Centralizar mapa
         </button>
-        {/* Banner de alerta de proximidade ao lado dos botões */}
-        {alertaProximidade && (
-          <div className="ml-0 sm:ml-4 mt-2 sm:mt-0 bg-green-600 text-white px-4 py-2 rounded shadow text-center whitespace-nowrap">
-            <span className="font-bold">O TukTuk está chegando!</span>
-            <br className="hidden sm:block" />
-            {tempoEstimado !== null && tempoEstimado <= 1 ? (
-              <span>Tempo estimado: menos de 1 min 🚕</span>
-            ) : tempoEstimado !== null ? (
-              <span>Tempo estimado: {tempoEstimado} min 🚕</span>
-            ) : null}
-          </div>
-        )}
       </div>
 
       {/* Componente de debug para desenvolvimento */}
