@@ -64,6 +64,9 @@ const MapController: React.FC<{
   return null;
 };
 
+const DISTANCIA_ALERTA_METROS = 50; // Distância para exibir o alerta
+const VELOCIDADE_MEDIA_KMH = 20; // Velocidade média do TukTuk em km/h
+
 const PassengerMap: React.FC = () => {
   const [activeDrivers, setActiveDrivers] = useState<DriverLocation[]>([]);
   const [userPosition, setUserPosition] = useState<Coordinates | null>(null);
@@ -71,6 +74,31 @@ const PassengerMap: React.FC = () => {
   const [showUserLocation, setShowUserLocation] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const [userInteracted, setUserInteracted] = useState(false);
+  const [alertaProximidade, setAlertaProximidade] = useState(false);
+  const [tempoEstimado, setTempoEstimado] = useState<number | null>(null);
+
+  // Função para calcular distância (haversine)
+  function calcularDistanciaMetros(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number
+  ) {
+    function toRad(x: number) {
+      return (x * Math.PI) / 180;
+    }
+    const R = 6371000; // raio da Terra em metros
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
 
   useEffect(() => {
     // Carregar todos os motoristas ativos
@@ -156,6 +184,30 @@ const PassengerMap: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    if (userPosition && activeDrivers[0]) {
+      const dist = calcularDistanciaMetros(
+        userPosition.lat,
+        userPosition.lng,
+        activeDrivers[0].lat,
+        activeDrivers[0].lng
+      );
+      if (dist < DISTANCIA_ALERTA_METROS) {
+        setAlertaProximidade(true);
+        // Calcular tempo estimado (em minutos)
+        const velocidadeMS = (VELOCIDADE_MEDIA_KMH * 1000) / 3600;
+        const tempoSegundos = dist / velocidadeMS;
+        setTempoEstimado(Math.round(tempoSegundos / 60));
+      } else {
+        setAlertaProximidade(false);
+        setTempoEstimado(null);
+      }
+    } else {
+      setAlertaProximidade(false);
+      setTempoEstimado(null);
+    }
+  }, [userPosition, activeDrivers]);
+
   // Detecta interação manual do usuário com o mapa
   useEffect(() => {
     if (!mapRef.current) return;
@@ -218,10 +270,15 @@ const PassengerMap: React.FC = () => {
 
           {/* Renderizar apenas o primeiro motorista ativo */}
           {activeDrivers[0] && (
-            <Marker position={[activeDrivers[0].lat, activeDrivers[0].lng]} icon={TukTukIcon}>
+            <Marker
+              position={[activeDrivers[0].lat, activeDrivers[0].lng]}
+              icon={TukTukIcon}
+            >
               <Popup>
                 <div className="text-center">
-                  <h3 className="font-bold text-blue-600">{activeDrivers[0].name}</h3>
+                  <h3 className="font-bold text-blue-600">
+                    {activeDrivers[0].name}
+                  </h3>
                   <p className="text-sm text-gray-600">TukTuk disponível</p>
                   <p className="text-xs text-gray-500">
                     Última atualização: {new Date().toLocaleTimeString()}
@@ -270,6 +327,19 @@ const PassengerMap: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Banner de alerta de proximidade */}
+      {alertaProximidade && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded shadow-lg z-[2000] text-center w-[90vw] max-w-md">
+          <span className="font-bold">O TukTuk está chegando!</span>
+          <br />
+          {tempoEstimado !== null && tempoEstimado <= 1 ? (
+            <span>Tempo estimado de chegada: menos de 1 minuto 🚕</span>
+          ) : tempoEstimado !== null ? (
+            <span>Tempo estimado de chegada: {tempoEstimado} min 🚕</span>
+          ) : null}
+        </div>
+      )}
 
       {/* Botão de localização do usuário FORA do mapa */}
       <div className="mt-4 flex flex-col gap-2 items-start">
