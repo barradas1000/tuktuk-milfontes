@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from "react";
 import L from "leaflet";
 import { useGeolocation } from "../hooks/useGeolocation";
 import { Coordinates } from "../utils/locationUtils";
+// Importar ícone PNG do usuário
+import userIconUrl from "../assets/user-icon.png";
 
 interface UserLocationMarkerProps {
   map: L.Map;
@@ -22,19 +24,13 @@ export const UserLocationMarker: React.FC<UserLocationMarkerProps> = ({
   const markerRef = useRef<L.Marker | null>(null);
   const accuracyCircleRef = useRef<L.Circle | null>(null);
 
-  // Criar ícone personalizado para o marcador do usuário
-  const createUserIcon = (): L.DivIcon => {
-    return L.divIcon({
-      className: "user-location-marker",
-      html: `
-        <div class="user-pin">
-          <div class="user-pin-dot"></div>
-          <div class="user-pin-pulse"></div>
-        </div>
-      `,
-      iconSize: [30, 30],
-      iconAnchor: [15, 15],
-      popupAnchor: [0, -15],
+  // Criar ícone personalizado para o marcador do usuário usando PNG
+  const createUserIcon = (): L.Icon => {
+    return L.icon({
+      iconUrl: userIconUrl,
+      iconSize: [40, 40], // Ajuste conforme o tamanho do seu PNG
+      iconAnchor: [20, 20], // Centralizar o ícone
+      popupAnchor: [0, -20],
     });
   };
 
@@ -109,89 +105,5 @@ export const UserLocationMarker: React.FC<UserLocationMarkerProps> = ({
     };
   }, [map]);
 
-  return (
-    <>
-      <style jsx>{`
-        .user-location-marker {
-          background: transparent;
-          border: none;
-        }
-
-        .user-pin {
-          position: relative;
-          width: 30px;
-          height: 30px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .user-pin-dot {
-          width: 12px;
-          height: 12px;
-          background: #4facfe;
-          border: 3px solid white;
-          border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-          z-index: 2;
-          position: relative;
-        }
-
-        .user-pin-pulse {
-          position: absolute;
-          width: 30px;
-          height: 30px;
-          background: rgba(79, 172, 254, 0.3);
-          border-radius: 50%;
-          animation: pulse 2s infinite;
-          z-index: 1;
-        }
-
-        @keyframes pulse {
-          0% {
-            transform: scale(0.8);
-            opacity: 1;
-          }
-          100% {
-            transform: scale(2);
-            opacity: 0;
-          }
-        }
-
-        .user-location-popup {
-          text-align: center;
-          min-width: 200px;
-        }
-
-        .user-location-popup h4 {
-          margin: 0 0 0.5rem 0;
-          color: #4facfe;
-          font-size: 1rem;
-        }
-
-        .user-location-popup p {
-          margin: 0.25rem 0;
-          font-size: 0.85rem;
-          color: #666;
-        }
-
-        /* Estilo para quando está carregando */
-        .user-location-marker.loading .user-pin-dot {
-          background: #ffc107;
-          animation: blink 1s infinite;
-        }
-
-        @keyframes blink {
-          0%,
-          50% {
-            opacity: 1;
-          }
-          51%,
-          100% {
-            opacity: 0.3;
-          }
-        }
-      `}</style>
-    </>
-  );
+  return null;
 };

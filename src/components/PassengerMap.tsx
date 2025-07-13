@@ -120,13 +120,21 @@ const PassengerMap: React.FC = () => {
           setActiveDrivers([]);
         } else if (data) {
           setActiveDrivers(
-            data.map((d: any) => ({
-              id: d.id,
-              lat: d.latitude || 37.725,
-              lng: d.longitude || -8.783,
-              isActive: d.is_active,
-              name: d.name || "TukTuk",
-            }))
+            data.map(
+              (d: {
+                id: string;
+                latitude: number;
+                longitude: number;
+                is_active: boolean;
+                name: string;
+              }) => ({
+                id: d.id,
+                lat: d.latitude || 37.725,
+                lng: d.longitude || -8.783,
+                isActive: d.is_active,
+                name: d.name || "TukTuk",
+              })
+            )
           );
         }
       } catch (error) {
@@ -263,10 +271,7 @@ const PassengerMap: React.FC = () => {
           style={{ height: "100%", width: "100%" }}
           ref={handleMapReady}
         >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
           {/* Renderizar apenas o primeiro motorista ativo */}
           {activeDrivers[0] && (
