@@ -1,0 +1,252 @@
+{
+  "hero": {
+    "title": "Entdecken Sie Milfontes mit Stil",
+    "subtitle": "Tuk-Tuk Abenteuer entlang der Vicentinischen Küste",
+    "description": "Erkunden Sie Vila Nova de Milfontes und Umgebung in einem einzigartigen Tuk-Tuk Erlebnis. Atemberaubende Landschaften, Geschichte und garantierter Spaß!",
+    "descriptionHighlight": "Buchen Sie Ihr Abenteuer jetzt!",
+    "reserveNow": "Jetzt Buchen",
+    "rating": "4.9/5 ⭐ (200+ Bewertungen)"
+  },
+  "benefits": {
+    "title": "Warum Unsere",
+    "titleHighlight": "Tuk-Tuks Wählen?",
+    "subtitle": "Komfort, Spaß und einzigartige Erlebnisse garantiert für die ganze Familie",
+    "exclusiveRoutes": {
+      "title": "Exklusive Routen",
+      "description": "Zugang zu einzigartigen Orten und Panoramablicken, die Sie nur mit unseren spezialisierten Tuk-Tuks erreichen können"
+    },
+    "familyComfort": {
+      "title": "Familienkomfort",
+      "description": "Sichere und komfortable Fahrzeuge, ideal für Familien mit Kindern und Menschen jeden Alters"
+    },
+    "quickReservation": {
+      "title": "Schnelle Reservierung",
+      "description": "Einfaches und schnelles WhatsApp-Buchungssystem. Bestätigen Sie Ihre Tour in wenigen Minuten"
+    }
+  },
+  "pricing": {
+    "title": "Transparente",
+    "titleHighlight": "Preise",
+    "subtitle": "Faire und klare Preise, keine Überraschungen. Garantierter Spaß für die ganze Familie!",
+    "upTo2People": "Bis zu 2 Personen",
+    "additionalPeople": "Zusätzliche Personen",
+    "seeDetailedPrices": "Detaillierte Preise Anzeigen",
+    "detailedPricesTitle": "Vollständige Preistabelle",
+    "howPricesWork": "Wie Die Preise Funktionieren",
+    "basePrice": "Grundpreis",
+    "basePriceDesc": "Festpreis bis zu 2 Personen pro Tuk-Tuk",
+    "additionalPeopleDesc": "€3.50 für jede zusätzliche Person (maximal 4 Personen pro Tuk-Tuk)",
+    "priceExamples": "Preisbeispiele:",
+    "person": "Person",
+    "people": "Personen",
+    "makeReservation": "Reservierung Machen"
+  },
+  "explore": {
+    "title": "Erkunden Sie",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Wie Nie Zuvor",
+    "description": "Entdecken Sie die bestgehüteten Geheimnisse von Vila Nova de Milfontes und der Vicentinischen Küste aus einer einzigartigen Perspektive",
+    "panoramicView": "Einzigartiger Panoramablick",
+    "panoramicViewDesc": "Genießen Sie die besten Aussichten der Alentejo-Küste",
+    "historicHeritage": "Historisches Erbe",
+    "historicHeritageDesc": "Erfahren Sie mehr über die reiche Geschichte dieses Fischerdorfs"
+  },
+  "availability": {
+    "title": "Echtzeit-",
+    "titleHighlight": "Verfügbarkeit",
+    "subtitle": "Überprüfen Sie verfügbare Zeiten und buchen Sie Ihren perfekten Moment",
+    "availabilityToday": "Verfügbarkeit Heute",
+    "availableSlots": "Verfügbare Zeitfenster für Buchungen",
+    "available": "Verfügbar",
+    "occupied": "Besetzt",
+    "reserveSpecificTime": "Um eine bestimmte Zeit zu buchen, verwenden Sie das Reservierungsformular",
+    "morning": "Vormittag (09:30-15:00)",
+    "afternoon": "Nachmittag (15:30-21:30)",
+    "places": "Plätze",
+    "autoUpdated": "Daten automatisch aktualisiert",
+    "lastUpdate": "Letzte Aktualisierung",
+    "noSlotsAvailable": "Keine Slots verfügbar für {{period}}",
+    "allSlotsBooked": "Alle Slots für {{period}} sind bereits gebucht oder blockiert",
+    "contactUs": "Prüfen Sie andere Tage oder kontaktieren Sie uns"
+  },
+  "testimonials": {
+    "title": "Was unsere",
+    "titleHighlight": "Kunden sagen",
+    "rating": "5.0 (200+ Bewertungen)"
+  },
+  "faq": {
+    "title": "Häufig gestellte",
+    "titleHighlight": "Fragen",
+    "subtitle": "Wir klären Ihre Hauptfragen zu unseren Tuk-Tuk Touren",
+    "q1": "Wie viele Personen passen in ein Tuk-Tuk?",
+    "a1": "Das Tuk-Tuk kann 4 Personen plus den Fahrer befördern.",
+    "q2": "Funktionieren die Touren bei Regen?",
+    "a2": "Unsere Tuk-Tuks haben Abdeckungen, aber bei starkem Regen können wir kostenlos umplanen.",
+    "q3": "Ist eine Vorabreservierung notwendig?",
+    "a3": "Wir empfehlen, mindestens 24 Stunden im Voraus zu buchen, besonders in der Hochsaison.",
+    "q4": "Gibt es Gruppenrabatte?",
+    "a4": "Ja, wir bieten spezielle Rabatte für Gruppen. Kontaktieren Sie uns für weitere Informationen.",
+    "q5": "Sind Tuk-Tuks sicher für Kinder?",
+    "a5": "Ja, alle unsere Tuk-Tuks sind mit Sicherheitsgurten ausgestattet und völlig sicher für Kinder."
+  },
+  "cta": {
+    "title": "Bereit für das",
+    "titleHighlight": "Abenteuer?",
+    "description": "Buchen Sie Ihre Tuk-Tuk Tour jetzt und entdecken Sie Milfontes auf einzigartige und unvergessliche Weise!",
+    "reserveNow": "Jetzt Buchen",
+    "talkToUs": "Mit Uns Sprechen",
+    "phone": "968 784 043",
+    "schedule": "Täglich 9-20 Uhr"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. Alle Rechte vorbehalten.",
+    "insurance": "Versicherung inbegriffen",
+    "photos": "Fotos inbegriffen",
+    "localGuides": "Ortskundige Führer"
+  },
+  "tours": {
+    "title": "Unsere Touren",
+    "panoramic": {
+      "title": "Panoramische Dorf-Tour",
+      "description": "Entdecken Sie die markantesten Punkte von Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Furnas Strand",
+      "description": "Reise zum berühmten Furnas Strand mit Fotostopps",
+      "duration": "1h 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Brückenüberquerung",
+      "description": "Überqueren Sie die historische Brücke mit Panoramablick",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Romantischer Sonnenuntergang",
+      "description": "Genießen Sie den schönsten Sonnenuntergang an der Küste",
+      "duration": "2h",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Nacht-Tour",
+      "description": "Erkunden Sie das Dorf im Mondlicht mit einer einzigartigen Perspektive",
+      "duration": "1h",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Fischerroute",
+      "description": "Erfahren Sie mehr über lokale Fischereitraditionen",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Kontaktieren Sie uns",
+    "phone": "Telefon",
+    "whatsapp": "WhatsApp",
+    "email": "E-Mail"
+  },
+  "map": {
+    "title": "Standort und",
+    "titleHighlight": "Sehenswürdigkeiten",
+    "subtitle": "Finden Sie uns im Herzen von Vila Nova de Milfontes und entdecken Sie die wichtigsten Sehenswürdigkeiten",
+    "mapTitle": "Standort",
+    "description": "Finden Sie uns im Herzen von Vila Nova de Milfontes",
+    "pointsOfInterest": "Sehenswürdigkeiten",
+    "historicCenter": "Historisches Zentrum",
+    "milfontesBeach": "Milfontes Strand",
+    "fort": "São Clemente Fort",
+    "nearbyBeaches": "Nahegelegene Strände",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Furnas Strand",
+    "viewpoints": "Panoramapunkte",
+    "openInGoogleMaps": "In Google Maps öffnen",
+    "clickToSee": "Klicken, um auf der Karte zu sehen",
+    "exitMap": "Karte verlassen"
+  },
+  "reservation": {
+    "title": "Reservierungsanfrage:",
+    "subtitle": "Füllen Sie die Details aus und bestätigen Sie über WhatsApp",
+    "name": "Vollständiger Name",
+    "email": "E-Mail",
+    "phone": "Telefon",
+    "date": "Gewünschtes Datum",
+    "time": "Gewünschte Zeit",
+    "tourType": "Tourtyp",
+    "numberOfPeople": "Anzahl der Personen",
+    "message": "Zusätzliche Nachricht",
+    "messagePlaceholder": "Weitere Informationen oder besondere Wünsche...",
+    "selectTour": "Tourtyp auswählen",
+    "people1": "1 Person",
+    "people2": "2 Personen",
+    "people3": "3 Personen",
+    "people4": "4 Personen",
+    "confirmWhatsApp": "Über WhatsApp bestätigen",
+    "reservationSent": "Reservierung gesendet!",
+    "reservationDescription": "Sie werden zu WhatsApp weitergeleitet, um Ihre Reservierung zu bestätigen.",
+    "required": "erforderlich",
+    "whatsappMessages": {
+      "pending": "Hallo {{name}}, wir haben Ihre Reservierungsanfrage für die Tour '{{tour_type}}' am {{reservation_date}} um {{reservation_time}} erhalten. Zur Bestätigung ist eine Zahlung von €{{total_price}} erforderlich. Sie können eine Überweisung an IBAN PT50 1234 5678 9012 3456 7890 1 vornehmen oder bar vor Ort bezahlen. Nach der Zahlung wird Ihre Reservierung automatisch bestätigt.",
+      "confirmed": "Hallo {{name}}, Ihre Reservierung für die Tour '{{tour_type}}' ist für den {{reservation_date}} um {{reservation_time}} bestätigt! Treffen Sie uns im Zentrum von Milfontes, neben dem öffentlichen Garten. Bei Fragen stehen wir Ihnen zur Verfügung.",
+      "cancelled": "Hallo {{name}}, wir müssen Ihnen leider mitteilen, dass Ihre Reservierung für die Tour '{{tour_type}}' am {{reservation_date}} um {{reservation_time}} storniert wurde. Wenn Sie umbuchen oder Fragen haben, kontaktieren Sie uns bitte.",
+      "completed": "Hallo {{name}}, vielen Dank, dass Sie die Tour mit uns gemacht haben! Wir hoffen, Sie hatten eine fantastische Erfahrung in Milfontes. Empfehlen Sie uns an Ihre Freunde und Familie. Bis zum nächsten Mal!",
+      "payment_reminder": "Hallo {{name}}, wir erinnern Sie daran, dass Ihre Reservierung für den {{reservation_date}} um {{reservation_time}} noch nicht bestätigt ist. Um Ihren Platz zu sichern, führen Sie bitte die Zahlung von €{{total_price}} so bald wie möglich durch.",
+      "weather_update": "Hallo {{name}}, aufgrund der für den {{reservation_date}} vorhergesagten Wetterbedingungen müssen wir möglicherweise Ihre Tour umbuchen. Wir werden uns näher am Datum bei Ihnen melden, um zu bestätigen.",
+      "pickup_reminder": "Hallo {{name}}, wir erinnern Sie daran, dass Ihre Tour für morgen, den {{reservation_date}}, um {{reservation_time}} geplant ist. Treffen Sie uns im Zentrum von Milfontes, neben dem öffentlichen Garten, 10 Minuten vor der geplanten Zeit."
+    },
+    "simpleContactMessage": "Hallo, ich möchte eine Reservierung vornehmen!",
+    "clientReservationMessage": "Hallo, ich möchte die Tour '{{tour_type}}' am {{reservation_date}} um {{reservation_time}} für {{number_of_people}} Personen reservieren.\nName: {{name}}\nE-Mail: {{email}}\nTelefon: {{phone}}\nNachricht: {{message}}\nAnfrage gestellt am: {{created_at}}",
+    "timeUnavailableWithSuggestion": "Die gewählte Uhrzeit ist bereits durch eine andere Tour belegt. Wir schlagen die nächste verfügbare Uhrzeit vor: {{next_available_time}}. Möchten Sie für diese neue Uhrzeit reservieren?",
+    "acceptSuggestion": "Vorschlag annehmen",
+    "chooseAnotherTime": "Andere Uhrzeit wählen"
+  },
+  "mapDescriptions": {
+    "praiaDaFranquia": "In der Nähe des Dorfes und ideal für Familien, bekannt für ihr ruhiges Wasser und die Landschaft des Mira-Mündungsgebiets.",
+    "praiaDoFarol": "In der Nähe des Leuchtturms und des Zentrums gelegen, ist dieser Strand wegen seiner Zugänglichkeit und des Blicks auf die Flussmündung beliebt.",
+    "praiaDoMalhao": "Ein wilderer und ausgedehnterer Strand, beliebt bei Surfern und Naturliebhabern wegen seiner Wellen und Dünen.",
+    "praiaDasFurnas": "Bekannt für ihre Felsformationen und Höhlen, bietet sie eine einzigartige Kulisse zum Sonnenbaden und Erkunden.",
+    "praiaDoPatacho": "Ein ruhigerer und abgelegener Strand, perfekt für alle, die Ruhe und Kontakt mit der Natur suchen.",
+    "praiaDoCarreiroDasFazendas": "Gekennzeichnet durch ihre Klippen und den schwierigeren Zugang, ist sie ein Ort von großer natürlicher Schönheit und Ruhe.",
+    "praiaDoPortoDasBarcas": "Eine kleine Bucht mit einem traditionellen Fischerhafen, ideal um das lokale Fischerleben zu beobachten.",
+    "praiaDosAivados": "Ein weiter und welliger Strand, sehr beliebt bei Surfern und Bodyboardern wegen des rauen Meeres.",
+    "forteDeSaoClemente": "Eine historische Befestigungsanlage, die die Mündung des Mira schützte und einen Panoramablick auf die Küste bietet.",
+    "farolDeMilfontes": "Ein ikonisches Wahrzeichen, das Seeleute leitet und einen visuellen Bezugspunkt für das Dorf bietet.",
+    "igrejaDeNossaSenhoraDaGraca": "Ein religiöser Tempel mit traditioneller lokaler Architektur, der das kulturelle Erbe der Region widerspiegelt.",
+    "estatuaDoArcanjo": "Ein Denkmal, das sich in der Dorflandschaft abhebt und einen künstlerischen und symbolischen Akzent setzt.",
+    "jardimPublico": "Ein Freizeit- und Begegnungsbereich im Dorfzentrum, ideal für Spaziergänge und Momente der Entspannung.",
+    "parqueNatural": "Ein großes Schutzgebiet, das die Region umfasst und ihre Artenvielfalt und wilden Küstenlandschaften bewahrt.",
+    "parqueInfantil": "Ein Spielplatz für Kinder mit Geräten zum Spielen und Spaß haben.",
+    "jardimParagem": "Ein kleiner Gartenbereich, der einen angenehmen Ort zum Warten auf öffentliche Verkehrsmittel bietet.",
+    "estuarioDoRioMira": "Ein Ort von großer natürlicher Schönheit und ökologischer Bedeutung, ideal zum Vogelbeobachten und für Spaziergänge am Flussufer.",
+    "restauranteAChoupana": "Restaurant am Meer, spezialisiert auf gegrillte Gerichte, immer mit frischem Fisch.",
+    "tascaDoCelso": "Ein gemütliches und beliebtes Restaurant, bekannt für sein hausgemachtes Essen und seine familiäre Atmosphäre.",
+    "aManjedoura": "Take-away · Vor Ort essen · Mit Terrasse.",
+    "restauranteRitual": "Restaurant und Tapas-Bar, in dem die Ruhe der Alentejo-Küste mit einer raffinierten und kosmopolitischen Atmosphäre verschmilzt, voller Geschichten und Reisen aus aller Welt.",
+    "patioAlentejano": "Ein Restaurant mit einem angenehmen Innenhof, das traditionelle Alentejo-Gerichte in entspannter Atmosphäre serviert.",
+    "restauranteHSBeach": "Ein Restaurant mit Meerblick, das eine Vielzahl von Gerichten, darunter frische Meeresfrüchte, serviert.",
+    "mercadoMilfontes": "Ein traditioneller Markt, auf dem Sie frische lokale Produkte und Kunsthandwerk finden können.",
+    "mercadoBrunheiras": "Ein weiterer lokaler Markt, der eine Vielzahl von Obst, Gemüse und anderen regionalen Produkten anbietet.",
+    "milsuper": "Ein Supermarkt mit einer großen Auswahl an Produkten für den täglichen Bedarf.",
+    "meuSuper": "Ein Convenience-Supermarkt, ideal für schnelle und wichtige Einkäufe.",
+    "amanhecer": "Ein Geschäft, das sich auf frisches Obst und Gemüse spezialisiert hat und eine große Auswahl bietet.",
+    "supermercadoSPAR": "Ein Supermarkt mit einem vollständigen Angebot an Lebensmitteln und Lebensmitteln.",
+    "campifrias": "Campingplatz in der Nähe des Marktes und des Fischplatzes.",
+    "jardimParagemDosAutocarros": "Bushaltestelle neben dem Garten.",
+    "frutasECompanhiaAmanhecer": "Lokaler Laden mit frischem Obst, Gemüse und täglichen Grundnahrungsmitteln.",
+    "campingMilfontes": "Campingplatz mit hervorragender Ausstattung, nahe dem Zentrum von Milfontes und der Natur.",
+    "restauranteOasis": "Restaurant mit Meerblick in Milfontes.",
+    "portinhoDoCanal": "Traditioneller Fischerhafen und Freizeitbereich.",
+    "ponteSobreORioMira": "Brücke über den Mira-Fluss in Milfontes.",
+    "estaturaDoArcanjo": "Ein künstlerischer und ökologischer Aufschrei, aus recyceltem Eisen gefertigt, der uns dazu auffordert, für den Planeten zu denken und zu handeln.",
+    "spotsDeSurfEKayak": "Kajak- und Kanuverleih.",
+    "restauranteHSMilfontesBeach": "Hotel und Restaurant mit Blick auf die Mündung des Mira-Flusses.",
+    "mercadoDeVilaNovaDeMilfontes": "Fisch- und Obstmarkt."
+  },
+  "aerialViewMilfontes": {
+    "title": "Luftaufnahme von Milfontes",
+    "description": "Luftaufnahme an einem Winternachmittag über Vila Nova de Milfontes, Alentejo - Portugal."
+  }
+}

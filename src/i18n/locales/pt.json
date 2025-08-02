@@ -1,0 +1,308 @@
+{
+  "hero": {
+    "title": "Descubra Milfontes com Estilo",
+    "subtitle": "Aventuras de Tuk-Tuk pela Costa Vicentina",
+    "description": "Explore Vila Nova de Milfontes e arredores numa experiência única de tuk-tuk. Paisagens deslumbrantes, história e diversão garantida!",
+    "descriptionHighlight": "Reserve já a sua aventura!",
+    "reserveNow": "Reservar Agora",
+    "rating": "4.9/5 ⭐ (200+ avaliações)"
+  },
+  "benefits": {
+    "title": "Porquê Escolher os",
+    "titleHighlight": "Nossos Tuk-Tuks?",
+    "subtitle": "Conforto, diversão e experiências únicas garantidas para toda a família",
+    "exclusiveRoutes": {
+      "title": "Rotas Exclusivas",
+      "description": "Acesso a locais únicos e vistas panorâmicas que só consegue alcançar com os nossos tuk-tuks especializados"
+    },
+    "familyComfort": {
+      "title": "Conforto Familiar",
+      "description": "Veículos seguros e confortáveis, ideais para famílias com crianças e pessoas de todas as idades"
+    },
+    "quickReservation": {
+      "title": "Reserva Rápida",
+      "description": "Sistema de reservas WhatsApp simples e rápido. Confirme o seu passeio em apenas alguns minutos"
+    }
+  },
+  "pricing": {
+    "title": "Preços",
+    "titleHighlight": "Transparentes",
+    "subtitle": "Preços justos e claros, sem surpresas. Diversão garantida para toda a família!",
+    "upTo2People": "Até 2 pessoas",
+    "additionalPeople": "Pessoas adicionais",
+    "seeDetailedPrices": "Ver Preços Detalhados",
+    "detailedPricesTitle": "Tabela de Preços Completa",
+    "howPricesWork": "Como Funcionam os Preços",
+    "basePrice": "Preço Base",
+    "basePriceDesc": "Preço fixo até 2 pessoas por tuk-tuk",
+    "additionalPeopleDesc": "€3.50 por cada pessoa adicional (máximo 4 pessoas por tuk-tuk)",
+    "priceExamples": "Exemplos de Preços:",
+    "person": "pessoa",
+    "people": "pessoas",
+    "makeReservation": "Fazer Reserva"
+  },
+  "explore": {
+    "title": "Explore",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Como Nunca Antes",
+    "description": "Descubra os segredos mais bem guardados de Vila Nova de Milfontes e Costa Vicentina numa perspetiva única",
+    "panoramicView": "Vista Panorâmica Única",
+    "panoramicViewDesc": "Desfrute das melhores vistas da costa alentejana",
+    "historicHeritage": "Património Histórico",
+    "historicHeritageDesc": "Conheça a rica história desta vila piscatória"
+  },
+  "availability": {
+    "title": "Disponibilidade em",
+    "titleHighlight": "Tempo Real",
+    "subtitle": "Consulte os horários disponíveis e reserve o seu momento perfeito",
+    "availabilityToday": "Disponibilidade Hoje",
+    "availableSlots": "Horários disponíveis para reserva",
+    "available": "Disponível",
+    "occupied": "Ocupado",
+    "reserveSpecificTime": "Para reservar um horário específico, use o formulário de reserva",
+    "morning": "Manhã (09:30-15:00)",
+    "afternoon": "Tarde (15:30-21:30)",
+    "places": "lugares",
+    "autoUpdated": "Dados atualizados automaticamente",
+    "lastUpdate": "Última atualização",
+    "noSlotsAvailable": "Nenhum horário disponível para {{period}}",
+    "allSlotsBooked": "Todos os horários para {{period}} já estão reservados ou bloqueados",
+    "contactUs": "Consulte outros dias ou entre em contacto connosco"
+  },
+  "testimonials": {
+    "title": "O que dizem os nossos",
+    "titleHighlight": "clientes",
+    "rating": "5.0 (200+ avaliações)",
+    "items": {
+      "0": {
+        "quote": "O Diogo Caria é um guia fantástico!\nFoi uma ótima experiência, adorei conhecer locais que não conhecia em Milfontes",
+        "name": "Ana Silva",
+        "designation": "Lisboa"
+      },
+      "1": {
+        "quote": "Passeio incrível! O tuk-tuk é super confortável e as vistas são de tirar o fôlego. Recomendo 100%!",
+        "name": "Luisa Almeida",
+        "designation": "Porto"
+      },
+      "2": {
+        "quote": "Garantimos um Serviço profissional e divertido. Passeios inesquecíveis!",
+        "name": "Sónia Santos",
+        "designation": "Tuktuk-milfontes"
+      },
+      "3": {
+        "quote": "Descobrimos lugares incríveis que nunca encontraríamos sozinhos. Uma experiência inesquecível!",
+        "name": "Experiência Única",
+        "designation": "Milfontes"
+      },
+      "4": {
+        "quote": "Os tuk-tuks são modernos e seguros. Toda a família se divertiu muito durante o passeio!",
+        "name": "Conforto Garantido",
+        "designation": ""
+      },
+      "5": {
+        "quote": "Até nos eventos especiais, o serviço é impecável. Diversão e alegria em cada momento!",
+        "name": "Diversão Garantida",
+        "designation": "Carnaval"
+      }
+    }
+  },
+  "faq": {
+    "title": "Perguntas",
+    "titleHighlight": "Frequentes",
+    "subtitle": "Esclarecemos as suas principais dúvidas sobre os nossos passeios de tuk-tuk",
+    "q1": "Quantas pessoas cabem num tuk-tuk?",
+    "a1": "O tuk-tuk tem capacidade até 4 pessoas, mais o condutor",
+    "q2": "Os passeios funcionam com chuva?",
+    "a2": "Os nossos tuk-tuks têm cobertura, mas em caso de chuva forte, podemos reagendar sem custos.",
+    "q3": "É necessário reservar com antecedência?",
+    "a3": "Recomendamos reservar com pelo menos 24 horas de antecedência, especialmente na época alta.",
+    "q4": "Há descontos para grupos?",
+    "a4": "Sim, oferecemos descontos especiais para grupos. Contacte-nos para mais informações.",
+    "q5": "Os tuk-tuks são seguros para crianças?",
+    "a5": "Sim, todos os nossos tuk-tuks estão equipados com cintos de segurança e são perfeitamente seguros para crianças."
+  },
+  "cta": {
+    "title": "Pronto para a",
+    "titleHighlight": "Aventura?",
+    "description": "Reserve já o seu passeio de tuk-tuk e descubra Milfontes de forma única e inesquecível!",
+    "reserveNow": "Reservar Agora",
+    "talkToUs": "Falar Connosco",
+    "phone": "968 784 043",
+    "schedule": "Todos os dias 9h-20h"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. Todos os direitos reservados.",
+    "insurance": "Seguro incluído",
+    "photos": "Fotos incluídas",
+    "localGuides": "Guias locais",
+    "contactTitle": "Informações de Contacto",
+    "quickLinks": "Links Rápidos",
+    "linkHome": "Início",
+    "linkAbout": "Sobre Nós",
+    "linkServices": "Serviços",
+    "linkBooking": "Reservas",
+    "linkFAQ": "FAQ / Ajuda",
+    "linkSitemap": "Mapa do Site",
+    "policies": "Políticas e Termos",
+    "terms": "Termos e Condições",
+    "privacy": "Política de Privacidade",
+    "cancellation": "Política de Cancelamento",
+    "legalInfo": "Informações Legais",
+    "licenseInfo": "Licenciado pelo Turismo de Portugal",
+    "followUs": "Siga-nos",
+    "newsletter": "Subscreva a nossa newsletter",
+    "newsletterPlaceholder": "O seu e-mail",
+    "subscribe": "Subscrever",
+    "paymentInfo": "Métodos de Pagamento",
+    "paymentSecurity": "Pagamentos 100% seguros (SSL)",
+    "credits": "Créditos e Atribuições",
+    "attributions": "Imagens e ícones de fontes públicas e autores referenciados.",
+    "support": "Suporte ao Cliente"
+  },
+  "tours": {
+    "title": "Os Nossos Passeios",
+    "panoramic": {
+      "title": "Passeio panorâmico pela vila",
+      "description": "Descubra os pontos mais emblemáticos de Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Praia das Furnas",
+      "description": "Viagem até à famosa Praia das Furnas com paragens fotográficas",
+      "duration": "1h 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Travessia da ponte",
+      "description": "Atravesse a ponte histórica com vistas panorâmicas",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Pôr do Sol Romântico",
+      "description": "Desfrute do mais belo pôr do sol da costa",
+      "duration": "2h",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Passeio noturno",
+      "description": "Explore a vila sob o luar numa perspetiva única",
+      "duration": "1h",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Rota dos Pescadores",
+      "description": "Conheça as tradições piscatórias locais",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Contacte-nos",
+    "phone": "Telefone",
+    "whatsapp": "WhatsApp",
+    "email": "Email"
+  },
+  "map": {
+    "title": "Localização e",
+    "titleHighlight": "Pontos de Interesse",
+    "subtitle": "Encontre-nos no coração de Vila Nova de Milfontes e descubra as principais atrações turísticas",
+    "mapTitle": "Localização",
+    "description": "Encontre-nos no coração de Vila Nova de Milfontes",
+    "pointsOfInterest": "Pontos de Interesse",
+    "historicCenter": "Centro Histórico",
+    "milfontesBeach": "Praia de Milfontes",
+    "fort": "Forte de São Clemente",
+    "nearbyBeaches": "Praias Próximas",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Praia das Furnas",
+    "viewpoints": "Miradouros Panorâmicos",
+    "openInGoogleMaps": "Abrir no Google Maps",
+    "clickToSee": "Clique para ver no mapa",
+    "exitMap": "Sair do mapa"
+  },
+  "reservation": {
+    "title": "Pedido de reserva:",
+    "subtitle": "Preencha os dados e confirme via WhatsApp",
+    "name": "Nome Completo",
+    "email": "Email",
+    "phone": "Telefone",
+    "date": "Data Pretendida",
+    "time": "Hora Pretendida",
+    "tourType": "Tipo de Passeio",
+    "numberOfPeople": "Número de Pessoas",
+    "message": "Mensagem Adicional",
+    "messagePlaceholder": "Qualquer informação adicional ou pedido especial...",
+    "selectTour": "Selecione o tipo de passeio",
+    "people1": "1 pessoa",
+    "people2": "2 pessoas",
+    "people3": "3 pessoas",
+    "people4": "4 pessoas",
+    "confirmWhatsApp": "Confirmar via WhatsApp",
+    "reservationSent": "Reserva enviada!",
+    "reservationDescription": "Será redirecionado para o WhatsApp para confirmar a sua reserva.",
+    "required": "obrigatório",
+    "whatsappMessages": {
+      "pending": "Olá {{name}}, recebemos o seu pedido de reserva. Para confirmar, é necessário efetuar o pagamento de €{{total_price}}. Pode fazer a transferência para o IBAN PT50 1234 5678 9012 3456 7890 1 ou pagar em dinheiro no local. Após o pagamento, a sua reserva será confirmada automaticamente.",
+      "confirmed": "Olá {{name}}, a sua reserva para o passeio '{{tour_type}}' está confirmada para o dia {{reservation_date}} às {{reservation_time}}. Encontre-nos no centro de Milfontes, junto ao jardim público. Qualquer dúvida, estamos à disposição!",
+      "cancelled": "Olá {{name}}, lamentamos informar que a sua reserva para o passeio '{{tour_type}}' no dia {{reservation_date}} às {{reservation_time}} foi cancelada. Se precisar reagendar ou tiver alguma dúvida, entre em contacto connosco.",
+      "completed": "Olá {{name}}, obrigado por ter feito o passeio connosco! Esperamos que tenha tido uma experiência fantástica em Milfontes. Recomende-nos aos seus amigos e familiares. Até à próxima!",
+      "payment_reminder": "Olá {{name}}, recordamos que a sua reserva para o dia {{reservation_date}} às {{reservation_time}} ainda não está confirmada. Para garantir o seu lugar, efetue o pagamento de €{{total_price}} o mais brevemente possível.",
+      "weather_update": "Olá {{name}}, devido às condições meteorológicas previstas para {{reservation_date}}, poderemos ter de reagendar o seu passeio. Entraremos em contacto mais próximo da data para confirmar.",
+      "pickup_reminder": "Olá {{name}}, recordamos que o seu passeio está marcado para amanhã, {{reservation_date}}, às {{reservation_time}}. Encontre-nos no centro de Milfontes, junto ao jardim público, 10 minutos antes da hora marcada."
+    },
+    "simpleContactMessage": "Olá, gostaria de fazer uma reserva!",
+    "clientReservationMessage": "Olá, gostaria de reservar o passeio '{{tour_type}}' para o dia {{reservation_date}} às {{reservation_time}} para {{number_of_people}} pessoas.\nNome: {{name}}\nEmail: {{email}}\nTelefone: {{phone}}\nMensagem: {{message}}\nPedido feito em: {{created_at}}",
+    "timeUnavailableWithSuggestion": "O horário escolhido já está ocupado por outro passeio. Sugerimos o próximo horário disponível: {{next_available_time}}. Gostaria de reservar para este novo horário?",
+    "acceptSuggestion": "Aceitar sugestão",
+    "chooseAnotherTime": "Escolher outro horário",
+    "nextAvailableTimeSuggestion": "Para o percurso escolhido, a próxima hora disponível é: {{next_available_time}}. Gostaria de reservar para este horário?"
+  },
+  "mapDescriptions": {
+    "praiaDaFranquia": "Próxima à vila e ideal para famílias, é conhecida pelas suas águas calmas e paisagem do estuário do Mira.",
+    "praiaDoFarol": "Localizada perto do farol e do centro, esta praia é popular pela sua acessibilidade e vistas para a foz do rio.",
+    "praiaDoMalhao": "Uma praia mais selvagem e extensa, procurada por surfistas e amantes da natureza pelas suas ondas e dunas.",
+    "praiaDasFurnas": "Conhecida pelas suas formações rochosas e grutas, oferece um cenário único para banhos de sol e exploração.",
+    "praiaDoPatacho": "Uma praia de ambiente mais tranquilo e isolado, perfeita para quem busca sossego e contacto com a natureza.",
+    "praiaDoCarreiroDasFazendas": "Caracterizada pelas suas arribas e acesso mais desafiador, é um local de grande beleza natural e serenidade.",
+    "praiaDoPortoDasBarcas": "Uma pequena enseada com um porto de pesca tradicional, ideal para observar a vida piscatória local.",
+    "praiaDosAivados": "Uma praia vasta e com ondas, muito popular entre os praticantes de surf e bodyboard pelo seu mar agitado.",
+    "forteDeSaoClemente": "Uma fortificação histórica que protegia a foz do rio Mira, oferecendo vistas panorâmicas sobre a costa.",
+    "farolDeMilfontes": "Um marco icónico que guia os navegantes, proporcionando um ponto de referência visual da vila.",
+    "igrejaDeNossaSenhoraDaGraca": "Um templo religioso com arquitetura tradicional local, que reflete a herança cultural da região.",
+    "estatuaDoArcanjo": "Um monumento que se destaca na paisagem da vila, adicionando um toque artístico e simbólico.",
+    "jardimPublico": "Uma área de lazer e convívio no centro da vila, ideal para passeios e momentos de relaxamento.",
+    "parqueNatural": "Uma vasta área protegida que abrange a região, preservando a sua biodiversidade e paisagens costeiras selvagens.",
+    "parqueInfantil": "Um espaço de recreio dedicado às crianças, com equipamentos para brincadeiras e diversão.",
+    "jardimParagem": "Uma pequena área ajardinada que proporciona um local agradável para esperar o transporte público.",
+    "estuarioDoRioMira": "Um local de grande beleza natural e importância ecológica, perfeito para observação de aves e passeios à beira-rio.",
+    "restauranteAChoupana": "Restaurante em frente ao mar, especializado em grelhados, sempre com peixe fresco.",
+    "tascaDoCelso": "Um restaurante acolhedor e popular, famoso pela sua comida caseira e ambiente familiar.",
+    "aManjedoura": "Take-away · Jantar no local · Com esplanada.",
+    "restauranteRitual": "Restaurante e Tapas-Bar com um ambiente refinado e cosmopolita.",
+    "patioAlentejano": "Um restaurante com um pátio agradável, que serve pratos tradicionais alentejanos num ambiente descontraído.",
+    "restauranteHSBeach": "Um restaurante com vista para o mar, que serve uma variedade de pratos, incluindo marisco fresco.",
+    "mercadoMilfontes": "Um mercado tradicional onde se pode encontrar produtos frescos locais e artesanato.",
+    "mercadoBrunheiras": "Outro mercado local que oferece uma variedade de frutas, legumes e outros produtos da região.",
+    "milsuper": "Um supermercado que oferece uma vasta gama de produtos para as necessidades diárias.",
+    "meuSuper": "Um supermercado de conveniência, ideal para compras rápidas e essenciais.",
+    "amanhecer": "Um estabelecimento especializado em frutas e legumes frescos, com uma seleção variada.",
+    "supermercadoSPAR": "Um supermercado que oferece uma gama completa de produtos alimentares e de mercearia.",
+    "campifrias": "Camping perto ao mercado e praça de peixe",
+    "jardimParagemDosAutocarros": "Paragem de autocarros junto ao jardim.",
+    "frutasECompanhiaAmanhecer": "Mercearia local com frutas frescas, legumes e produtos essenciais para o dia a dia.",
+    "campingMilfontes": "Parque de campismo com excelentes infraestruturas, próximo do centro de Milfontes e da natureza.",
+    "restauranteOasis": "Restaurante com vista panorâmica de Milfontes.",
+    "portinhoDoCanal": "Porto de pesca tradicional e zona de lazer.",
+    "ponteSobreORioMira": "Ponte sobre o Rio Mira em Milfontes",
+    "estaturaDoArcanjo": "Um grito artístico e ecológico, feito em ferro reciclado, que nos desafia a pensar e agir em prol do planeta.",
+    "spotsDeSurfEKayak": "Aluguer de Caiaques e canoagem ",
+    "restauranteHSMilfontesBeach": " Hotel e restaurante com vista para a foz do rio Mira",
+    "mercadoDeVilaNovaDeMilfontes": "Mercado do peixe e frutas"
+  },
+  "aerialViewMilfontes": {
+    "title": "Vista Aérea de Milfontes",
+    "description": "Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes, Alentejo - Portugal."
+  }
+}

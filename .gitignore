@@ -1,0 +1,65 @@
+# Node
+node_modules/
+
+# Build
+/dist/
+/build/
+/.next/
+/.vercel/
+/.output/
+
+# Vite
+.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Ambiente
+.env
+.env.*
+
+# Supabase
+.supabase/
+supabase/.temp/
+supabase/.output/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Outros
+*.local
+*.log
+*.swp
+*.tmp
+
+# Lockfiles alternativos
+bun.lockb
+pnpm-lock.yaml
+yarn.lock
+
+# Testes
+coverage/
+
+# Variáveis de ambiente locais
+.env
+
+# Documentação interna
+/docs/
+
+# VSCode history
+.history/
+
+# Ignorar uploads (se não versionados)
+public/lovable-uploads/
