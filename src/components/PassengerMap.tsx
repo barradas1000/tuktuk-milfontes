@@ -28,7 +28,7 @@ const TukTukIcon = L.icon({
   popupAnchor: [0, -40],
 });
 
-interface DriverLocation {
+interface ConductorLocation {
   id: string;
   lat: number;
   lng: number;
@@ -39,27 +39,27 @@ interface DriverLocation {
 // Componente para controlar o mapa
 const MapController: React.FC<{
   userPosition: Coordinates | null;
-  driverLocation: DriverLocation | null;
+  conductorLocation: ConductorLocation | null;
   userInteracted: boolean;
-}> = ({ userPosition, driverLocation, userInteracted }) => {
+}> = ({ userPosition, conductorLocation, userInteracted }) => {
   const map = useMap();
 
   useEffect(() => {
-    if (userPosition && driverLocation?.isActive && !userInteracted) {
+    if (userPosition && conductorLocation?.isActive && !userInteracted) {
       // Calcular zoom ideal para mostrar ambos os pontos
       const bounds = L.latLngBounds([
         [userPosition.lat, userPosition.lng],
-        [driverLocation.lat, driverLocation.lng],
+        [conductorLocation.lat, conductorLocation.lng],
       ]);
       map.fitBounds(bounds, { padding: [20, 20] });
     } else if (userPosition && !userInteracted) {
       // Se só temos posição do usuário, centralizar nele
       map.setView([userPosition.lat, userPosition.lng], 15);
-    } else if (driverLocation?.isActive && !userInteracted) {
-      // Se só temos posição do motorista, centralizar nele
-      map.setView([driverLocation.lat, driverLocation.lng], 14);
+    } else if (conductorLocation?.isActive && !userInteracted) {
+      // Se só temos posição do condutor, centralizar nele
+      map.setView([conductorLocation.lat, conductorLocation.lng], 14);
     }
-  }, [userPosition, driverLocation, map, userInteracted]);
+  }, [userPosition, conductorLocation, map, userInteracted]);
 
   return null;
 };
@@ -68,7 +68,9 @@ const DISTANCIA_ALERTA_METROS = 50; // Distância para exibir o alerta
 const VELOCIDADE_MEDIA_KMH = 20; // Velocidade média do TukTuk em km/h
 
 const PassengerMap: React.FC = () => {
-  const [activeDrivers, setActiveDrivers] = useState<DriverLocation[]>([]);
+  const [activeConductors, setActiveConductors] = useState<ConductorLocation[]>(
+    []
+  );
   const [userPosition, setUserPosition] = useState<Coordinates | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUserLocation, setShowUserLocation] = useState(false);
@@ -101,25 +103,25 @@ const PassengerMap: React.FC = () => {
   }
 
   useEffect(() => {
-    // Carregar todos os motoristas ativos
-    const fetchActiveDrivers = async () => {
+    // Carregar todos os condutores ativos
+    const fetchActiveConductors = async () => {
       try {
         if (
           !import.meta.env.VITE_SUPABASE_URL ||
           !import.meta.env.VITE_SUPABASE_ANON_KEY
         ) {
-          setActiveDrivers([]);
+          setActiveConductors([]);
           setLoading(false);
           return;
         }
         const { data, error } = await supabase
-          .from("drivers")
+          .from("conductors")
           .select("*")
           .eq("is_active", true);
         if (error) {
-          setActiveDrivers([]);
+          setActiveConductors([]);
         } else if (data) {
-          setActiveDrivers(
+          setActiveConductors(
             data.map(
               (d: {
                 id: string;
@@ -138,12 +140,12 @@ const PassengerMap: React.FC = () => {
           );
         }
       } catch (error) {
-        setActiveDrivers([]);
+        setActiveConductors([]);
       } finally {
         setLoading(false);
       }
     };
-    fetchActiveDrivers();
+    fetchActiveConductors();
 
     // Subscrever a atualizações em tempo real
     if (
@@ -151,10 +153,10 @@ const PassengerMap: React.FC = () => {
       import.meta.env.VITE_SUPABASE_ANON_KEY
     ) {
       const channel = supabase
-        .channel("driver_location")
+        .channel("conductor_location")
         .on(
           "postgres_changes",
-          { event: "UPDATE", schema: "public", table: "drivers" },
+          { event: "UPDATE", schema: "public", table: "conductors" },
           (payload) => {
             const newData = payload.new as {
               id: string;
@@ -163,7 +165,7 @@ const PassengerMap: React.FC = () => {
               is_active?: boolean;
               name?: string;
             };
-            setActiveDrivers((prev) => {
+            setActiveConductors((prev) => {
               // Remove o antigo se existir
               const filtered = prev.filter((d) => d.id !== newData.id);
               // Só adiciona se is_active for true
@@ -193,12 +195,12 @@ const PassengerMap: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (userPosition && activeDrivers[0]) {
+    if (userPosition && activeConductors[0]) {
       const dist = calcularDistanciaMetros(
         userPosition.lat,
         userPosition.lng,
-        activeDrivers[0].lat,
-        activeDrivers[0].lng
+        activeConductors[0].lat,
+        activeConductors[0].lng
       );
       if (dist < DISTANCIA_ALERTA_METROS) {
         setAlertaProximidade(true);
@@ -214,7 +216,7 @@ const PassengerMap: React.FC = () => {
       setAlertaProximidade(false);
       setTempoEstimado(null);
     }
-  }, [userPosition, activeDrivers]);
+  }, [userPosition, activeConductors]);
 
   // Detecta interação manual do usuário com o mapa
   useEffect(() => {
@@ -273,16 +275,16 @@ const PassengerMap: React.FC = () => {
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-          {/* Renderizar apenas o primeiro motorista ativo */}
-          {activeDrivers[0] && (
+          {/* Renderizar apenas o primeiro condutor ativo */}
+          {activeConductors[0] && (
             <Marker
-              position={[activeDrivers[0].lat, activeDrivers[0].lng]}
+              position={[activeConductors[0].lat, activeConductors[0].lng]}
               icon={TukTukIcon}
             >
               <Popup>
                 <div className="text-center">
                   <h3 className="font-bold text-blue-600">
-                    {activeDrivers[0].name}
+                    {activeConductors[0].name}
                   </h3>
                   <p className="text-sm text-gray-600">TukTuk disponível</p>
                   <p className="text-xs text-gray-500">
@@ -296,7 +298,7 @@ const PassengerMap: React.FC = () => {
           {/* Controlador do mapa */}
           <MapController
             userPosition={userPosition}
-            driverLocation={activeDrivers[0] || null}
+            conductorLocation={activeConductors[0] || null}
             userInteracted={userInteracted}
           />
 
@@ -312,13 +314,13 @@ const PassengerMap: React.FC = () => {
         </MapContainer>
 
         {/* Calculador de distância apenas quando TukTuk está online */}
-        {activeDrivers.length > 0 && activeDrivers[0] && (
+        {activeConductors.length > 0 && activeConductors[0] && (
           <div className="absolute top-4 right-4 z-[1000]">
             <DistanceCalculator
               userPosition={userPosition}
               tuktukPosition={{
-                lat: activeDrivers[0].lat,
-                lng: activeDrivers[0].lng,
+                lat: activeConductors[0].lat,
+                lng: activeConductors[0].lng,
               }}
               showDetails={true}
             />
@@ -326,7 +328,7 @@ const PassengerMap: React.FC = () => {
         )}
 
         {/* Status do TukTuk */}
-        {activeDrivers.length === 0 && (
+        {activeConductors.length === 0 && (
           <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000]">
             <p className="text-sm">🚫 TukTuk offline</p>
           </div>

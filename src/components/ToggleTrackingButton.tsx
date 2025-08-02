@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "../lib/supabase";
 
 interface ToggleTrackingButtonProps {
-  driverId: string;
+  conductorId: string;
 }
 
 const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
-  driverId,
+  conductorId,
 }) => {
   const [isTracking, setIsTracking] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,9 +18,9 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
     const checkInitialStatus = async () => {
       try {
         const { data, error } = await supabase
-          .from("drivers")
+          .from("conductors")
           .select("is_active")
-          .eq("id", driverId)
+          .eq("id", conductorId)
           .single();
 
         if (!error && data) {
@@ -32,7 +32,7 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
     };
 
     checkInitialStatus();
-  }, [driverId]);
+  }, [conductorId]);
 
   const startTracking = async () => {
     setLoading(true);
@@ -46,9 +46,9 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
 
       // Atualizar status no Supabase
       const { error: updateError } = await supabase
-        .from("drivers")
+        .from("conductors")
         .update({ is_active: true })
-        .eq("id", driverId);
+        .eq("id", conductorId);
 
       if (updateError) {
         console.error("Erro ao ativar rastreamento:", updateError);
@@ -62,13 +62,13 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
 
           try {
             await supabase
-              .from("drivers")
+              .from("conductors")
               .update({
                 latitude,
                 longitude,
                 updated_at: new Date().toISOString(),
               })
-              .eq("id", driverId);
+              .eq("id", conductorId);
           } catch (error) {
             console.error("Erro ao atualizar localização:", error);
           }
@@ -105,9 +105,9 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
 
       // Atualizar status no Supabase
       const { error } = await supabase
-        .from("drivers")
+        .from("conductors")
         .update({ is_active: false })
-        .eq("id", driverId);
+        .eq("id", conductorId);
 
       if (error) {
         console.error("Erro ao desativar rastreamento:", error);

@@ -14,7 +14,6 @@ const Instrucoes = lazy(() => import("./pages/Instrucoes"));
 import TermosCondicoes from "./pages/TermosCondicoes";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import PoliticaCancelamento from "./pages/PoliticaCancelamento";
-import DriverDashboard from "./pages/DriverDashboard";
 import PassengerView from "./pages/PassengerView";
 import "./i18n";
 
@@ -70,7 +69,6 @@ const App = () => (
               path="/PoliticaCancelamento"
               element={<PoliticaCancelamento />}
             />
-            <Route path="/driver" element={<DriverDashboard />} />
             <Route path="/tracking" element={<PassengerView />} />
             <Route
               path="*"

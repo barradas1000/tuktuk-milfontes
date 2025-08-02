@@ -1,6 +1,22 @@
 import { supabase } from "@/lib/supabase";
 import { AdminReservation, BlockedPeriod } from "@/types/adminReservations";
 
+// Tipos auxiliares para dados do banco
+interface Conductor {
+  id: string;
+  name: string;
+  whatsapp?: string;
+  latitude?: number;
+  longitude?: number;
+  is_active?: boolean;
+}
+interface ActiveConductor {
+  conductor_id: string;
+  is_active: boolean;
+  activated_at?: string;
+  deactivated_at?: string;
+}
+
 export const checkSupabaseConfiguration = (): boolean => {
   const url = import.meta.env.VITE_SUPABASE_URL;
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -16,20 +32,17 @@ export const fetchReservationsFromSupabase = async (): Promise<
   AdminReservation[]
 > => {
   console.log("Fetching reservations from Supabase...");
-
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("reservations")
       .select("*")
       .order("created_at", { ascending: false });
-
     if (error) {
       console.error("Supabase error:", error);
       return [];
     }
-
     console.log("Reservations loaded from Supabase:", data?.length || 0);
-    return data || [];
+    return (data as AdminReservation[]) || [];
   } catch (error) {
     console.error("Error fetching reservations:", error);
     return [];
@@ -39,22 +52,19 @@ export const fetchReservationsFromSupabase = async (): Promise<
 export const updateReservationInSupabase = async (
   id: string,
   status: string
-) => {
+): Promise<AdminReservation | undefined> => {
   console.log("Updating reservation in Supabase:", { id, status });
-
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("reservations")
       .update({ status, updated_at: new Date().toISOString() })
       .eq("id", id)
       .select();
-
     if (error) {
       console.error("Error updating reservation:", error);
       throw error;
     }
-
-    return data?.[0];
+    return (data as AdminReservation[])?.[0];
   } catch (error) {
     console.error("Error updating reservation:", error);
     throw error;
@@ -64,11 +74,10 @@ export const updateReservationInSupabase = async (
 export const updateManualPaymentInSupabase = async (
   id: string,
   manualPayment: number
-) => {
+): Promise<AdminReservation | undefined> => {
   console.log("Updating manual payment in Supabase:", { id, manualPayment });
-
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("reservations")
       .update({
         manual_payment: manualPayment,
@@ -76,13 +85,11 @@ export const updateManualPaymentInSupabase = async (
       })
       .eq("id", id)
       .select();
-
     if (error) {
       console.error("Error updating manual payment:", error);
       throw error;
     }
-
-    return data?.[0];
+    return (data as AdminReservation[])?.[0];
   } catch (error) {
     console.error("Error updating manual payment:", error);
     throw error;
@@ -92,17 +99,15 @@ export const updateManualPaymentInSupabase = async (
 // --- Novas funções para condutores ---
 export const fetchActiveConductors = async (): Promise<string[]> => {
   try {
-    const { data, error } = await (supabase as any)
-      .from("active_conductors")
-      .select("conductor_id")
+    const { data, error } = await supabase
+      .from("conductors")
+      .select("id")
       .eq("is_active", true);
-
     if (error) {
       console.error("Error fetching active conductors:", error);
-      return ["condutor2"]; // fallback para condutor 2
+      return ["condutor2"];
     }
-
-    return data?.map((item: any) => item.conductor_id) || ["condutor2"];
+    return (data as Conductor[])?.map((item) => item.id) || ["condutor2"];
   } catch (error) {
     console.error("Error fetching active conductors:", error);
     return ["condutor2"];
@@ -113,42 +118,36 @@ export const updateActiveConductors = async (
   conductorIds: string[]
 ): Promise<void> => {
   try {
-    // Primeiro, desativar todos os condutores
-    await (supabase as any)
-      .from("active_conductors")
-      .update({
-        is_active: false,
-        deactivated_at: new Date().toISOString(),
-      })
+    // Desativar todos os condutores
+    await supabase
+      .from("conductors")
+      .update({ is_active: false })
       .eq("is_active", true);
 
-    // Depois, ativar apenas os selecionados
-    for (const conductorId of conductorIds) {
-      await (supabase as any).from("active_conductors").insert({
-        conductor_id: conductorId,
-        is_active: true,
-        activated_at: new Date().toISOString(),
-      });
+    // Ativar apenas os IDs selecionados
+    if (conductorIds.length > 0) {
+      await supabase
+        .from("conductors")
+        .update({ is_active: true })
+        .in("id", conductorIds);
     }
   } catch (error) {
-    console.error("Error updating active conductors:", error);
+    console.error("Error updating conductors is_active:", error);
     throw error;
   }
 };
 
-export const fetchConductors = async () => {
+export const fetchConductors = async (): Promise<Conductor[]> => {
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("conductors")
       .select("*")
       .order("name");
-
     if (error) {
       console.error("Error fetching conductors:", error);
       return [];
     }
-
-    return data || [];
+    return (data as Conductor[]) || [];
   } catch (error) {
     console.error("Error fetching conductors:", error);
     return [];
@@ -158,26 +157,26 @@ export const fetchConductors = async () => {
 // --- Novas funções para bloqueios ---
 export const fetchBlockedPeriods = async (): Promise<BlockedPeriod[]> => {
   try {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("blocked_periods")
       .select("*")
       .order("created_at", { ascending: false });
-
     if (error) {
       console.error("Error fetching blocked periods:", error);
       return [];
     }
-
     // Mapear os campos do banco para a interface TypeScript
-    return (data || []).map((item: any) => ({
-      id: item.id,
-      date: item.date,
-      startTime: item.start_time,
-      endTime: item.end_time,
-      reason: item.reason,
-      createdBy: item.created_by,
-      createdAt: item.created_at, // <-- incluir campo de data de criação
-    }));
+    return (
+      (data as BlockedPeriod[] | null)?.map((item) => ({
+        id: item.id,
+        date: item.date,
+        startTime: item.start_time,
+        endTime: item.end_time,
+        reason: item.reason,
+        createdBy: item.created_by,
+        createdAt: item.created_at,
+      })) || []
+    );
   } catch (error) {
     console.error("Error fetching blocked periods:", error);
     return [];
@@ -198,7 +197,7 @@ export const createBlockedPeriod = async (
       created_at: blockedPeriod.createdAt, // <-- incluir campo de data de criação se fornecido
     };
 
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("blocked_periods")
       .insert(dbBlockedPeriod)
       .select()
@@ -227,7 +226,7 @@ export const createBlockedPeriod = async (
 
 export const deleteBlockedPeriod = async (id: string): Promise<void> => {
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from("blocked_periods")
       .delete()
       .eq("id", id);
@@ -249,10 +248,7 @@ export const deleteBlockedPeriodsByDate = async (
   try {
     console.log("Deletando bloqueios para data:", date, "horário:", startTime);
 
-    let query = (supabase as any)
-      .from("blocked_periods")
-      .delete()
-      .eq("date", date);
+    let query = supabase.from("blocked_periods").delete().eq("date", date);
 
     if (startTime) {
       query = query.eq("start_time", startTime);
@@ -279,9 +275,7 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     console.log("Iniciando limpeza de bloqueios duplicados...");
 
     // Buscar todos os bloqueios
-    const { data: allBlockedPeriods, error: fetchError } = await (
-      supabase as any
-    )
+    const { data: allBlockedPeriods, error: fetchError } = await supabase
       .from("blocked_periods")
       .select("*")
       .order("created_at", { ascending: false });
@@ -297,9 +291,9 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     }
 
     // Agrupar por data e horário
-    const groupedByDateAndTime: { [key: string]: any[] } = {};
+    const groupedByDateAndTime: { [key: string]: BlockedPeriod[] } = {};
 
-    allBlockedPeriods.forEach((period: any) => {
+    (allBlockedPeriods as BlockedPeriod[]).forEach((period) => {
       const key = `${period.date}_${period.start_time}`;
       if (!groupedByDateAndTime[key]) {
         groupedByDateAndTime[key] = [];
@@ -310,11 +304,11 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     // Identificar duplicados (mais de 1 bloqueio para mesma data/horário)
     const duplicatesToRemove: string[] = [];
 
-    Object.values(groupedByDateAndTime).forEach((periods: any[]) => {
+    Object.values(groupedByDateAndTime).forEach((periods) => {
       if (periods.length > 1) {
         // Manter o mais recente (primeiro da lista, já ordenado por created_at desc)
         const toRemove = periods.slice(1); // Remove todos exceto o primeiro
-        toRemove.forEach((period: any) => {
+        toRemove.forEach((period) => {
           duplicatesToRemove.push(period.id);
         });
       }
@@ -330,7 +324,7 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     );
 
     // Remover duplicados
-    const { error: deleteError, count } = await (supabase as any)
+    const { error: deleteError, count } = await supabase
       .from("blocked_periods")
       .delete()
       .in("id", duplicatesToRemove);
