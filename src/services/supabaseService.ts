@@ -1,3 +1,43 @@
+// Garante que o condutor ativo tem registro em active_conductors
+export const ensureActiveConductorRecord = async (conductorId: string) => {
+  // Tenta buscar registro existente
+  const { data, error } = await supabase
+    .from("active_conductors")
+    .select("conductor_id")
+    .eq("conductor_id", conductorId)
+    .single();
+  if (error || !data) {
+    // Não existe, cria novo registro
+    const { error: insertError } = await supabase
+      .from("active_conductors")
+      .insert({
+        conductor_id: conductorId,
+        is_active: true,
+        status: "available",
+        occupied_until: null,
+        activated_at: new Date().toISOString(),
+        deactivated_at: null,
+      });
+    if (insertError) {
+      console.error(
+        "Erro ao criar registro em active_conductors:",
+        insertError
+      );
+    }
+  } else {
+    // Já existe, só garante que está ativo
+    const { error: updateError } = await supabase
+      .from("active_conductors")
+      .update({ is_active: true, status: "available", deactivated_at: null })
+      .eq("conductor_id", conductorId);
+    if (updateError) {
+      console.error(
+        "Erro ao atualizar registro em active_conductors:",
+        updateError
+      );
+    }
+  }
+};
 import { supabase } from "@/lib/supabase";
 import { AdminReservation, BlockedPeriod } from "@/types/adminReservations";
 
@@ -26,7 +66,7 @@ export const updateTuktukStatus = async (
   occupiedUntil: Date | null
 ): Promise<void> => {
   try {
-    const updateObj: any = { status };
+    const updateObj: Record<string, unknown> = { status };
     if (occupiedUntil) {
       updateObj.occupied_until = occupiedUntil.toISOString();
     } else {
@@ -188,6 +228,10 @@ export const updateActiveConductors = async (
         .from("conductors")
         .update({ is_active: true })
         .in("id", conductorIds);
+      // Garante registro em active_conductors para cada condutor ativado
+      for (const id of conductorIds) {
+        await ensureActiveConductorRecord(id);
+      }
     }
   } catch (error) {
     console.error("Error updating conductors is_active:", error);
@@ -228,11 +272,11 @@ export const fetchBlockedPeriods = async (): Promise<BlockedPeriod[]> => {
       (data as BlockedPeriod[] | null)?.map((item) => ({
         id: item.id,
         date: item.date,
-        startTime: item.start_time,
-        endTime: item.end_time,
+        startTime: item.startTime,
+        endTime: item.endTime,
         reason: item.reason,
-        createdBy: item.created_by,
-        createdAt: item.created_at,
+        createdBy: item.createdBy,
+        createdAt: item.createdAt,
       })) || []
     );
   } catch (error) {
@@ -352,7 +396,7 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     const groupedByDateAndTime: { [key: string]: BlockedPeriod[] } = {};
 
     (allBlockedPeriods as BlockedPeriod[]).forEach((period) => {
-      const key = `${period.date}_${period.start_time}`;
+      const key = `${period.date}_${period.startTime}`;
       if (!groupedByDateAndTime[key]) {
         groupedByDateAndTime[key] = [];
       }
