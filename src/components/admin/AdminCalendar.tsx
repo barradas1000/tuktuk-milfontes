@@ -59,6 +59,8 @@ import {
   updateActiveConductors,
   fetchConductors,
   cleanDuplicateBlockedPeriods,
+  updateTuktukStatus,
+  fetchTuktukStatus,
 } from "@/services/supabaseService";
 import { BlockedPeriod } from "@/types/adminReservations";
 import { AdminReservation } from "@/types/adminReservations";
@@ -184,9 +186,35 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // --- Estados para seleção de condutores ---
   const [activeConductors, setActiveConductors] = useState<string[]>([]);
   const [conductorsLoading, setConductorsLoading] = useState(true);
-  const [conductors, setConductors] = useState(FALLBACK_CONDUCTORS);
+  const [conductors, setConductors] =
+    useState<{ id: string; name: string; whatsapp?: string }[]>(
+      FALLBACK_CONDUCTORS
+    );
   // Novo estado para seleção do motorista para rastreamento
   const [selectedConductorId, setSelectedConductorId] = useState<string>("");
+
+  // --- Estados para disponibilidade do TukTuk ---
+  const [tuktukStatus, setTuktukStatus] = useState<"available" | "busy">(
+    "available"
+  );
+  const [occupiedMinutes, setOccupiedMinutes] = useState(30);
+  const [occupiedUntil, setOccupiedUntil] = useState<Date | null>(null);
+
+  // Buscar status inicial do TukTuk ao carregar (para o condutor ativo)
+  useEffect(() => {
+    // Supondo que só há um condutor ativo por vez (ajuste se necessário)
+    if (activeConductors.length === 1) {
+      const conductorId = activeConductors[0];
+      fetchTuktukStatus(conductorId).then((data) => {
+        if (data) {
+          setTuktukStatus(data.status || "available");
+          setOccupiedUntil(
+            data.occupied_until ? new Date(data.occupied_until) : null
+          );
+        }
+      });
+    }
+  }, [activeConductors]);
 
   // Estados para filtros de bloqueios
   const [blockFilterDate, setBlockFilterDate] = useState<string>("");
@@ -853,7 +881,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         alert("Erro ao bloquear o intervalo. Tente novamente.");
       }
     },
-    [blockTime, timeSlots]
+    [blockTime]
   );
 
   // --- Handlers de Eventos ---
@@ -1230,7 +1258,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           WhatsApp responsável:{" "}
           <span className="text-purple-700">{getCurrentWhatsapp()}</span>
         </div>
-        {/* Bloco de rastreamento em tempo real */}
+        {/* Bloco de rastreamento em tempo real desabilitado */}
+        {/*
         <Card className="mt-6 w-full max-w-md mx-auto bg-blue-50 border-blue-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-blue-900">
@@ -1298,9 +1327,126 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             )}
           </CardContent>
         </Card>
+        */}
       </div>
 
-      {/* Disponibilidade por Horário Card */}
+      {/* Painel de Disponibilidade do TukTuk para o condutor */}
+      <div
+        className={`mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex flex-col gap-4 items-center shadow-md ${
+          activeConductors.length !== 1 ? "opacity-60 pointer-events-none" : ""
+        }`}
+      >
+        {activeConductors.length === 0 && (
+          <div className="text-red-600 font-semibold text-center mb-2">
+            Não há Condutores Disponíveis
+          </div>
+        )}
+        <h2 className="text-lg font-bold text-green-900 mb-2 flex items-center gap-2">
+          <Clock className="h-5 w-5" /> Disponibilidade do TukTuk
+        </h2>
+        <div className="flex flex-col md:flex-row gap-4 items-center w-full justify-center">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-gray-800">Status:</span>
+            <Switch
+              checked={tuktukStatus === "available"}
+              onCheckedChange={async (checked) => {
+                if (activeConductors.length === 1) {
+                  const conductorId = activeConductors[0];
+                  if (checked) {
+                    setTuktukStatus("available");
+                    setOccupiedUntil(null);
+                    await updateTuktukStatus(conductorId, "available", null);
+                  } else {
+                    setTuktukStatus("busy");
+                    await updateTuktukStatus(
+                      conductorId,
+                      "busy",
+                      occupiedUntil
+                    );
+                  }
+                } else {
+                  // fallback local
+                  if (checked) {
+                    setTuktukStatus("available");
+                    setOccupiedUntil(null);
+                  } else {
+                    setTuktukStatus("busy");
+                  }
+                }
+              }}
+              id="switch-tuktuk-status"
+              disabled={activeConductors.length !== 1}
+            />
+            <span
+              className={
+                tuktukStatus === "available"
+                  ? "text-green-600 font-semibold"
+                  : "text-red-600 font-semibold"
+              }
+            >
+              {tuktukStatus === "available" ? "Disponível" : "Ocupado"}
+            </span>
+          </div>
+          {tuktukStatus === "busy" && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm">Tempo previsto ocupado:</span>
+              <input
+                type="number"
+                min={1}
+                max={180}
+                value={occupiedMinutes}
+                onChange={(e) => setOccupiedMinutes(Number(e.target.value))}
+                className="border rounded px-2 py-1 w-20 text-center"
+                disabled={activeConductors.length !== 1}
+              />
+              <span className="text-xs text-gray-500">minutos</span>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={async () => {
+                  const until = new Date(Date.now() + occupiedMinutes * 60000);
+                  setOccupiedUntil(until);
+                  if (activeConductors.length === 1) {
+                    const conductorId = activeConductors[0];
+                    await updateTuktukStatus(conductorId, "busy", until);
+                  }
+                  toast({
+                    title: "TukTuk marcado como Ocupado",
+                    description: `Disponível a partir das ${until.toLocaleTimeString(
+                      "pt-PT",
+                      { hour: "2-digit", minute: "2-digit" }
+                    )}`,
+                    variant: "default",
+                  });
+                }}
+                disabled={
+                  !occupiedMinutes ||
+                  occupiedMinutes < 1 ||
+                  activeConductors.length !== 1
+                }
+              >
+                Confirmar
+              </Button>
+            </div>
+          )}
+        </div>
+        {tuktukStatus === "busy" && occupiedUntil && (
+          <div className="text-sm text-red-700 mt-2">
+            Ocupado até:{" "}
+            <b>
+              {occupiedUntil.toLocaleTimeString("pt-PT", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </b>
+          </div>
+        )}
+        {tuktukStatus === "available" && (
+          <div className="text-sm text-green-700 mt-2">
+            TukTuk disponível para novas viagens!
+          </div>
+        )}
+      </div>
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1457,7 +1603,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CalendarIcon className="h-5 w-5" />
-            Calendário
+            Disponibilidade
           </CardTitle>
         </CardHeader>
         <CardContent>

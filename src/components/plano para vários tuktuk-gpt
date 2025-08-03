@@ -1,0 +1,545 @@
+🧩 Estratégia Recomendada: Gestão Híbrida (Admin + App do Condutor) com Tabela Unificada
+Por quê? Porque dá autonomia ao condutor, controle ao admin, e mantém segurança e rastreabilidade.
+
+🛠️ Passo a Passo Técnico para Implementar
+🔁 1. Unificar Tabelas de Condutores e Rastreamento
+Crie uma única tabela no Supabase chamada conductors com os campos:
+
+ts
+Copiar
+Editar
+id: string (UUID, PK)
+name: string
+whatsapp: string
+email: string
+password_hash: string (se usares autenticação por email)
+latitude: number
+longitude: number
+is_active: boolean         // Status de rastreamento atual
+last_updated: timestamp    // Última vez em que a posição foi atualizada
+role: 'conductor' | 'admin'
+📌 Se já tens tabela drivers, podes migrar dados e eliminar redundância.
+
+📲 2. App do Condutor: Ativar/Desativar Rastreamento
+✅ No frontend do condutor:
+Botão “Entrar em serviço” → atualiza is_active = true
+
+Botão “Sair de serviço” → atualiza is_active = false
+
+tsx
+Copiar
+Editar
+// Exemplo com Supabase e React
+const toggleStatus = async (newStatus: boolean) => {
+  const { data, error } = await supabase
+    .from("conductors")
+    .update({ is_active: newStatus, last_updated: new Date() })
+    .eq("id", user.id);
+
+  if (error) {
+    console.error("Erro ao atualizar status:", error.message);
+  }
+};
+📍 3. Mapa do Passageiro: Mostrar Condutores Ativos
+Use useQuery com filtro por is_active = true:
+ts
+Copiar
+Editar
+const fetchActiveConductors = async (): Promise<Conductor[]> => {
+  const { data, error } = await supabase
+    .from("conductors")
+    .select("*")
+    .eq("is_active", true);
+
+  if (error) throw error;
+  return data;
+};
+E renderize os ícones no <MapContainer> usando React-Leaflet.
+
+🧑‍💼 4. Painel Admin: Criar e Gerenciar Condutores
+Crie condutores com dados básicos (nome, email, região…)
+
+Ao criar, registra automaticamente na tabela conductors
+
+O admin pode alterar is_active (forçar online/offline)
+
+Exibe alerta se o condutor não tiver posição atualizada (last_updated > X minutos atrás)
+
+📅 5. (Opcional) Gestão de Escalas
+Tabela conductor_schedule:
+
+ts
+Copiar
+Editar
+id: string
+conductor_id: string (FK)
+day_of_week: number (0-6)
+start_time: time
+end_time: time
+Usas isso para mostrar se o condutor devia estar online (comparando com hora atual).
+
+🔒 6. Autenticação
+Com Supabase Auth:
+
+Cada condutor faz login com email/senha ou OTP (mais simples).
+
+auth.user.id deve estar ligado ao conductors.id.
+
+📦 Exemplo de Estrutura de Diretórios
+css
+Copiar
+Editar
+src/
+├── components/
+│   └── ConductorMap.tsx
+│   └── AdminConductorPanel.tsx
+│   └── ToggleConductorTrackingButton.tsx
+├── hooks/
+│   └── useActiveConductors.ts
+│   └── useConductorStatus.ts
+├── pages/
+│   └── passenger/Map.tsx
+│   └── admin/Conductors.tsx
+│   └── conductor/Dashboard.tsx
+🧪 Testes e Validação
+ Criar 2 condutores fictícios
+
+ Simular login com cada um
+
+ Verificar se apenas condutores ativos aparecem no mapa
+
+ Testar painel admin forçando status online/offline
+
+🚀 Deployment
+Backend Supabase já em tempo real
+
+Deploy do painel admin e mapa no Vercel
+
+(Opcional) App Condutor pode ser PWA com React/Vite para ser usado no telemóvel
+
+✅ Resumo Final
+Componente	Solução
+Mapa Passageiro	Só mostra condutores com is_active = true
+Painel Admin	Gerencia condutores e pode forçar status
+App Condutor	Ativa/desativa status e envia posição
+Supabase	Centraliza dados e autenticação
+Escalabilidade	Suportada com modelo híbrido e escalas
+Tipagem Segura	Feita com TypeScript
+
+Se quiseres, posso agora ajudar-te a:
+
+ Criar a tabela unificada conductors
+
+ Criar o hook useActiveConductors
+
+ Fazer o componente do mapa atualizado
+
+ Construir o painel admin com botões de ativar/desativar
+
+Só dizer por onde queres começar!
+
+
+
+
+
+
+
+
+
+Perguntar ao ChatGPT
+Dito por si:
+a opção híbrida, parece ser a melhor solução .
+Na prática, o que precisaria de fazer na parte administrativa?
+Como seria a interface, não crie código nenhum, apenas estamos a construir a ideia conceptual.
+
+
+Dito pelo ChatGPT:
+Perfeito! A opção híbrida é realmente a mais equilibrada entre autonomia do condutor e controlo administrativo.
+
+Vamos então definir conceitualmente o que o painel administrativo precisa oferecer para suportar esse modelo híbrido, sem ainda entrar em código.
+
+🧠 OBJETIVO DO PAINEL ADMIN (NA OPÇÃO HÍBRIDA)
+Garantir que apenas condutores autorizados e com permissão ativa possam aparecer no sistema de rastreamento — mesmo que eles próprios controlem quando estão online.
+
+🧩 FUNÇÕES ESSENCIAIS NO PAINEL ADMIN
+1. Cadastro de Condutores
+Admin pode adicionar novos condutores ao sistema.
+
+Campos básicos:
+
+Nome
+
+Email ou telefone
+
+Região/zona de operação
+
+Permissões iniciais (ativo/inativo)
+
+Nota: o condutor só pode fazer login e ativar-se se estiver registrado pelo admin.
+
+2. Lista de Condutores
+Tabela ou lista com todos os condutores do sistema.
+
+Colunas visíveis:
+
+Nome
+
+Contacto
+
+Região
+
+Status de conta (ativo/inativo)
+
+Status de rastreamento atual (online/offline)
+
+Última atualização (timestamp)
+
+3. Permitir/Bloquear Ativação
+O admin pode ativar/desativar a permissão de um condutor ficar visível no sistema (mesmo que ele tente ativar-se).
+
+Exemplo: checkbox ou botão "Permitir Ativação".
+
+Isto impede que um condutor “bloqueado” apareça no mapa mesmo que tente ficar online.
+
+4. Forçar Status Online/Offline (Opcional)
+Botão de emergência para forçar um condutor offline, se necessário.
+
+Útil em situações como:
+
+Falha do app do condutor
+
+Problema com localização incorreta
+
+Condutor esqueceu-se de desligar
+
+5. Visualização no Mapa (opcional)
+O admin pode abrir um mapa e ver a posição atual de todos os condutores ativos.
+
+Cada condutor pode ter um ícone com nome e estado.
+
+Ajuda a acompanhar operações em tempo real.
+
+6. Escalas ou Agenda (fase seguinte)
+Admin define horários ou turnos para condutores.
+
+Serve como base para alertas (ex: “condutor fora de horário ativo”).
+
+Pode ficar em segundo plano inicialmente.
+
+7. Filtros e Pesquisa
+Filtros por:
+
+Região
+
+Status (ativo/inativo, online/offline)
+
+Campo de pesquisa por nome, email ou ID
+
+8. Logs / Histórico
+Visualizar logs de:
+
+Entradas/saídas dos condutores
+
+Mudanças de status
+
+Localizações mais recentes
+
+Ajuda em casos de auditoria ou problemas.
+
+🖼️ CONCEITO VISUAL SIMPLIFICADO (sem código)
+less
+Copiar
+Editar
+───────────────────────────────────────────────
+| Condutores                                   |
+───────────────────────────────────────────────
+| Nome   | Região | Permissão | Online | Última posição |
+|--------|--------|-----------|--------|----------------|
+| Ana M. | Centro | ✔️        | 🟢     | 14:32          |
+| João S.| Norte  | ❌        | 🔴     | 13:01          |
+| Carla P.| Sul   | ✔️        | 🔴     | 09:20          |
+───────────────────────────────────────────────
+[Ações]
+[✓ Ativar Permissão] [✗ Bloquear Condutor] [👁 Ver no mapa]
+[📋 Adicionar novo condutor]
+✅ Resumo Final (Conceitual)
+Item	Descrição
+Cadastro	O admin regista condutores e dá permissão
+Controle	O admin pode permitir ou bloquear o direito de ficar online
+Visibilidade	O condutor aparece no mapa só se tiver permissão e estiver ativo
+Segurança	O admin pode forçar desligamento ou impedir rastreamento
+Operacional	O sistema reflete com precisão quem está disponível
+
+Se estiveres de acordo com este modelo, posso ajudar-te a planear as interfaces passo a passo, como:
+
+Estrutura das páginas
+
+Componentes essenciais
+
+Lógica por trás das ações do admin
+
+Pronto para avançar com isso?
+
+
+
+
+
+
+
+
+Dito por si:
+como seria a zona administrativa e a zona do condutor?
+
+
+Dito pelo ChatGPT:
+Ótima pergunta! Vamos construir conceitualmente como seriam:
+
+🔐 A zona administrativa (para gestores)
+
+🧑‍💼 A zona do condutor (app ou painel que o condutor usa)
+
+🧑‍💼 ZONA ADMINISTRATIVA (Backoffice do Administrador)
+Público-alvo: gestores ou operadores responsáveis por condutores e operações.
+
+🔐 Acesso
+Autenticação obrigatória
+
+Papel: admin
+
+Proteção de rota (somente administradores)
+
+🗂️ Módulos principais
+1. Dashboard (Resumo Geral)
+Número total de condutores
+
+Quantos estão online agora
+
+Última posição de cada condutor (resumo)
+
+Alertas (ex: condutor online fora do horário)
+
+2. Gestão de Condutores
+Tabela com condutores:
+
+Nome	Região	Email	Permissão	Online?	Última posição	Ações
+Ana M.	Centro	ana@email.com	✔️	🟢	14:32	[Editar] [Ver no mapa] [Bloquear]
+
+Ações possíveis:
+
+Criar novo condutor
+
+Editar dados (nome, zona, contacto)
+
+Ativar/desativar permissão para rastreamento
+
+Forçar condutor offline (emergência)
+
+3. Mapa em Tempo Real
+Mostra todos os condutores com is_active = true
+
+Ícones com nomes, localização e status
+
+Pode clicar em cada um para detalhes rápidos
+
+4. Histórico / Logs
+Quando entrou ou saiu do modo online
+
+Registo de localização por dia/hora
+
+Permite auditoria e análise
+
+5. Escalas (Futuro)
+Definição de turnos
+
+Alerta se condutor ativo fora do horário
+
+Geração automática de relatórios de pontualidade
+
+🧑 ZONA DO CONDUTOR (App ou Dashboard Pessoal)
+Público-alvo: condutores do TukTuk. Usam esta interface no telemóvel.
+
+🔐 Acesso
+Login (email/senha ou OTP)
+
+Papel: conductor
+
+Acesso restrito às suas próprias informações
+
+🖥️ Tela Inicial (Dashboard)
+Estado atual:
+“Estás online” ou “Estás offline”
+
+Botão: ✅ Entrar em serviço / ❌ Sair de serviço
+
+Informações adicionais:
+Região atual
+
+Última posição enviada
+
+Se o admin permitiu ou bloqueou o rastreamento
+
+📍 Atualização de Localização
+Sempre que estiver online:
+
+Envia a posição GPS a cada X segundos
+
+Atualiza latitude, longitude, last_updated
+
+⚠️ Avisos:
+“Não estás autorizado a entrar em serviço” (se o admin bloqueou)
+
+“Estás fora do horário definido” (caso usem sistema de escala)
+
+📋 Histórico pessoal (opcional):
+Ver turnos anteriores
+
+Horas online
+
+Estatísticas pessoais
+
+🔐 Comparativo de Funcionalidades
+Funcionalidade	Admin	Condutor
+Criar condutores	✅	❌
+Editar dados dos condutores	✅	❌
+Ver todos os condutores no mapa	✅	❌
+Ativar/desativar rastreamento	✅	✅ (somente se permitido)
+Ver posição atual (de todos)	✅	❌
+Ver posição atual (dele próprio)	❌	✅
+Histórico/logs	✅	(opcional) ✅
+Escalas/turnos	✅ (define)	✅ (visualiza)
+
+📱 Dispositivos esperados
+Interface	Acesso
+Admin	Computador ou tablet (interface completa)
+Condutor	Telemóvel (web app ou PWA)
+
+Se quiseres, o próximo passo pode ser:
+
+Esboçar os fluxos de navegação entre páginas
+
+Definir quais componentes React são necessários para cada zona
+
+Queres avançar com isso?
+
+
+
+
+
+
+
+
+Dito por si:
+haveria uma área administrativa para cada condutor para sua própria gestão? 
+
+
+Dito pelo ChatGPT:
+Sim, faz todo o sentido que cada condutor tenha a sua própria área administrativa pessoal, uma espécie de “painel de condutor” — limitado aos seus próprios dados e ações permitidas.
+
+Não é uma área administrativa no sentido tradicional (como a do admin geral), mas sim um painel pessoal de gestão com funcionalidades específicas que lhe dizem respeito.
+
+🧑‍💼 Painel do Condutor — Gestão Pessoal
+A zona do condutor serve para gestão da sua própria presença no sistema.
+Ele não vê dados de outros condutores, nem acessa zonas de administração global.
+
+🔐 Acesso
+Cada condutor faz login com as suas credenciais.
+
+É autenticado com o papel conductor.
+
+Roteamento protegido: só pode aceder à sua zona pessoal.
+
+📋 Funcionalidades no Painel do Condutor
+✅ 1. Ativação de Rastreamento
+Botão para entrar/sair de serviço:
+
+"Entrar em serviço" → atualiza is_active = true
+
+"Sair de serviço" → atualiza is_active = false
+
+Indicador visual de status:
+
+🔵 Online / 🔴 Offline
+
+📍 2. Informação de Localização Atual
+Última localização GPS enviada
+
+Data/hora da última atualização
+
+🚫 3. Permissão de Rastreamento
+Informação se o condutor está autorizado ou bloqueado pelo admin:
+
+"Autorizado pelo admin para ficar online" ✅
+
+"Rastreamento bloqueado pelo admin" ❌
+
+Isso impede que ele fique online mesmo clicando no botão
+
+📆 4. Escalas e Turnos (opcional)
+Visualização dos turnos agendados pelo admin
+
+Notificações se estiver fora do horário
+
+Ex: "Estás fora do teu turno. Próximo turno: 14h–18h"
+
+📊 5. Histórico Pessoal (opcional)
+Dias e horários em que esteve online
+
+Total de horas por dia/semana/mês
+
+Número de ativações/desativações
+
+🧾 6. Dados Pessoais
+Nome, telefone, região
+
+Opção de atualizar contacto (com validação)
+
+Mostrar email de login (sem possibilidade de alteração)
+
+🧱 Exemplo conceitual da estrutura de página:
+yaml
+Copiar
+Editar
+────────────────────────────────────────────
+ Painel do Condutor — Bem-vindo, João Silva
+────────────────────────────────────────────
+🔴 Estás OFFLINE
+[✅ Entrar em serviço]
+
+Última localização enviada: 38.123, -9.456 (às 15:41)
+Permissão do admin: ✅ Ativado
+
+────────────────────────────────────────────
+🗓️ Turno atual: 14h00 – 18h00 (Sul)
+Próximo turno: amanhã, 10h00 – 13h00
+────────────────────────────────────────────
+📊 Histórico (últimos 7 dias)
+- Segunda: 3h online
+- Terça: 4h online
+────────────────────────────────────────────
+📁 Meus Dados
+Nome: João Silva
+WhatsApp: +351 912 345 678
+Região: Sul
+────────────────────────────────────────────
+✅ Resumo
+Item	Função
+Acesso restrito	Condutor só vê e controla os próprios dados
+Autonomia	Pode ativar/desativar-se quando quiser (se autorizado)
+Transparência	Vê se está autorizado e quando esteve online
+Responsabilidade	Acompanhar e melhorar o seu próprio desempenho
+
+Se quiseres, podemos agora:
+
+Definir a estrutura de páginas da área do condutor
+
+Ou pensar na integração com Supabase Auth e tabela conductors
+
+Queres que avancemos para isso?
+
+
+
+
+
+
+
+

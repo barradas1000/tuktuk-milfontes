@@ -10,12 +10,70 @@ interface Conductor {
   longitude?: number;
   is_active?: boolean;
 }
-interface ActiveConductor {
+
+export interface ActiveConductor {
   conductor_id: string;
   is_active: boolean;
+  status?: "available" | "busy";
+  occupied_until?: string | null;
   activated_at?: string;
   deactivated_at?: string;
 }
+// Atualiza status e occupied_until do condutor ativo
+export const updateTuktukStatus = async (
+  conductorId: string,
+  status: "available" | "busy",
+  occupiedUntil: Date | null
+): Promise<void> => {
+  try {
+    const updateObj: any = { status };
+    if (occupiedUntil) {
+      updateObj.occupied_until = occupiedUntil.toISOString();
+    } else {
+      updateObj.occupied_until = null;
+    }
+    const { error } = await supabase
+      .from("active_conductors")
+      .update(updateObj)
+      .eq("conductor_id", conductorId)
+      .eq("is_active", true);
+    if (error) {
+      console.error("Erro ao atualizar status do TukTuk:", error);
+      throw error;
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar status do TukTuk:", error);
+    throw error;
+  }
+};
+
+// Busca status e occupied_until do condutor ativo
+export const fetchTuktukStatus = async (
+  conductorId: string
+): Promise<{
+  status: "available" | "busy";
+  occupied_until: string | null;
+} | null> => {
+  try {
+    const { data, error } = await supabase
+      .from("active_conductors")
+      .select("status, occupied_until")
+      .eq("conductor_id", conductorId)
+      .eq("is_active", true)
+      .single();
+    if (error) {
+      console.error("Erro ao buscar status do TukTuk:", error);
+      return null;
+    }
+    return data as {
+      status: "available" | "busy";
+      occupied_until: string | null;
+    };
+  } catch (error) {
+    console.error("Erro ao buscar status do TukTuk:", error);
+    return null;
+  }
+};
 
 export const checkSupabaseConfiguration = (): boolean => {
   const url = import.meta.env.VITE_SUPABASE_URL;
