@@ -1228,18 +1228,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               <Switch
                 checked={activeConductors.includes(c.id)}
                 onCheckedChange={(checked) => {
-                  let newActiveConductors;
-                  if (checked) {
-                    // Adiciona apenas se ainda não estiver presente
-                    newActiveConductors = Array.from(
-                      new Set([...activeConductors, c.id])
-                    );
-                  } else {
-                    // Remove o id do condutor
-                    newActiveConductors = activeConductors.filter(
-                      (id) => id !== c.id
-                    );
-                  }
+                  const newActiveConductors = checked
+                    ? [...activeConductors, c.id]
+                    : activeConductors.filter((id) => id !== c.id);
 
                   setActiveConductors(newActiveConductors);
 
@@ -1345,11 +1336,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           activeConductors.length !== 1 ? "opacity-60 pointer-events-none" : ""
         }`}
       >
-        {activeConductors.length === 0 && (
-          <div className="text-red-600 font-semibold text-center mb-2">
-            Não há Condutores Disponíveis
-          </div>
-        )}
         <h2 className="text-lg font-bold text-green-900 mb-2 flex items-center gap-2">
           <Clock className="h-5 w-5" /> Disponibilidade do TukTuk
         </h2>

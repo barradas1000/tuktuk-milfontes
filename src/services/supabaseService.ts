@@ -1,43 +1,3 @@
-// Garante que o condutor ativo tem registro em active_conductors
-export const ensureActiveConductorRecord = async (conductorId: string) => {
-  // Tenta buscar registro existente
-  const { data, error } = await supabase
-    .from("active_conductors")
-    .select("conductor_id")
-    .eq("conductor_id", conductorId)
-    .single();
-  if (error || !data) {
-    // Não existe, cria novo registro
-    const { error: insertError } = await supabase
-      .from("active_conductors")
-      .insert({
-        conductor_id: conductorId,
-        is_active: true,
-        status: "available",
-        occupied_until: null,
-        activated_at: new Date().toISOString(),
-        deactivated_at: null,
-      });
-    if (insertError) {
-      console.error(
-        "Erro ao criar registro em active_conductors:",
-        insertError
-      );
-    }
-  } else {
-    // Já existe, só garante que está ativo
-    const { error: updateError } = await supabase
-      .from("active_conductors")
-      .update({ is_active: true, status: "available", deactivated_at: null })
-      .eq("conductor_id", conductorId);
-    if (updateError) {
-      console.error(
-        "Erro ao atualizar registro em active_conductors:",
-        updateError
-      );
-    }
-  }
-};
 import { supabase } from "@/lib/supabase";
 import { AdminReservation, BlockedPeriod } from "@/types/adminReservations";
 
@@ -66,7 +26,7 @@ export const updateTuktukStatus = async (
   occupiedUntil: Date | null
 ): Promise<void> => {
   try {
-    const updateObj: Record<string, unknown> = { status };
+    const updateObj: any = { status };
     if (occupiedUntil) {
       updateObj.occupied_until = occupiedUntil.toISOString();
     } else {
@@ -222,45 +182,12 @@ export const updateActiveConductors = async (
       .update({ is_active: false })
       .eq("is_active", true);
 
-    // Desativar todos em active_conductors
-    await supabase
-      .from("active_conductors")
-      .update({ is_active: false, status: "offline" })
-      .eq("is_active", true);
-
     // Ativar apenas os IDs selecionados
     if (conductorIds.length > 0) {
       await supabase
         .from("conductors")
         .update({ is_active: true })
         .in("id", conductorIds);
-      for (const id of conductorIds) {
-        // Garante registro e ativa em active_conductors
-        const { data } = await supabase
-          .from("active_conductors")
-          .select("id")
-          .eq("conductor_id", id)
-          .single();
-        if (data) {
-          await supabase
-            .from("active_conductors")
-            .update({
-              is_active: true,
-              status: "available",
-              deactivated_at: null,
-            })
-            .eq("conductor_id", id);
-        } else {
-          await supabase.from("active_conductors").insert({
-            conductor_id: id,
-            is_active: true,
-            status: "available",
-            occupied_until: null,
-            activated_at: new Date().toISOString(),
-            deactivated_at: null,
-          });
-        }
-      }
     }
   } catch (error) {
     console.error("Error updating conductors is_active:", error);
@@ -301,11 +228,11 @@ export const fetchBlockedPeriods = async (): Promise<BlockedPeriod[]> => {
       (data as BlockedPeriod[] | null)?.map((item) => ({
         id: item.id,
         date: item.date,
-        startTime: item.startTime,
-        endTime: item.endTime,
+        startTime: item.start_time,
+        endTime: item.end_time,
         reason: item.reason,
-        createdBy: item.createdBy,
-        createdAt: item.createdAt,
+        createdBy: item.created_by,
+        createdAt: item.created_at,
       })) || []
     );
   } catch (error) {
@@ -425,7 +352,7 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     const groupedByDateAndTime: { [key: string]: BlockedPeriod[] } = {};
 
     (allBlockedPeriods as BlockedPeriod[]).forEach((period) => {
-      const key = `${period.date}_${period.startTime}`;
+      const key = `${period.date}_${period.start_time}`;
       if (!groupedByDateAndTime[key]) {
         groupedByDateAndTime[key] = [];
       }

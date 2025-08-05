@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-import L, { Map as LeafletMap } from "leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { supabase } from "../lib/supabase";
 import { UserLocationMarker } from "./UserLocationMarker";
@@ -8,11 +8,13 @@ import { LocationPermissionButton } from "./LocationPermissionButton";
 import { DistanceCalculator } from "./DistanceCalculator";
 import { LocationDebug } from "./LocationDebug";
 import { Coordinates } from "../utils/locationUtils";
+import { format } from "date-fns";
+import { pt } from "date-fns/locale";
 
-// Corrigir ícones padrão do Leaflet
+// Corrigir ícones do Leaflet
 import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
-import tukTukIconUrl from "../assets/tuktuk-icon.png";
+import tukTukIconUrl from "../assets/tuktuk-icon.png"; // Adicione um ícone de TukTuk na pasta assets
 
 const DefaultIcon = L.icon({
   iconUrl,
@@ -34,11 +36,11 @@ interface ConductorLocation {
   lng: number;
   isActive: boolean;
   name: string;
+  status?: "available" | "busy";
+  occupiedUntil?: string | null;
 }
 
-const DISTANCIA_ALERTA_METROS = 50;
-const VELOCIDADE_MEDIA_KMH = 20;
-
+// Componente para controlar o mapa
 const MapController: React.FC<{
   userPosition: Coordinates | null;
   conductorLocation: ConductorLocation | null;
@@ -47,40 +49,27 @@ const MapController: React.FC<{
   const map = useMap();
 
   useEffect(() => {
-    if (!userInteracted) {
-      if (userPosition && conductorLocation?.isActive) {
-        const bounds = L.latLngBounds([
-          [userPosition.lat, userPosition.lng],
-          [conductorLocation.lat, conductorLocation.lng],
-        ]);
-        map.fitBounds(bounds, { padding: [20, 20] });
-      } else if (userPosition) {
-        map.setView([userPosition.lat, userPosition.lng], 15);
-      } else if (conductorLocation?.isActive) {
-        map.setView([conductorLocation.lat, conductorLocation.lng], 14);
-      }
+    if (userPosition && conductorLocation?.isActive && !userInteracted) {
+      // Calcular zoom ideal para mostrar ambos os pontos
+      const bounds = L.latLngBounds([
+        [userPosition.lat, userPosition.lng],
+        [conductorLocation.lat, conductorLocation.lng],
+      ]);
+      map.fitBounds(bounds, { padding: [20, 20] });
+    } else if (userPosition && !userInteracted) {
+      // Se só temos posição do usuário, centralizar nele
+      map.setView([userPosition.lat, userPosition.lng], 15);
+    } else if (conductorLocation?.isActive && !userInteracted) {
+      // Se só temos posição do condutor, centralizar nele
+      map.setView([conductorLocation.lat, conductorLocation.lng], 14);
     }
   }, [userPosition, conductorLocation, map, userInteracted]);
 
   return null;
 };
 
-const calcularDistanciaMetros = (
-  lat1: number,
-  lng1: number,
-  lat2: number,
-  lng2: number
-): number => {
-  const toRad = (x: number) => (x * Math.PI) / 180;
-  const R = 6371000;
-  const dLat = toRad(lat2 - lat1);
-  const dLng = toRad(lng2 - lng1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-};
+const DISTANCIA_ALERTA_METROS = 50; // Distância para exibir o alerta
+const VELOCIDADE_MEDIA_KMH = 20; // Velocidade média do TukTuk em km/h
 
 const PassengerMap: React.FC = () => {
   const [activeConductors, setActiveConductors] = useState<ConductorLocation[]>(
@@ -89,165 +78,314 @@ const PassengerMap: React.FC = () => {
   const [userPosition, setUserPosition] = useState<Coordinates | null>(null);
   const [loading, setLoading] = useState(true);
   const [showUserLocation, setShowUserLocation] = useState(false);
-  const [userInteracted, setUserInteracted] = useState(false);
-  // const [tempoEstimado, setTempoEstimado] = useState<number | null>(null);
-
-  const [tuktukStatus, setTuktukStatus] = useState<{
-    status: "available" | "busy";
-    occupied_until: string | null;
-  } | null>(null);
-
   const mapRef = useRef<L.Map | null>(null);
+  const [userInteracted, setUserInteracted] = useState(false);
+  const [alertaProximidade, setAlertaProximidade] = useState(false);
+  const [tempoEstimado, setTempoEstimado] = useState<number | null>(null);
 
-  // Definir conductor ANTES dos hooks que o usam
-  const conductor = activeConductors[0];
+  // Função para calcular distância (haversine)
+  function calcularDistanciaMetros(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number
+  ) {
+    function toRad(x: number) {
+      return (x * Math.PI) / 180;
+    }
+    const R = 6371000; // raio da Terra em metros
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  // Função para buscar status de disponibilidade dos condutores
+  const fetchConductorStatusFromActiveTable = async (conductorId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("active_conductors")
+        .select("status, occupied_until")
+        .eq("conductor_id", conductorId)
+        .eq("is_active", true)
+        .single();
+
+      if (error || !data) {
+        return { status: "available", occupiedUntil: null };
+      }
+
+      return {
+        status: data.status || "available",
+        occupiedUntil: data.occupied_until,
+      };
+    } catch (error) {
+      return { status: "available", occupiedUntil: null };
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true;
-    const fetchConductors = async () => {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from("conductors")
-        .select("*")
-        .eq("is_active", true);
-      if (data && !error && isMounted) {
-        setActiveConductors(
-          data.map(({ id, latitude, longitude, is_active, name }: any) => ({
-            id,
-            lat: latitude || 37.725,
-            lng: longitude || -8.783,
-            isActive: is_active,
-            name: name || "TukTuk",
-          }))
-        );
-      }
-      setLoading(false);
-    };
-    fetchConductors();
-
-    const channel = supabase
-      .channel("conductor_location")
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "conductors" },
-        (payload: { new: any }) => {
-          const { id, latitude, longitude, is_active, name } = payload.new;
-          setActiveConductors((prev) => {
-            const updated = prev.filter((d) => d.id !== id);
-            return is_active
-              ? [
-                  ...updated,
-                  {
-                    id,
-                    lat: latitude || 37.725,
-                    lng: longitude || -8.783,
-                    isActive: true,
-                    name: name || "TukTuk",
-                  },
-                ]
-              : updated;
-          });
+    // Carregar todos os condutores ativos
+    const fetchActiveConductors = async () => {
+      try {
+        if (
+          !import.meta.env.VITE_SUPABASE_URL ||
+          !import.meta.env.VITE_SUPABASE_ANON_KEY
+        ) {
+          setActiveConductors([]);
+          setLoading(false);
+          return;
         }
-      )
-      .subscribe();
-
-    return () => {
-      isMounted = false;
-      supabase.removeChannel(channel);
+        const { data, error } = await supabase
+          .from("conductors")
+          .select("*")
+          .eq("is_active", true);
+        if (error) {
+          setActiveConductors([]);
+        } else if (data) {
+          // Buscar status de cada condutor ativo
+          const conductorsWithStatus = await Promise.all(
+            data.map(
+              async (d: {
+                id: string;
+                latitude: number;
+                longitude: number;
+                is_active: boolean;
+                name: string;
+              }) => {
+                const statusData = await fetchConductorStatusFromActiveTable(
+                  d.id
+                );
+                return {
+                  id: d.id,
+                  lat: d.latitude || 37.725,
+                  lng: d.longitude || -8.783,
+                  isActive: d.is_active,
+                  name: d.name || "TukTuk",
+                  status: statusData.status,
+                  occupiedUntil: statusData.occupiedUntil,
+                };
+              }
+            )
+          );
+          setActiveConductors(conductorsWithStatus);
+        }
+      } catch (error) {
+        setActiveConductors([]);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchActiveConductors();
+
+    // Subscrever a atualizações em tempo real na tabela conductors
+    if (
+      import.meta.env.VITE_SUPABASE_URL &&
+      import.meta.env.VITE_SUPABASE_ANON_KEY
+    ) {
+      const conductorChannel = supabase
+        .channel("conductor_location")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "conductors" },
+          async (payload) => {
+            const newData = payload.new as {
+              id: string;
+              latitude?: number;
+              longitude?: number;
+              is_active?: boolean;
+              name?: string;
+            };
+
+            if (newData.is_active) {
+              // Buscar status do condutor da tabela active_conductors
+              const statusData = await fetchConductorStatusFromActiveTable(
+                newData.id
+              );
+
+              setActiveConductors((prev) => {
+                const filtered = prev.filter((d) => d.id !== newData.id);
+                return [
+                  ...filtered,
+                  {
+                    id: newData.id,
+                    lat: newData.latitude || 37.725,
+                    lng: newData.longitude || -8.783,
+                    isActive: true,
+                    name: newData.name || "TukTuk",
+                    status: statusData.status,
+                    occupiedUntil: statusData.occupiedUntil,
+                  },
+                ];
+              });
+            } else {
+              // Se ficou inativo, só remove
+              setActiveConductors((prev) =>
+                prev.filter((d) => d.id !== newData.id)
+              );
+            }
+          }
+        )
+        .subscribe();
+
+      // Subscrever a atualizações em tempo real na tabela active_conductors
+      const activeChannel = supabase
+        .channel("active_conductors_status")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "active_conductors" },
+          (payload) => {
+            const newData = payload.new as {
+              conductor_id: string;
+              status?: "available" | "busy";
+              occupied_until?: string | null;
+            };
+
+            // Atualizar status do condutor específico
+            setActiveConductors((prev) =>
+              prev.map((conductor) =>
+                conductor.id === newData.conductor_id
+                  ? {
+                      ...conductor,
+                      status: newData.status || "available",
+                      occupiedUntil: newData.occupied_until,
+                    }
+                  : conductor
+              )
+            );
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(conductorChannel);
+        supabase.removeChannel(activeChannel);
+      };
+    }
   }, []);
 
   useEffect(() => {
-    if (!userPosition || activeConductors.length === 0) return;
-    const dist = calcularDistanciaMetros(
-      userPosition.lat,
-      userPosition.lng,
-      activeConductors[0].lat,
-      activeConductors[0].lng
-    );
-    if (dist < DISTANCIA_ALERTA_METROS) {
-      const velocidadeMS = (VELOCIDADE_MEDIA_KMH * 1000) / 3600;
-      setTempoEstimado(Math.round(dist / velocidadeMS / 60));
+    if (userPosition && activeConductors[0]) {
+      const dist = calcularDistanciaMetros(
+        userPosition.lat,
+        userPosition.lng,
+        activeConductors[0].lat,
+        activeConductors[0].lng
+      );
+      if (dist < DISTANCIA_ALERTA_METROS) {
+        setAlertaProximidade(true);
+        // Calcular tempo estimado (em minutos)
+        const velocidadeMS = (VELOCIDADE_MEDIA_KMH * 1000) / 3600;
+        const tempoSegundos = dist / velocidadeMS;
+        setTempoEstimado(Math.round(tempoSegundos / 60));
+      } else {
+        setAlertaProximidade(false);
+        setTempoEstimado(null);
+      }
     } else {
+      setAlertaProximidade(false);
       setTempoEstimado(null);
     }
   }, [userPosition, activeConductors]);
 
+  // Detecta interação manual do usuário com o mapa
   useEffect(() => {
     if (!mapRef.current) return;
     const map = mapRef.current;
-    const onInteract = () => setUserInteracted(true);
-    map.on("zoomstart", onInteract);
-    map.on("movestart", onInteract);
+    const onUserInteraction = () => setUserInteracted(true);
+    map.on("zoomstart", onUserInteraction);
+    map.on("movestart", onUserInteraction);
     return () => {
-      map.off("zoomstart", onInteract);
-      map.off("movestart", onInteract);
+      map.off("zoomstart", onUserInteraction);
+      map.off("movestart", onUserInteraction);
     };
-  }, []);
+  }, [mapRef.current]);
 
-  const handleLocationGranted = useCallback((pos: GeolocationPosition) => {
-    setUserPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+  const handleLocationGranted = useCallback((position: GeolocationPosition) => {
+    setUserPosition({
+      lat: position.coords.latitude,
+      lng: position.coords.longitude,
+    });
     setShowUserLocation(true);
   }, []);
 
-  useEffect(() => {
-    if (!conductor) {
-      setTuktukStatus(null);
-      return;
+  const handleLocationDenied = useCallback(() => {
+    setShowUserLocation(false);
+    setUserPosition(null);
+  }, []);
+
+  const handleMapReady = useCallback((map: L.Map) => {
+    mapRef.current = map;
+  }, []);
+
+  // Função para centralizar o mapa novamente
+  const handleRecenter = () => {
+    setUserInteracted(false);
+  };
+
+  // Função para renderizar o status do TukTuk
+  const renderTuktukStatus = () => {
+    if (activeConductors.length === 0) {
+      return (
+        <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000]">
+          <p className="text-sm">🚫 TukTuk offline</p>
+        </div>
+      );
     }
-    let isMounted = true;
-    const fetchStatus = async () => {
-      const { data } = await supabase
-        .from("active_conductors")
-        .select("status, occupied_until")
-        .eq("conductor_id", conductor.id)
-        .eq("is_active", true)
-        .single();
-      if (data && isMounted) {
-        setTuktukStatus({
-          status: (data as any).status,
-          occupied_until: (data as any).occupied_until,
-        });
-      } else if (isMounted) {
-        setTuktukStatus(null);
+
+    const conductor = activeConductors[0];
+
+    if (conductor.status === "busy") {
+      const occupiedUntil = conductor.occupiedUntil
+        ? new Date(conductor.occupiedUntil)
+        : null;
+
+      const isStillOccupied = occupiedUntil
+        ? occupiedUntil > new Date()
+        : false;
+
+      if (isStillOccupied && occupiedUntil) {
+        return (
+          <div className="absolute bottom-4 left-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded z-[1000] max-w-xs">
+            <p className="text-sm font-semibold">
+              🔴 TukTuk Neste Momento Está Ocupado
+            </p>
+            <p className="text-xs mt-1">
+              Previsão de disponibilidade:{" "}
+              {format(occupiedUntil, "HH:mm", { locale: pt })}
+            </p>
+          </div>
+        );
+      } else {
+        // Se passou do horário previsto, mostrar como disponível
+        return (
+          <div className="absolute bottom-4 left-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-[1000]">
+            <p className="text-sm">🟢 TukTuk Neste Momento Disponível</p>
+          </div>
+        );
       }
-    };
-    fetchStatus();
+    }
 
-    // Realtime listener para status do TukTuk
-    const channel = supabase
-      .channel("tuktuk_status")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "active_conductors",
-          filter: `conductor_id=eq.${conductor.id}`,
-        },
-        (payload: { new: any }) => {
-          if (payload.new && typeof payload.new.status !== "undefined") {
-            setTuktukStatus({
-              status: payload.new.status,
-              occupied_until: payload.new.occupied_until,
-            });
-          } else {
-            setTuktukStatus(null);
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      isMounted = false;
-      supabase.removeChannel(channel);
-    };
-  }, [conductor]);
+    // Status "available" ou padrão
+    return (
+      <div className="absolute bottom-4 left-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-[1000]">
+        <p className="text-sm">🟢 TukTuk Neste Momento Disponível</p>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <p>Carregando localização do TukTuk...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+          <p>Carregando localização do TukTuk...</p>
+        </div>
       </div>
     );
   }
@@ -259,149 +397,85 @@ const PassengerMap: React.FC = () => {
           center={[37.725, -8.783]}
           zoom={14}
           style={{ height: "100%", width: "100%" }}
-          whenReady={({ target }) => {
-            mapRef.current = target as L.Map;
-          }}
+          ref={handleMapReady}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-          {conductor && (
+          {/* Renderizar apenas o primeiro condutor ativo */}
+          {activeConductors[0] && (
             <Marker
-              position={[conductor.lat, conductor.lng]}
-              icon={TukTukIcon as any}
+              position={[activeConductors[0].lat, activeConductors[0].lng]}
+              icon={TukTukIcon}
             >
               <Popup>
-                <div className="text-center min-w-[180px] min-h-[40px] flex flex-col items-center justify-center gap-1">
-                  <div>
-                    <h3 className="font-bold text-blue-600 mb-1">
-                      {conductor.name}
-                    </h3>
-                  </div>
-                  <div>
-                    {/* Debug: mostrar o valor de tuktukStatus no popup */}
-                    <pre
-                      style={{
-                        fontSize: 10,
-                        color: "#888",
-                        background: "#f8f8f8",
-                        marginBottom: 4,
-                        borderRadius: 4,
-                        padding: 2,
-                      }}
-                    >
-                      {JSON.stringify(tuktukStatus)}
-                    </pre>
-                    {tuktukStatus ? (
-                      tuktukStatus.status === "available" ? (
-                        <span className="text-sm text-green-700 font-semibold">
-                          🟢 Disponível
-                        </span>
-                      ) : tuktukStatus.status === "busy" ? (
-                        <span className="text-sm text-yellow-700 font-semibold">
-                          {tuktukStatus.occupied_until &&
-                          !isNaN(
-                            new Date(tuktukStatus.occupied_until).getTime()
-                          )
-                            ? `🟡 Ocupado — Disponível às ${new Date(
-                                tuktukStatus.occupied_until
-                              ).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}`
-                            : "🟡 Ocupado"}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-gray-700 font-semibold">
-                          Status desconhecido
-                        </span>
-                      )
-                    ) : (
-                      <span className="text-sm text-gray-700 font-semibold">
-                        Carregando status...
-                      </span>
-                    )}
-                  </div>
+                <div className="text-center">
+                  <h3 className="font-bold text-blue-600">
+                    {activeConductors[0].name}
+                  </h3>
+                  <p className="text-sm text-gray-600">TukTuk disponível</p>
+                  <p className="text-xs text-gray-500">
+                    Última atualização: {new Date().toLocaleTimeString()}
+                  </p>
                 </div>
               </Popup>
             </Marker>
           )}
 
+          {/* Controlador do mapa */}
           <MapController
             userPosition={userPosition}
-            conductorLocation={conductor}
+            conductorLocation={activeConductors[0] || null}
             userInteracted={userInteracted}
           />
 
+          {/* Marcador da localização do usuário */}
           {showUserLocation && mapRef.current && userPosition && (
             <UserLocationMarker
               map={mapRef.current}
               userPosition={userPosition}
               autoCenter={false}
-              showAccuracy
+              showAccuracy={true}
             />
           )}
         </MapContainer>
 
-        {conductor && (
+        {/* Calculador de distância apenas quando TukTuk está online */}
+        {activeConductors.length > 0 && activeConductors[0] && (
           <div className="absolute top-4 right-4 z-[1000]">
             <DistanceCalculator
               userPosition={userPosition}
-              tuktukPosition={{ lat: conductor.lat, lng: conductor.lng }}
-              showDetails
+              tuktukPosition={{
+                lat: activeConductors[0].lat,
+                lng: activeConductors[0].lng,
+              }}
+              showDetails={true}
             />
           </div>
         )}
 
-        <div className="absolute bottom-4 left-4 bg-white border px-4 py-2 rounded z-[1000] shadow">
-          {!conductor && (
-            <p className="text-sm text-red-600 font-semibold">
-              🚫 TukTuk offline
-            </p>
-          )}
-          {conductor && tuktukStatus?.status === "available" && (
-            <p className="text-sm text-green-700 font-semibold">
-              🟢 Disponível
-            </p>
-          )}
-          {conductor && tuktukStatus?.status === "busy" && (
-            <p className="text-sm text-yellow-700 font-semibold">
-              {(() => {
-                if (
-                  tuktukStatus.occupied_until &&
-                  !isNaN(new Date(tuktukStatus.occupied_until).getTime())
-                ) {
-                  return `🟡 Ocupado — Disponível às ${new Date(
-                    tuktukStatus.occupied_until
-                  ).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}`;
-                } else {
-                  return "🟡 Ocupado";
-                }
-              })()}
-            </p>
-          )}
-        </div>
+        {/* Status do TukTuk com disponibilidade */}
+        {renderTuktukStatus()}
       </div>
 
+      {/* Botão de localização do usuário FORA do mapa */}
       <div className="mt-4 flex flex-col gap-2 items-start">
         <LocationPermissionButton
           onLocationGranted={handleLocationGranted}
-          onLocationDenied={() => setShowUserLocation(false)}
+          onLocationDenied={handleLocationDenied}
           showStatus={false}
         >
           📍 Localizar-me
         </LocationPermissionButton>
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition-colors"
-          onClick={() => setUserInteracted(false)}
+          onClick={handleRecenter}
           type="button"
         >
           Centralizar mapa
         </button>
       </div>
 
+      {/* Componente de debug para desenvolvimento */}
       {import.meta.env.DEV && <LocationDebug />}
     </>
   );
