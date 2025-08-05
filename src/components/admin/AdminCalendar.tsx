@@ -1187,6 +1187,33 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     }
   };
 
+  // --- Função para confirmar tempo ocupado ---
+  const confirmOccupiedTime = async () => {
+    if (activeConductors.length > 0) {
+      const conductorId = activeConductors[0]; // Primeiro condutor ativo
+      console.log("🔍 Tentando atualizar status para condutor:", conductorId); // Debug
+
+      const occupiedUntil = new Date();
+      occupiedUntil.setMinutes(occupiedUntil.getMinutes() + occupiedMinutes);
+
+      try {
+        await updateTuktukStatus(conductorId, "busy", occupiedUntil);
+        setOccupiedUntil(occupiedUntil);
+        toast({
+          title: "Status atualizado",
+          description: `TukTuk ficará ocupado até ${occupiedUntil.toLocaleTimeString()}`,
+        });
+      } catch (error) {
+        console.error("Erro ao atualizar status:", error);
+        toast({
+          title: "Erro",
+          description: "Não foi possível atualizar o status",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   // --- Renderização do Componente ---
   return (
     <div>

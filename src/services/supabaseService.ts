@@ -23,24 +23,48 @@ export interface ActiveConductor {
 export const updateTuktukStatus = async (
   conductorId: string,
   status: "available" | "busy",
-  occupiedUntil: Date | null
-): Promise<void> => {
+  occupiedUntil?: Date | null
+) => {
   try {
-    const updateObj: any = { status };
-    if (occupiedUntil) {
-      updateObj.occupied_until = occupiedUntil.toISOString();
-    } else {
-      updateObj.occupied_until = null;
-    }
-    const { error } = await supabase
+    // Primeiro, verificar se existe registro para este condutor
+    const { data: existingRecord } = await supabase
       .from("active_conductors")
-      .update(updateObj)
+      .select("*")
       .eq("conductor_id", conductorId)
       .eq("is_active", true);
-    if (error) {
-      console.error("Erro ao atualizar status do TukTuk:", error);
-      throw error;
+
+    console.log("Registros existentes para condutor:", existingRecord); // Debug
+
+    if (!existingRecord || existingRecord.length === 0) {
+      console.error(
+        "❌ Nenhum registro ativo encontrado para o condutor:",
+        conductorId
+      );
+      return null;
     }
+
+    // Converter status para boolean: "available" = true, "busy" = false
+    const isAvailable = status === "available";
+
+    console.log("Salvando status:", {
+      conductorId,
+      isAvailable,
+      occupiedUntil,
+    }); // Debug
+
+    const { data, error } = await supabase
+      .from("active_conductors")
+      .update({
+        is_available: isAvailable, // Usar boolean
+        occupied_until: occupiedUntil?.toISOString() || null,
+      })
+      .eq("conductor_id", conductorId)
+      .eq("is_active", true);
+
+    console.log("Resultado da atualização:", { data, error }); // Debug
+
+    if (error) throw error;
+    return data;
   } catch (error) {
     console.error("Erro ao atualizar status do TukTuk:", error);
     throw error;
@@ -57,17 +81,22 @@ export const fetchTuktukStatus = async (
   try {
     const { data, error } = await supabase
       .from("active_conductors")
-      .select("status, occupied_until")
+      .select("is_available, occupied_until") // ✅ Corrigir: usar is_available em vez de status
       .eq("conductor_id", conductorId)
       .eq("is_active", true)
       .single();
+
     if (error) {
       console.error("Erro ao buscar status do TukTuk:", error);
       return null;
     }
-    return data as {
-      status: "available" | "busy";
-      occupied_until: string | null;
+
+    // ✅ Converter boolean para string
+    const status = data.is_available ? "available" : "busy";
+
+    return {
+      status: status,
+      occupied_until: data.occupied_until,
     };
   } catch (error) {
     console.error("Erro ao buscar status do TukTuk:", error);
@@ -176,21 +205,43 @@ export const updateActiveConductors = async (
   conductorIds: string[]
 ): Promise<void> => {
   try {
-    // Desativar todos os condutores
+    // 1. Desativar todos os condutores na tabela conductors
     await supabase
       .from("conductors")
       .update({ is_active: false })
       .eq("is_active", true);
 
-    // Ativar apenas os IDs selecionados
+    // 2. Finalizar sessões ativas na tabela active_conductors
+    await supabase
+      .from("active_conductors")
+      .update({
+        is_active: false,
+        session_end: new Date().toISOString(),
+      })
+      .eq("is_active", true);
+
+    // 3. Ativar condutores selecionados
     if (conductorIds.length > 0) {
+      // Ativar na tabela conductors
       await supabase
         .from("conductors")
         .update({ is_active: true })
         .in("id", conductorIds);
+
+      // Criar registros na tabela active_conductors
+      const activeRecords = conductorIds.map((id) => ({
+        conductor_id: id,
+        is_active: true,
+        is_available: true,
+        status: "available",
+        session_start: new Date().toISOString(),
+        activated_at: new Date().toISOString(),
+      }));
+
+      await supabase.from("active_conductors").insert(activeRecords);
     }
   } catch (error) {
-    console.error("Error updating conductors is_active:", error);
+    console.error("Error updating conductors and active sessions:", error);
     throw error;
   }
 };
@@ -399,3 +450,6 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     throw error;
   }
 };
+
+// Verificar se existem registros na tabela active_conductors
+console.log("Verificando registros ativos...");

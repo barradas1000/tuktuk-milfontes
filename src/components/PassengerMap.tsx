@@ -109,22 +109,32 @@ const PassengerMap: React.FC = () => {
   // Função para buscar status de disponibilidade dos condutores
   const fetchConductorStatusFromActiveTable = async (conductorId: string) => {
     try {
+      console.log("🔍 Buscando status para condutor:", conductorId); // Debug
+
       const { data, error } = await supabase
         .from("active_conductors")
-        .select("status, occupied_until")
+        .select("is_available, occupied_until") // Usar is_available (boolean)
         .eq("conductor_id", conductorId)
         .eq("is_active", true)
         .single();
 
+      console.log("📊 Resultado da busca:", { data, error }); // Debug
+
       if (error || !data) {
+        console.log("⚠️ Nenhum registro encontrado, usando padrão"); // Debug
         return { status: "available", occupiedUntil: null };
       }
 
+      // Converter boolean para string: true = "available", false = "busy"
+      const status = data.is_available ? "available" : "busy";
+
+      console.log("✅ Status encontrado:", status); // Debug
       return {
-        status: data.status || "available",
+        status: status,
         occupiedUntil: data.occupied_until,
       };
     } catch (error) {
+      console.error("❌ Erro ao buscar status:", error); // Debug
       return { status: "available", occupiedUntil: null };
     }
   };
@@ -233,31 +243,84 @@ const PassengerMap: React.FC = () => {
         )
         .subscribe();
 
-      // Subscrever a atualizações em tempo real na tabela active_conductors
+      // Subscrever a atualizações em tempo real na tabela active_conductors para status changes
       const activeChannel = supabase
         .channel("active_conductors_status")
         .on(
           "postgres_changes",
-          { event: "UPDATE", schema: "public", table: "active_conductors" },
-          (payload) => {
+          {
+            event: "*", // Escutar todos os eventos (INSERT, UPDATE, DELETE)
+            schema: "public",
+            table: "active_conductors",
+          },
+          async (payload) => {
+            console.log("Active conductors change detected:", payload); // Debug
+
             const newData = payload.new as {
               conductor_id: string;
               status?: "available" | "busy";
               occupied_until?: string | null;
+              is_active?: boolean;
             };
 
-            // Atualizar status do condutor específico
-            setActiveConductors((prev) =>
-              prev.map((conductor) =>
-                conductor.id === newData.conductor_id
-                  ? {
-                      ...conductor,
-                      status: newData.status || "available",
-                      occupiedUntil: newData.occupied_until,
+            if (payload.eventType === "DELETE") {
+              // Remover condutor se foi deletado
+              const oldData = payload.old as { conductor_id: string };
+              setActiveConductors((prev) =>
+                prev.filter(
+                  (conductor) => conductor.id !== oldData.conductor_id
+                )
+              );
+              return;
+            }
+
+            if (newData.conductor_id && newData.is_active) {
+              // Atualizar status do condutor específico
+              setActiveConductors((prev) => {
+                const existingIndex = prev.findIndex(
+                  (conductor) => conductor.id === newData.conductor_id
+                );
+
+                if (existingIndex >= 0) {
+                  // Atualizar condutor existente
+                  const updated = [...prev];
+                  updated[existingIndex] = {
+                    ...updated[existingIndex],
+                    status: newData.status || "available",
+                    occupiedUntil: newData.occupied_until,
+                  };
+                  return updated;
+                } else {
+                  // Buscar dados completos do condutor se não existe
+                  (async () => {
+                    const { data: conductorData } = await supabase
+                      .from("conductors")
+                      .select("*")
+                      .eq("id", newData.conductor_id)
+                      .eq("is_active", true)
+                      .single();
+
+                    if (conductorData) {
+                      setActiveConductors((prevInner) => [
+                        ...prevInner.filter(
+                          (c) => c.id !== newData.conductor_id
+                        ),
+                        {
+                          id: conductorData.id,
+                          lat: conductorData.latitude || 37.725,
+                          lng: conductorData.longitude || -8.783,
+                          isActive: true,
+                          name: conductorData.name || "TukTuk",
+                          status: newData.status || "available",
+                          occupiedUntil: newData.occupied_until,
+                        },
+                      ]);
                     }
-                  : conductor
-              )
-            );
+                  })();
+                  return prev;
+                }
+              });
+            }
           }
         )
         .subscribe();
@@ -340,38 +403,38 @@ const PassengerMap: React.FC = () => {
 
     const conductor = activeConductors[0];
 
+    console.log(
+      "Conductor status:",
+      conductor.status,
+      "Occupied until:",
+      conductor.occupiedUntil
+    ); // Debug
+
     if (conductor.status === "busy") {
       const occupiedUntil = conductor.occupiedUntil
         ? new Date(conductor.occupiedUntil)
         : null;
 
-      const isStillOccupied = occupiedUntil
-        ? occupiedUntil > new Date()
-        : false;
+      const isStillOccupied = occupiedUntil ? occupiedUntil > new Date() : true; // Se não tem horário, assume ocupado
 
-      if (isStillOccupied && occupiedUntil) {
+      if (isStillOccupied) {
         return (
           <div className="absolute bottom-4 left-4 bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded z-[1000] max-w-xs">
             <p className="text-sm font-semibold">
               🔴 TukTuk Neste Momento Está Ocupado
             </p>
-            <p className="text-xs mt-1">
-              Previsão de disponibilidade:{" "}
-              {format(occupiedUntil, "HH:mm", { locale: pt })}
-            </p>
-          </div>
-        );
-      } else {
-        // Se passou do horário previsto, mostrar como disponível
-        return (
-          <div className="absolute bottom-4 left-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-[1000]">
-            <p className="text-sm">🟢 TukTuk Neste Momento Disponível</p>
+            {occupiedUntil && (
+              <p className="text-xs mt-1">
+                Previsão de disponibilidade:{" "}
+                {format(occupiedUntil, "HH:mm", { locale: pt })}
+              </p>
+            )}
           </div>
         );
       }
     }
 
-    // Status "available" ou padrão
+    // Status "available" ou padrão (incluindo quando passou do horário de ocupação)
     return (
       <div className="absolute bottom-4 left-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-[1000]">
         <p className="text-sm">🟢 TukTuk Neste Momento Disponível</p>
