@@ -69,7 +69,7 @@ const MapController: React.FC<{
 };
 
 const DISTANCIA_ALERTA_METROS = 50; // Distância para exibir o alerta
-const VELOCIDADE_MEDIA_KMH = 20; // Velocidade média do TukTuk em km/h
+const VELOCIDADE_MEDIA_KMH = 15; // ✅ Velocidade média do TukTuk em km/h
 
 const PassengerMap: React.FC = () => {
   const [activeConductors, setActiveConductors] = useState<ConductorLocation[]>(
@@ -139,6 +139,23 @@ const PassengerMap: React.FC = () => {
     }
   };
 
+  // Função para validar coordenadas
+  const isValidCoordinate = (
+    lat: number | undefined,
+    lng: number | undefined
+  ): boolean => {
+    return (
+      typeof lat === "number" &&
+      typeof lng === "number" &&
+      !isNaN(lat) &&
+      !isNaN(lng) &&
+      lat >= -90 &&
+      lat <= 90 &&
+      lng >= -180 &&
+      lng <= 180
+    );
+  };
+
   useEffect(() => {
     // Carregar todos os condutores ativos
     const fetchActiveConductors = async () => {
@@ -171,10 +188,23 @@ const PassengerMap: React.FC = () => {
                 const statusData = await fetchConductorStatusFromActiveTable(
                   d.id
                 );
+
+                // Validar coordenadas antes de criar o objeto
+                const lat = d.latitude || 37.725;
+                const lng = d.longitude || -8.783;
+
+                if (!isValidCoordinate(lat, lng)) {
+                  console.warn(
+                    `⚠️ Coordenadas inválidas para condutor ${d.id}:`,
+                    { lat, lng }
+                  );
+                  return null;
+                }
+
                 return {
                   id: d.id,
-                  lat: d.latitude || 37.725,
-                  lng: d.longitude || -8.783,
+                  lat: lat,
+                  lng: lng,
                   isActive: d.is_active,
                   name: d.name || "TukTuk",
                   status: statusData.status,
@@ -183,9 +213,15 @@ const PassengerMap: React.FC = () => {
               }
             )
           );
-          setActiveConductors(conductorsWithStatus);
+
+          // Filtrar condutores com coordenadas válidas
+          const validConductors = conductorsWithStatus.filter(
+            (c) => c !== null
+          ) as ConductorLocation[];
+          setActiveConductors(validConductors);
         }
       } catch (error) {
+        console.error("Erro ao carregar condutores:", error);
         setActiveConductors([]);
       } finally {
         setLoading(false);
@@ -204,6 +240,8 @@ const PassengerMap: React.FC = () => {
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "conductors" },
           async (payload) => {
+            console.log("🔄 Conductor table update detected:", payload); // Debug
+
             const newData = payload.new as {
               id: string;
               latitude?: number;
@@ -213,6 +251,18 @@ const PassengerMap: React.FC = () => {
             };
 
             if (newData.is_active) {
+              // Validar coordenadas
+              const lat = newData.latitude || 37.725;
+              const lng = newData.longitude || -8.783;
+
+              if (!isValidCoordinate(lat, lng)) {
+                console.warn(
+                  `⚠️ Coordenadas inválidas para condutor ${newData.id}:`,
+                  { lat, lng }
+                );
+                return;
+              }
+
               // Buscar status do condutor da tabela active_conductors
               const statusData = await fetchConductorStatusFromActiveTable(
                 newData.id
@@ -224,8 +274,8 @@ const PassengerMap: React.FC = () => {
                   ...filtered,
                   {
                     id: newData.id,
-                    lat: newData.latitude || 37.725,
-                    lng: newData.longitude || -8.783,
+                    lat: lat,
+                    lng: lng,
                     isActive: true,
                     name: newData.name || "TukTuk",
                     status: statusData.status,
@@ -243,91 +293,171 @@ const PassengerMap: React.FC = () => {
         )
         .subscribe();
 
-      // Subscrever a atualizações em tempo real na tabela active_conductors para status changes
+      // SUBSCRIÇÃO para mudanças na tabela active_conductors
       const activeChannel = supabase
         .channel("active_conductors_status")
         .on(
           "postgres_changes",
           {
-            event: "*", // Escutar todos os eventos (INSERT, UPDATE, DELETE)
+            event: "*",
             schema: "public",
             table: "active_conductors",
           },
           async (payload) => {
-            console.log("Active conductors change detected:", payload); // Debug
+            console.log(
+              "🚀 Active conductors status change detected:",
+              payload
+            );
 
-            const newData = payload.new as {
-              conductor_id: string;
-              status?: "available" | "busy";
-              occupied_until?: string | null;
-              is_active?: boolean;
-            };
+            if (
+              payload.eventType === "UPDATE" ||
+              payload.eventType === "INSERT"
+            ) {
+              const newData = payload.new as {
+                conductor_id: string;
+                is_available?: boolean;
+                occupied_until?: string | null;
+                is_active?: boolean;
+              };
 
-            if (payload.eventType === "DELETE") {
-              // Remover condutor se foi deletado
+              if (newData.conductor_id && newData.is_active) {
+                const status = newData.is_available ? "available" : "busy";
+
+                console.log("📊 Updating conductor status:", {
+                  conductorId: newData.conductor_id,
+                  isAvailable: newData.is_available,
+                  status: status,
+                  occupiedUntil: newData.occupied_until,
+                });
+
+                setActiveConductors((prev) => {
+                  const existingIndex = prev.findIndex(
+                    (conductor) => conductor.id === newData.conductor_id
+                  );
+
+                  if (existingIndex >= 0) {
+                    // Validar se o condutor existente tem coordenadas válidas
+                    const existingConductor = prev[existingIndex];
+                    if (
+                      !isValidCoordinate(
+                        existingConductor.lat,
+                        existingConductor.lng
+                      )
+                    ) {
+                      console.warn(
+                        `⚠️ Condutor ${newData.conductor_id} tem coordenadas inválidas, ignorando atualização`
+                      );
+                      return prev;
+                    }
+
+                    const updated = [...prev];
+                    updated[existingIndex] = {
+                      ...updated[existingIndex],
+                      status: status,
+                      occupiedUntil: newData.occupied_until,
+                    };
+                    console.log(
+                      "✅ Updated existing conductor:",
+                      updated[existingIndex]
+                    );
+                    return updated;
+                  } else {
+                    console.log(
+                      "🔍 Conductor not found in list, fetching full data..."
+                    );
+
+                    (async () => {
+                      const { data: conductorData } = await supabase
+                        .from("conductors")
+                        .select("*")
+                        .eq("id", newData.conductor_id)
+                        .eq("is_active", true)
+                        .single();
+
+                      if (conductorData) {
+                        const lat = conductorData.latitude || 37.725;
+                        const lng = conductorData.longitude || -8.783;
+
+                        if (!isValidCoordinate(lat, lng)) {
+                          console.warn(
+                            `⚠️ Coordenadas inválidas para novo condutor ${newData.conductor_id}:`,
+                            { lat, lng }
+                          );
+                          return;
+                        }
+
+                        setActiveConductors((prevInner) => [
+                          ...prevInner.filter(
+                            (c) => c.id !== newData.conductor_id
+                          ),
+                          {
+                            id: conductorData.id,
+                            lat: lat,
+                            lng: lng,
+                            isActive: true,
+                            name: conductorData.name || "TukTuk",
+                            status: status,
+                            occupiedUntil: newData.occupied_until,
+                          },
+                        ]);
+                      }
+                    })();
+                    return prev;
+                  }
+                });
+              }
+            } else if (payload.eventType === "DELETE") {
               const oldData = payload.old as { conductor_id: string };
+              console.log("🗑️ Removing conductor:", oldData.conductor_id);
+
               setActiveConductors((prev) =>
                 prev.filter(
                   (conductor) => conductor.id !== oldData.conductor_id
                 )
               );
-              return;
-            }
-
-            if (newData.conductor_id && newData.is_active) {
-              // Atualizar status do condutor específico
-              setActiveConductors((prev) => {
-                const existingIndex = prev.findIndex(
-                  (conductor) => conductor.id === newData.conductor_id
-                );
-
-                if (existingIndex >= 0) {
-                  // Atualizar condutor existente
-                  const updated = [...prev];
-                  updated[existingIndex] = {
-                    ...updated[existingIndex],
-                    status: newData.status || "available",
-                    occupiedUntil: newData.occupied_until,
-                  };
-                  return updated;
-                } else {
-                  // Buscar dados completos do condutor se não existe
-                  (async () => {
-                    const { data: conductorData } = await supabase
-                      .from("conductors")
-                      .select("*")
-                      .eq("id", newData.conductor_id)
-                      .eq("is_active", true)
-                      .single();
-
-                    if (conductorData) {
-                      setActiveConductors((prevInner) => [
-                        ...prevInner.filter(
-                          (c) => c.id !== newData.conductor_id
-                        ),
-                        {
-                          id: conductorData.id,
-                          lat: conductorData.latitude || 37.725,
-                          lng: conductorData.longitude || -8.783,
-                          isActive: true,
-                          name: conductorData.name || "TukTuk",
-                          status: newData.status || "available",
-                          occupiedUntil: newData.occupied_until,
-                        },
-                      ]);
-                    }
-                  })();
-                  return prev;
-                }
-              });
             }
           }
         )
         .subscribe();
 
+      // Corrigir o intervalo de atualização
+      const statusRefreshInterval = setInterval(async () => {
+        console.log("🔄 Refreshing conductor status (30s interval)");
+
+        setActiveConductors((prev) => {
+          // Usar Promise.all para aguardar todas as atualizações
+          Promise.all(
+            prev.map(async (conductor) => {
+              // Validar coordenadas antes de atualizar
+              if (!isValidCoordinate(conductor.lat, conductor.lng)) {
+                console.warn(
+                  `⚠️ Coordenadas inválidas para condutor ${conductor.id}, pulando atualização`
+                );
+                return conductor;
+              }
+
+              const updatedStatus = await fetchConductorStatusFromActiveTable(
+                conductor.id
+              );
+              return {
+                ...conductor,
+                status: updatedStatus.status,
+                occupiedUntil: updatedStatus.occupiedUntil,
+              };
+            })
+          ).then((updatedConductors) => {
+            setActiveConductors(updatedConductors);
+          });
+
+          return prev; // Retornar o estado anterior temporariamente
+        });
+      }, 30000);
+
       return () => {
+        console.log("🧹 Cleaning up subscriptions");
         supabase.removeChannel(conductorChannel);
         supabase.removeChannel(activeChannel);
+        clearInterval(statusRefreshInterval);
       };
     }
   }, []);
@@ -342,10 +472,12 @@ const PassengerMap: React.FC = () => {
       );
       if (dist < DISTANCIA_ALERTA_METROS) {
         setAlertaProximidade(true);
-        // Calcular tempo estimado (em minutos)
+        // ✅ Calcular tempo estimado corretamente (em minutos)
+        // Converter 15 km/h para m/s: (15 * 1000) / 3600 = 4.17 m/s
         const velocidadeMS = (VELOCIDADE_MEDIA_KMH * 1000) / 3600;
         const tempoSegundos = dist / velocidadeMS;
-        setTempoEstimado(Math.round(tempoSegundos / 60));
+        const tempoMinutos = tempoSegundos / 60;
+        setTempoEstimado(Math.round(tempoMinutos));
       } else {
         setAlertaProximidade(false);
         setTempoEstimado(null);
@@ -370,11 +502,18 @@ const PassengerMap: React.FC = () => {
   }, [mapRef.current]);
 
   const handleLocationGranted = useCallback((position: GeolocationPosition) => {
-    setUserPosition({
-      lat: position.coords.latitude,
-      lng: position.coords.longitude,
-    });
-    setShowUserLocation(true);
+    const lat = position.coords.latitude;
+    const lng = position.coords.longitude;
+
+    // Validar coordenadas do usuário
+    if (isValidCoordinate(lat, lng)) {
+      setUserPosition({ lat, lng });
+      setShowUserLocation(true);
+    } else {
+      console.error("⚠️ Coordenadas do usuário inválidas:", { lat, lng });
+      setShowUserLocation(false);
+      setUserPosition(null);
+    }
   }, []);
 
   const handleLocationDenied = useCallback(() => {
@@ -391,8 +530,13 @@ const PassengerMap: React.FC = () => {
     setUserInteracted(false);
   };
 
-  // Função para renderizar o status do TukTuk
+  // Função para renderizar o status do TukTuk (melhorada com logs)
   const renderTuktukStatus = () => {
+    console.log("🎨 Rendering TukTuk status:", {
+      activeConductors: activeConductors.length,
+      firstConductor: activeConductors[0],
+    }); // Debug
+
     if (activeConductors.length === 0) {
       return (
         <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000]">
@@ -403,19 +547,25 @@ const PassengerMap: React.FC = () => {
 
     const conductor = activeConductors[0];
 
-    console.log(
-      "Conductor status:",
-      conductor.status,
-      "Occupied until:",
-      conductor.occupiedUntil
-    ); // Debug
+    console.log("🎯 Conductor status details:", {
+      id: conductor.id,
+      status: conductor.status,
+      occupiedUntil: conductor.occupiedUntil,
+      name: conductor.name,
+    }); // Debug
 
     if (conductor.status === "busy") {
       const occupiedUntil = conductor.occupiedUntil
         ? new Date(conductor.occupiedUntil)
         : null;
 
-      const isStillOccupied = occupiedUntil ? occupiedUntil > new Date() : true; // Se não tem horário, assume ocupado
+      const isStillOccupied = occupiedUntil ? occupiedUntil > new Date() : true; // Se não tem horário definido, assume que ainda está ocupado
+
+      console.log("⏰ Busy status check:", {
+        occupiedUntil: occupiedUntil?.toISOString(),
+        currentTime: new Date().toISOString(),
+        isStillOccupied,
+      }); // Debug
 
       if (isStillOccupied) {
         return (
@@ -464,25 +614,29 @@ const PassengerMap: React.FC = () => {
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
-          {/* Renderizar apenas o primeiro condutor ativo */}
-          {activeConductors[0] && (
-            <Marker
-              position={[activeConductors[0].lat, activeConductors[0].lng]}
-              icon={TukTukIcon}
-            >
-              <Popup>
-                <div className="text-center">
-                  <h3 className="font-bold text-blue-600">
-                    {activeConductors[0].name}
-                  </h3>
-                  <p className="text-sm text-gray-600">TukTuk disponível</p>
-                  <p className="text-xs text-gray-500">
-                    Última atualização: {new Date().toLocaleTimeString()}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          )}
+          {/* Renderizar apenas condutores com coordenadas válidas */}
+          {activeConductors[0] &&
+            isValidCoordinate(
+              activeConductors[0].lat,
+              activeConductors[0].lng
+            ) && (
+              <Marker
+                position={[activeConductors[0].lat, activeConductors[0].lng]}
+                icon={TukTukIcon}
+              >
+                <Popup>
+                  <div className="text-center">
+                    <h3 className="font-bold text-blue-600">
+                      {activeConductors[0].name}
+                    </h3>
+                    <p className="text-sm text-gray-600">TukTuk disponível</p>
+                    <p className="text-xs text-gray-500">
+                      Última atualização: {new Date().toLocaleTimeString()}
+                    </p>
+                  </div>
+                </Popup>
+              </Marker>
+            )}
 
           {/* Controlador do mapa */}
           <MapController
@@ -491,32 +645,40 @@ const PassengerMap: React.FC = () => {
             userInteracted={userInteracted}
           />
 
-          {/* Marcador da localização do usuário */}
-          {showUserLocation && mapRef.current && userPosition && (
-            <UserLocationMarker
-              map={mapRef.current}
-              userPosition={userPosition}
-              autoCenter={false}
-              showAccuracy={true}
-            />
-          )}
+          {/* Marcador da localização do usuário - com validação */}
+          {showUserLocation &&
+            mapRef.current &&
+            userPosition &&
+            isValidCoordinate(userPosition.lat, userPosition.lng) && (
+              <UserLocationMarker
+                map={mapRef.current}
+                userPosition={userPosition}
+                autoCenter={false}
+                showAccuracy={true}
+              />
+            )}
         </MapContainer>
 
-        {/* Calculador de distância apenas quando TukTuk está online */}
-        {activeConductors.length > 0 && activeConductors[0] && (
-          <div className="absolute top-4 right-4 z-[1000]">
-            <DistanceCalculator
-              userPosition={userPosition}
-              tuktukPosition={{
-                lat: activeConductors[0].lat,
-                lng: activeConductors[0].lng,
-              }}
-              showDetails={true}
-            />
-          </div>
-        )}
+        {/* Calculador de distância - com validação */}
+        {activeConductors.length > 0 &&
+          activeConductors[0] &&
+          isValidCoordinate(
+            activeConductors[0].lat,
+            activeConductors[0].lng
+          ) && (
+            <div className="absolute top-4 right-4 z-[1000]">
+              <DistanceCalculator
+                userPosition={userPosition}
+                tuktukPosition={{
+                  lat: activeConductors[0].lat,
+                  lng: activeConductors[0].lng,
+                }}
+                showDetails={true}
+              />
+            </div>
+          )}
 
-        {/* Status do TukTuk com disponibilidade */}
+        {/* Status do TukTuk */}
         {renderTuktukStatus()}
       </div>
 
