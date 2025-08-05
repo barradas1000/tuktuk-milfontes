@@ -222,15 +222,44 @@ export const updateActiveConductors = async (
       .update({ is_active: false })
       .eq("is_active", true);
 
+    // Desativar todos em active_conductors
+    await supabase
+      .from("active_conductors")
+      .update({ is_active: false, status: "offline" })
+      .eq("is_active", true);
+
     // Ativar apenas os IDs selecionados
     if (conductorIds.length > 0) {
       await supabase
         .from("conductors")
         .update({ is_active: true })
         .in("id", conductorIds);
-      // Garante registro em active_conductors para cada condutor ativado
       for (const id of conductorIds) {
-        await ensureActiveConductorRecord(id);
+        // Garante registro e ativa em active_conductors
+        const { data } = await supabase
+          .from("active_conductors")
+          .select("id")
+          .eq("conductor_id", id)
+          .single();
+        if (data) {
+          await supabase
+            .from("active_conductors")
+            .update({
+              is_active: true,
+              status: "available",
+              deactivated_at: null,
+            })
+            .eq("conductor_id", id);
+        } else {
+          await supabase.from("active_conductors").insert({
+            conductor_id: id,
+            is_active: true,
+            status: "available",
+            occupied_until: null,
+            activated_at: new Date().toISOString(),
+            deactivated_at: null,
+          });
+        }
       }
     }
   } catch (error) {

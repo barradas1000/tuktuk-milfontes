@@ -1228,9 +1228,18 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               <Switch
                 checked={activeConductors.includes(c.id)}
                 onCheckedChange={(checked) => {
-                  const newActiveConductors = checked
-                    ? [...activeConductors, c.id]
-                    : activeConductors.filter((id) => id !== c.id);
+                  let newActiveConductors;
+                  if (checked) {
+                    // Adiciona apenas se ainda não estiver presente
+                    newActiveConductors = Array.from(
+                      new Set([...activeConductors, c.id])
+                    );
+                  } else {
+                    // Remove o id do condutor
+                    newActiveConductors = activeConductors.filter(
+                      (id) => id !== c.id
+                    );
+                  }
 
                   setActiveConductors(newActiveConductors);
 
