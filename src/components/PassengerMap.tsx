@@ -605,7 +605,9 @@ const PassengerMap: React.FC = () => {
     // Status "available" ou padrão (incluindo quando passou do horário de ocupação)
     return (
       <div className="absolute bottom-4 left-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-[1000] max-w-xs">
-        <p className="text-sm font-semibold">🟢 {t("tracking.tuktukAvailable")}</p>
+        <p className="text-sm font-semibold">
+          🟢 {t("tracking.tuktukAvailable")}
+        </p>
         <p className="text-xs mt-1">✨ {t("tracking.readyForAdventure")}</p>
       </div>
     );
@@ -616,9 +618,7 @@ const PassengerMap: React.FC = () => {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-lg font-medium">
-            🔄 {t("tracking.loading")}
-          </p>
+          <p className="text-lg font-medium">🔄 {t("tracking.loading")}</p>
           <p className="text-sm text-gray-500 mt-1">
             {t("tracking.pleaseWait")} ⏳
           </p>

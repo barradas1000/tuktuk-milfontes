@@ -279,5 +279,126 @@
   "aerialViewMilfontes": {
     "title": "Vista Aérea de Milfontes",
     "description": "Vista aérea en una tarde de invierno sobre Vila Nova de Milfontes, Alentejo - Portugal."
+  },
+  "tracking": {
+    "title": "TukTuk en Tiempo Real",
+    "subtitle": "Sigue la ubicación de nuestro TukTuk en Vila Nova de Milfontes",
+    "currentLocation": "Ubicación Actual",
+    "howItWorks": "Cómo funciona",
+    "contact": "Contacto",
+    "backToMainSite": "Volver al sitio principal",
+    "loading": "Cargando ubicación del TukTuk...",
+    "pleaseWait": "Por favor espere",
+    "mapCentering": "Centrar mapa",
+    "makeReservation": "¡Haga Su Reserva Aquí!",
+    "reservationDialog": "Formulario de Reserva",
+    "tuktukAvailable": "¡TukTuk disponible ahora!",
+    "tuktukBusy": "TukTuk Actualmente Ocupado",
+    "readyForAdventure": "Listo para llevarte en una aventura",
+    "busyUntil": "hasta las",
+    "availableAgainAt": "Estará disponible nuevamente a las",
+    "instructions": {
+      "locateMe": "Haz clic en \"Localizarme\" para ver tu posición en el mapa",
+      "tuktukIcon": "El icono del TukTuk muestra la ubicación actual en tiempo real",
+      "statusIndicator": "El estado indica si el TukTuk está disponible u ocupado",
+      "distanceCalculation": "La distancia y tiempo estimado se calculan automáticamente",
+      "makeReservation": "Usa \"¡Haga Su Reserva Aquí!\" para reservar el servicio",
+      "centerMap": "\"Centrar mapa\" ajusta la vista para mejor visualización",
+      "offlineNote": "Si no ves el TukTuk, puede estar desconectado"
+    },
+    "contactInfo": {
+      "phone": "Teléfono: 963 496 320",
+      "whatsapp": "WhatsApp: Disponible en el sitio principal",
+      "email": "Email: diogo.carias@outlook.pt"
+    }
+  },
+  "locationPermission": {
+    "grantAccess": "Localizarme",
+    "locating": "Localizando...",
+    "permissionDenied": "Permiso Denegado",
+    "located": "¡Localizado!",
+    "permissionNeeded": "Permiso de ubicación necesario",
+    "permissionDescription": "Para **mostrar tu ubicación** en el mapa y calcular la **distancia hasta el TukTuk**, necesitamos tu permiso de ubicación.",
+    "clickForHelp": "Haz clic para ayuda",
+    "helpInstructions": {
+      "android": {
+        "title": "Cómo permitir ubicación en Android",
+        "method1": "Método completo:",
+        "method2": "Método rápido (más fácil):",
+        "method3": "Si no encuentras los iconos:",
+        "steps": {
+          "complete": [
+            "Toca los **tres puntos** (⋮) en la esquina superior derecha de Chrome",
+            "Selecciona **\"Configuración\"**",
+            "Toca **\"Configuración del sitio\"**",
+            "Toca **\"Ubicación\"**",
+            "Encuentra este sitio en la lista y cambia a **\"Permitir\"**",
+            "Vuelve al sitio y **actualiza la página**"
+          ],
+          "quick": [
+            "Busca el icono **📍** en la barra de direcciones",
+            "O el icono **🔒** al lado de la dirección",
+            "Tócalo y selecciona **\"Permitir\"\""
+          ],
+          "alternative": [
+            "Toca la **barra de direcciones** para ver más opciones",
+            "Busca el icono de **información** (ⓘ)"
+          ]
+        }
+      },
+      "ios": {
+        "title": "Cómo permitir ubicación en iPhone/iPad",
+        "steps": [
+          "Toca el icono **\"AA\"** en la barra de direcciones",
+          "Selecciona **\"Configuración del sitio web\"**",
+          "Toca **\"Ubicación\"**",
+          "Cambia a **\"Permitir\"**",
+          "Vuelve al sitio y **actualiza la página**"
+        ],
+        "alternative": [
+          "Busca el icono **📍** en la barra de direcciones",
+          "Tócalo y selecciona **\"Permitir\"\""
+        ]
+      },
+      "desktop": {
+        "title": "Cómo permitir ubicación en el navegador",
+        "steps": [
+          "Busca el icono **📍** en la barra de direcciones",
+          "Haz clic en él y selecciona **\"Permitir\"** cuando aparezca el popup",
+          "Si no aparece, verifica la **configuración del navegador**",
+          "Busca **\"Permisos\"** o **\"Configuración del sitio\"**",
+          "**Habilita** el permiso de ubicación para este sitio"
+        ]
+      }
+    },
+    "statusMessages": {
+      "unsupported": "Geolocalización no soportada en este navegador",
+      "obtaining": "Obteniendo tu ubicación...",
+      "error": "Error:",
+      "denied": "Permiso denegado - Haz clic para ayuda",
+      "success": "¡Ubicación obtenida con éxito!",
+      "clickToDiscover": "Haz clic para descubrir tu ubicación"
+    },
+    "helpModal": {
+      "understood": "¡Entendido, gracias!",
+      "completeGuide": "Ver guía completa",
+      "lookForIcons": "Dónde encontrar los iconos:",
+      "visualNote": "**🔍 Busca estos iconos** en la barra de direcciones de tu navegador"
+    }
+  },
+  "distanceCalculator": {
+    "waitingLocation": "Esperando ubicación...",
+    "distance": "Distancia:",
+    "estimatedTime": "Tiempo estimado:",
+    "averageSpeed": "Velocidad media: {{speed}} km/h",
+    "meters": "metros",
+    "kilometers": "km",
+    "minutes": "min",
+    "hours": "h"
+  },
+  "realTimeTracking": {
+    "title": "🛺 ¡Sigue nuestro TukTuk en tiempo real!",
+    "description": "Ve dónde está nuestro TukTuk ahora mismo y sigue su ubicación en tiempo real",
+    "buttonText": "📍 Ver TukTuk en Tiempo Real"
   }
 }

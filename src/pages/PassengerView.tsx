@@ -39,34 +39,26 @@ const PassengerView: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">ℹ️ {t("tracking.howItWorks")}</CardTitle>
+              <CardTitle className="text-lg">
+                ℹ️ {t("tracking.howItWorks")}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-gray-600">
-              <div>
-                • {t("tracking.instructions.locateMe")}
-              </div>
-              <div>
-                • {t("tracking.instructions.tuktukIcon")}
-              </div>
-              <div>
-                • {t("tracking.instructions.statusIndicator")}
-              </div>
-              <div>
-                • {t("tracking.instructions.distanceCalculation")}
-              </div>
-              <div>
-                • {t("tracking.instructions.makeReservation")}
-              </div>
-              <div>
-                • {t("tracking.instructions.centerMap")}
-              </div>
+              <div>• {t("tracking.instructions.locateMe")}</div>
+              <div>• {t("tracking.instructions.tuktukIcon")}</div>
+              <div>• {t("tracking.instructions.statusIndicator")}</div>
+              <div>• {t("tracking.instructions.distanceCalculation")}</div>
+              <div>• {t("tracking.instructions.makeReservation")}</div>
+              <div>• {t("tracking.instructions.centerMap")}</div>
               <div>• {t("tracking.instructions.offlineNote")}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">📞 {t("tracking.contact")}</CardTitle>
+              <CardTitle className="text-lg">
+                📞 {t("tracking.contact")}
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-gray-600">
               <div>• {t("tracking.contactInfo.phone")}</div>

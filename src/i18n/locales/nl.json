@@ -280,5 +280,126 @@
     "title": "Luchtfoto van Milfontes",
     "description": "Luchtfoto op een wintermiddag boven Vila Nova de Milfontes, Alentejo - Portugal."
   },
-  "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}"
+  "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}",
+  "tracking": {
+    "title": "TukTuk in Real-time",
+    "subtitle": "Volg de locatie van onze TukTuk in Vila Nova de Milfontes",
+    "currentLocation": "Huidige Locatie",
+    "howItWorks": "Hoe het werkt",
+    "contact": "Contact",
+    "backToMainSite": "Terug naar hoofdsite",
+    "loading": "TukTuk locatie laden...",
+    "pleaseWait": "Even geduld...",
+    "mapCentering": "Kaart centreren",
+    "makeReservation": "Maak Hier Uw Reservering!",
+    "reservationDialog": "Reserveringsformulier",
+    "tuktukAvailable": "TukTuk nu beschikbaar!",
+    "tuktukBusy": "TukTuk Momenteel Bezet",
+    "readyForAdventure": "Klaar om je mee te nemen op avontuur",
+    "busyUntil": "tot",
+    "availableAgainAt": "Zal weer beschikbaar zijn om",
+    "instructions": {
+      "locateMe": "Klik op \"Lokaliseer mij\" om uw positie op de kaart te zien",
+      "tuktukIcon": "Het TukTuk-pictogram toont de huidige locatie in real-time",
+      "statusIndicator": "De status geeft aan of de TukTuk beschikbaar of bezet is",
+      "distanceCalculation": "Afstand en geschatte tijd worden automatisch berekend",
+      "makeReservation": "Gebruik \"Maak Hier Uw Reservering!\" om de service te boeken",
+      "centerMap": "\"Kaart centreren\" past de weergave aan voor betere visualisatie",
+      "offlineNote": "Als je de TukTuk niet ziet, kan deze offline zijn"
+    },
+    "contactInfo": {
+      "phone": "Telefoon: 963 496 320",
+      "whatsapp": "WhatsApp: Beschikbaar op hoofdsite",
+      "email": "Email: diogo.carias@outlook.pt"
+    }
+  },
+  "locationPermission": {
+    "grantAccess": "Lokaliseer mij",
+    "locating": "Lokaliseren...",
+    "permissionDenied": "Toestemming Geweigerd",
+    "located": "Gelokaliseerd!",
+    "permissionNeeded": "Locatietoestemming vereist",
+    "permissionDescription": "Om **uw locatie** op de kaart te tonen en de **afstand tot de TukTuk** te berekenen, hebben we uw locatietoestemming nodig.",
+    "clickForHelp": "Klik voor hulp",
+    "helpInstructions": {
+      "android": {
+        "title": "Hoe locatie toestaan op Android",
+        "method1": "Volledige methode:",
+        "method2": "Snelle methode (makkelijker):",
+        "method3": "Als je de pictogrammen niet kunt vinden:",
+        "steps": {
+          "complete": [
+            "Tik op de **drie punten** (⋮) in de rechterbovenhoek van Chrome",
+            "Selecteer **\"Instellingen\"**",
+            "Tik op **\"Site-instellingen\"**",
+            "Tik op **\"Locatie\"**",
+            "Vind deze site in de lijst en verander naar **\"Toestaan\"**",
+            "Ga terug naar de site en **ververs de pagina**"
+          ],
+          "quick": [
+            "Zoek naar het **📍** pictogram in de adresbalk",
+            "Of het **🔒** pictogram naast het adres",
+            "Tik erop en selecteer **\"Toestaan\"\""
+          ],
+          "alternative": [
+            "Tik op de **adresbalk** om meer opties te zien",
+            "Zoek naar het **informatie** pictogram (ⓘ)"
+          ]
+        }
+      },
+      "ios": {
+        "title": "Hoe locatie toestaan op iPhone/iPad",
+        "steps": [
+          "Tik op het **\"AA\"** pictogram in de adresbalk",
+          "Selecteer **\"Website-instellingen\"**",
+          "Tik op **\"Locatie\"**",
+          "Verander naar **\"Toestaan\"**",
+          "Ga terug naar de site en **ververs de pagina**"
+        ],
+        "alternative": [
+          "Zoek naar het **📍** pictogram in de adresbalk",
+          "Tik erop en selecteer **\"Toestaan\"\""
+        ]
+      },
+      "desktop": {
+        "title": "Hoe locatie toestaan in browser",
+        "steps": [
+          "Zoek naar het **📍** pictogram in de adresbalk",
+          "Klik erop en selecteer **\"Toestaan\"** wanneer de popup verschijnt",
+          "Als deze niet verschijnt, controleer de **browserinstellingen**",
+          "Zoek naar **\"Toestemmingen\"** of **\"Site-instellingen\"**",
+          "**Schakel** locatietoestemming in voor deze site"
+        ]
+      }
+    },
+    "statusMessages": {
+      "unsupported": "Geolocatie niet ondersteund in deze browser",
+      "obtaining": "Uw locatie ophalen...",
+      "error": "Fout:",
+      "denied": "Toestemming geweigerd - Klik voor hulp",
+      "success": "Locatie succesvol verkregen!",
+      "clickToDiscover": "Klik om uw locatie te ontdekken"
+    },
+    "helpModal": {
+      "understood": "Begrepen, bedankt!",
+      "completeGuide": "Bekijk volledige gids",
+      "lookForIcons": "Waar de pictogrammen te vinden:",
+      "visualNote": "**🔍 Zoek naar deze pictogrammen** in de adresbalk van uw browser"
+    }
+  },
+  "distanceCalculator": {
+    "waitingLocation": "Wachten op locatie...",
+    "distance": "Afstand:",
+    "estimatedTime": "Geschatte tijd:",
+    "averageSpeed": "Gemiddelde snelheid: {{speed}} km/u",
+    "meters": "meter",
+    "kilometers": "km",
+    "minutes": "min",
+    "hours": "uur"
+  },
+  "realTimeTracking": {
+    "title": "🛺 Volg onze TukTuk in real-time!",
+    "description": "Zie waar onze TukTuk nu is en volg zijn locatie in real-time",
+    "buttonText": "📍 TukTuk in Real-time Bekijken"
+  }
 }

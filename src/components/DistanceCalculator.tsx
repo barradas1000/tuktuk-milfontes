@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Coordinates,
   calculateDistanceAndTime,
@@ -23,10 +24,11 @@ export const DistanceCalculator: React.FC<DistanceCalculatorProps> = ({
   showDetails = false,
   updateInterval = 5000, // atualiza a cada 5 segundos
 }) => {
+  const { t } = useTranslation();
   const [distanceInfo, setDistanceInfo] = useState<{
-    distance: number;
     distanceKm: number;
-    estimatedTime: number;
+    distanceMeters: number;
+    tempoEstimadoMinutos: number;
   } | null>(null);
 
   const [isNearby, setIsNearby] = useState(false);
@@ -75,7 +77,7 @@ export const DistanceCalculator: React.FC<DistanceCalculatorProps> = ({
     setDistanceInfo(result);
 
     // Verificar se está próximo (menos de 100m)
-    setIsNearby(result.distance <= 100);
+    setIsNearby(result.distanceMeters <= 100);
   }, [calculateDistance, updateInterval]);
 
   // Efeito para alerta de proximidade
@@ -97,7 +99,9 @@ export const DistanceCalculator: React.FC<DistanceCalculatorProps> = ({
       <div className={`distance-calculator ${className}`}>
         <div className="distance-status">
           <span className="status-icon">📍</span>
-          <span className="status-text">Aguardando localização...</span>
+          <span className="status-text">
+            {t("distanceCalculator.waitingLocation")}
+          </span>
         </div>
       </div>
     );
@@ -132,26 +136,37 @@ export const DistanceCalculator: React.FC<DistanceCalculatorProps> = ({
     <div className="bg-white rounded-lg shadow-md p-3 text-sm max-w-xs">
       <div className="space-y-2">
         <div>
-          <p className="font-medium text-gray-700">Distância:</p>
+          <p className="font-medium text-gray-700">
+            {t("distanceCalculator.distance")}
+          </p>
           <p className="text-blue-600 font-semibold">
             {distanceKm < 1
-              ? `${Math.round(distanceMeters)} metros`
-              : `${distanceKm.toFixed(1)} km`}
+              ? `${Math.round(distanceMeters)} ${t(
+                  "distanceCalculator.meters"
+                )}`
+              : `${distanceKm.toFixed(1)} ${t(
+                  "distanceCalculator.kilometers"
+                )}`}
           </p>
         </div>
 
         <div>
-          <p className="font-medium text-gray-700">Tempo estimado:</p>
+          <p className="font-medium text-gray-700">
+            {t("distanceCalculator.estimatedTime")}
+          </p>
           <p className="text-green-600 font-semibold">
             {tempoEstimadoMinutos < 1
-              ? "< 1 minuto"
-              : `${tempoEstimadoMinutos} min`}
+              ? `< 1 ${t("distanceCalculator.minutes")}`
+              : `${tempoEstimadoMinutos} ${t("distanceCalculator.minutes")}`}
           </p>
         </div>
 
         <div className="text-xs text-gray-500 border-t pt-2">
-          <p>Velocidade média: {VELOCIDADE_MEDIA_KMH} km/h</p>{" "}
-          {/* ✅ Mostra 15 km/h */}
+          <p>
+            {t("distanceCalculator.averageSpeed", {
+              speed: VELOCIDADE_MEDIA_KMH,
+            })}
+          </p>
         </div>
       </div>
     </div>

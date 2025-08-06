@@ -410,5 +410,20 @@
       "lookForIcons": "Onde encontrar os ícones:",
       "visualNote": "**🔍 Procure por estes ícones** na barra de endereços do seu navegador"
     }
+  },
+  "distanceCalculator": {
+    "waitingLocation": "Aguardando localização...",
+    "distance": "Distância:",
+    "estimatedTime": "Tempo estimado:",
+    "averageSpeed": "Velocidade média: {{speed}} km/h",
+    "meters": "metros",
+    "kilometers": "km",
+    "minutes": "min",
+    "hours": "h"
+  },
+  "realTimeTracking": {
+    "title": "🛺 Acompanhe o nosso TukTuk em tempo real!",
+    "description": "Veja onde está o nosso TukTuk neste momento e acompanhe a sua localização em tempo real",
+    "buttonText": "📍 Ver TukTuk em Tempo Real"
   }
 }

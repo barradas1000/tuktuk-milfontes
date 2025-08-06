@@ -560,20 +560,22 @@ const Index = () => {
       </section>
 
       {/* TukTuk Tracking Button Section */}
-      <section className="py-12 px-4 bg-gradient-to-br from-amber-50 to-blue-50">
+      <section
+        id="real-time-tracking-section"
+        className="py-12 px-4 bg-gradient-to-br from-amber-50 to-blue-50"
+      >
         <div className="max-w-4xl mx-auto text-center">
           <h3 className="text-2xl md:text-3xl font-bold text-blue-900 mb-4">
-            🛺 Acompanhe o nosso TukTuk em tempo real!
+            {t("realTimeTracking.title")}
           </h3>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Veja onde está o nosso TukTuk neste momento e acompanhe a sua
-            localização em tempo real
+            {t("realTimeTracking.description")}
           </p>
           <a
             href="/tracking"
             className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
-            📍 Ver TukTuk em Tempo Real
+            {t("realTimeTracking.buttonText")}
           </a>
         </div>
       </section>

@@ -248,5 +248,61 @@
   "aerialViewMilfontes": {
     "title": "Luftaufnahme von Milfontes",
     "description": "Luftaufnahme an einem Winternachmittag über Vila Nova de Milfontes, Alentejo - Portugal."
+  },
+  "tracking": {
+    "title": "TukTuk in Echtzeit",
+    "subtitle": "Verfolgen Sie die Position unseres TukTuks in Vila Nova de Milfontes",
+    "currentLocation": "Aktuelle Position",
+    "howItWorks": "Wie es funktioniert",
+    "contact": "Kontakt",
+    "backToMainSite": "Zurück zur Hauptseite",
+    "loading": "TukTuk-Position wird geladen...",
+    "pleaseWait": "Bitte warten",
+    "mapCentering": "Karte zentrieren",
+    "makeReservation": "Machen Sie Hier Ihre Reservierung!",
+    "reservationDialog": "Reservierungsformular",
+    "tuktukAvailable": "TukTuk jetzt verfügbar!",
+    "tuktukBusy": "TukTuk Derzeit Besetzt",
+    "readyForAdventure": "Bereit, Sie auf ein Abenteuer mitzunehmen",
+    "busyUntil": "bis",
+    "availableAgainAt": "Wird wieder verfügbar sein um",
+    "instructions": {
+      "locateMe": "Klicken Sie auf \"Mich lokalisieren\", um Ihre Position auf der Karte zu sehen",
+      "tuktukIcon": "Das TukTuk-Symbol zeigt die aktuelle Position in Echtzeit",
+      "statusIndicator": "Der Status zeigt an, ob das TukTuk verfügbar oder besetzt ist",
+      "distanceCalculation": "Entfernung und geschätzte Zeit werden automatisch berechnet",
+      "makeReservation": "Verwenden Sie \"Machen Sie Hier Ihre Reservierung!\", um den Service zu buchen",
+      "centerMap": "\"Karte zentrieren\" passt die Ansicht für bessere Visualisierung an",
+      "offlineNote": "Wenn Sie das TukTuk nicht sehen, könnte es offline sein"
+    },
+    "contactInfo": {
+      "phone": "Telefon: 963 496 320",
+      "whatsapp": "WhatsApp: Auf der Hauptseite verfügbar",
+      "email": "Email: diogo.carias@outlook.pt"
+    }
+  },
+  "locationPermission": {
+    "grantAccess": "Mich lokalisieren",
+    "locating": "Lokalisierung...",
+    "permissionDenied": "Berechtigung Verweigert",
+    "located": "Lokalisiert!",
+    "permissionNeeded": "Standortberechtigung erforderlich",
+    "permissionDescription": "Um **Ihre Position** auf der Karte anzuzeigen und die **Entfernung zum TukTuk** zu berechnen, benötigen wir Ihre Standortberechtigung.",
+    "clickForHelp": "Klicken Sie für Hilfe"
+  },
+  "distanceCalculator": {
+    "waitingLocation": "Warten auf Standort...",
+    "distance": "Entfernung:",
+    "estimatedTime": "Geschätzte Zeit:",
+    "averageSpeed": "Durchschnittsgeschwindigkeit: {{speed}} km/h",
+    "meters": "Meter",
+    "kilometers": "km",
+    "minutes": "Min",
+    "hours": "Std"
+  },
+  "realTimeTracking": {
+    "title": "🛺 Verfolgen Sie unseren TukTuk in Echtzeit!",
+    "description": "Sehen Sie, wo sich unser TukTuk gerade befindet und verfolgen Sie seine Position in Echtzeit",
+    "buttonText": "📍 TukTuk in Echtzeit anzeigen"
   }
 }

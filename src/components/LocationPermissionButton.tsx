@@ -1,10 +1,5 @@
 import React, { useState, useRef } from "react";
-import { useTranslation }   const getButtonText = () => {
-    if (isLoading) return "📍 " + t("locationPermission.locating");
-    if (permission === "denied") return "🔒 " + t("locationPermission.permissionDenied");
-    if (position) return "✅ " + t("locationPermission.located");
-    return children || "📍 " + t("locationPermission.grantAccess");
-  };react-i18next";
+import { useTranslation } from "react-i18next";
 import { useGeolocation } from "../hooks/useGeolocation";
 
 import { GeolocationPosition as CustomGeolocationPosition } from "../hooks/useGeolocation";
@@ -36,7 +31,9 @@ export const LocationPermissionButton: React.FC<
   const handleClick = () => {
     if (!isSupported) {
       alert(
-        "❌ A geolocalização não é suportada neste navegador.\n\n💡 Tente usar um navegador mais recente como Chrome, Firefox ou Safari."
+        `❌ ${t(
+          "locationPermission.statusMessages.unsupported"
+        )}.\n\n💡 Tente usar um navegador mais recente como Chrome, Firefox ou Safari.`
       );
       return;
     }
@@ -79,10 +76,11 @@ export const LocationPermissionButton: React.FC<
   }, [error, onLocationDenied]);
 
   const getButtonText = () => {
-    if (isLoading) return "📍 A localizar...";
-    if (permission === "denied") return "� Permissão Negada";
-    if (position) return "✅ Localizado!";
-    return children || "📍 Localizar-me";
+    if (isLoading) return "📍 " + t("locationPermission.locating");
+    if (permission === "denied")
+      return "🔒 " + t("locationPermission.permissionDenied");
+    if (position) return "✅ " + t("locationPermission.located");
+    return children || "📍 " + t("locationPermission.grantAccess");
   };
 
   const getButtonClass = () => {
@@ -97,13 +95,16 @@ export const LocationPermissionButton: React.FC<
   };
 
   const getStatusText = () => {
-    if (!isSupported) return "❌ Geolocalização não suportada neste navegador";
-    if (isLoading) return "🔄 A obter a sua localização...";
-    if (error) return `❌ Erro: ${error}`;
+    if (!isSupported)
+      return "❌ " + t("locationPermission.statusMessages.unsupported");
+    if (isLoading)
+      return "🔄 " + t("locationPermission.statusMessages.obtaining");
+    if (error)
+      return `❌ ${t("locationPermission.statusMessages.error")} ${error}`;
     if (permission === "denied")
-      return "🔒 Permissão negada - Clique para ajuda";
-    if (position) return "✅ Localização obtida com sucesso!";
-    return "👆 Clique para descobrir a sua localização";
+      return "🔒 " + t("locationPermission.statusMessages.denied");
+    if (position) return "✅ " + t("locationPermission.statusMessages.success");
+    return "👆 " + t("locationPermission.statusMessages.clickToDiscover");
   };
 
   const detectMobileOS = () => {
@@ -129,52 +130,48 @@ export const LocationPermissionButton: React.FC<
 
     if (os === "android") {
       return {
-        title: "📱 Como permitir localização no Android",
+        title: t("locationPermission.helpInstructions.android.title"),
         steps: [
-          "**🔧 Método completo:**",
-          "1️⃣ Toque nos **três pontos** (⋮) no canto superior direito do Chrome",
-          '2️⃣ Selecione **"Configurações"**',
-          '3️⃣ Toque em **"Site settings"** ou **"Configurações do site"**',
-          '4️⃣ Toque em **"Localização"**',
-          '5️⃣ Encontre este site na lista e mude para **"Permitir"**',
-          "6️⃣ Volte para o site e **atualize a página** 🔄",
+          `**🔧 ${t("locationPermission.helpInstructions.android.method1")}**`,
+          ...t("locationPermission.helpInstructions.android.steps.complete", {
+            returnObjects: true,
+          }),
           "",
-          "**⚡ Método rápido (mais fácil):**",
-          "• Procure pelo ícone **📍** na barra de endereços",
-          "• Ou pelo ícone **🔒** ao lado do endereço",
-          '• Toque nele e selecione **"Permitir"**',
+          `**⚡ ${t("locationPermission.helpInstructions.android.method2")}**`,
+          ...t("locationPermission.helpInstructions.android.steps.quick", {
+            returnObjects: true,
+          }),
           "",
-          "**🔍 Se não encontrar os ícones:**",
-          "• Toque na **barra de endereços** para ver mais opções",
-          "• Procure pelo ícone de **informação** (ⓘ)",
+          `**🔍 ${t("locationPermission.helpInstructions.android.method3")}**`,
+          ...t(
+            "locationPermission.helpInstructions.android.steps.alternative",
+            { returnObjects: true }
+          ),
         ],
       };
     } else if (os === "ios") {
       return {
-        title: "🍎 Como permitir localização no iPhone/iPad",
+        title: t("locationPermission.helpInstructions.ios.title"),
         steps: [
           "**📱 Passos no Safari:**",
-          '1️⃣ Toque no ícone **"AA"** na barra de endereços',
-          '2️⃣ Selecione **"Configurações do site"**',
-          '3️⃣ Toque em **"Localização"**',
-          '4️⃣ Mude para **"Permitir"**',
-          "5️⃣ Volte para o site e **atualize a página** 🔄",
+          ...t("locationPermission.helpInstructions.ios.steps", {
+            returnObjects: true,
+          }),
           "",
           "**⚡ Método alternativo:**",
-          "• Procure pelo ícone **📍** na barra de endereços",
-          '• Toque nele e selecione **"Permitir"**',
+          ...t("locationPermission.helpInstructions.ios.alternative", {
+            returnObjects: true,
+          }),
         ],
       };
     } else {
       return {
-        title: "💻 Como permitir localização no navegador",
+        title: t("locationPermission.helpInstructions.desktop.title"),
         steps: [
           "**🖱️ Passos simples:**",
-          "1️⃣ Procure pelo ícone **📍** na barra de endereços",
-          '2️⃣ Clique nele e selecione **"Permitir"** quando aparecer o popup',
-          "3️⃣ Se não aparecer, verifique as **configurações do navegador** ⚙️",
-          '4️⃣ Procure por **"Permissões"** ou **"Configurações do site"**',
-          "5️⃣ **Habilite** a permissão de localização para este site ✅",
+          ...t("locationPermission.helpInstructions.desktop.steps", {
+            returnObjects: true,
+          }),
         ],
       };
     }
@@ -209,12 +206,8 @@ export const LocationPermissionButton: React.FC<
           <div className="permission-alert-content">
             <div className="permission-alert-icon">🔐</div>
             <div className="permission-alert-text">
-              <strong>📍 Permissão de localização necessária</strong>
-              <p>
-                Para **mostrar a sua localização** no mapa e calcular a
-                **distância até ao TukTuk**, precisamos da sua permissão de
-                localização. ✨
-              </p>
+              <strong>📍 {t("locationPermission.permissionNeeded")}</strong>
+              <p>{t("locationPermission.permissionDescription")}</p>
             </div>
             <button
               className="permission-alert-close"
@@ -253,7 +246,7 @@ export const LocationPermissionButton: React.FC<
               {/* Seção visual para Android */}
               {detectMobileOS() === "android" && (
                 <div className="help-visual-section">
-                  <h4>📍 Onde encontrar os ícones:</h4>
+                  <h4>{t("locationPermission.helpModal.lookForIcons")}</h4>
                   <div className="browser-mockup">
                     <div className="browser-address-bar">
                       <span className="address-text">
@@ -278,8 +271,7 @@ export const LocationPermissionButton: React.FC<
                       </div>
                     </div>
                     <p className="visual-note">
-                      **🔍 Procure por estes ícones** na barra de endereços do
-                      seu navegador
+                      {t("locationPermission.helpModal.visualNote")}
                     </p>
                   </div>
                 </div>
@@ -290,7 +282,7 @@ export const LocationPermissionButton: React.FC<
                 className="help-modal-button"
                 onClick={() => setShowHelpModal(false)}
               >
-                ✅ Entendi, obrigado!
+                ✅ {t("locationPermission.helpModal.understood")}
               </button>
               <a
                 href="/docs/PERMISSAO-LOCALIZACAO.md"
@@ -298,7 +290,7 @@ export const LocationPermissionButton: React.FC<
                 rel="noopener noreferrer"
                 className="help-modal-link"
               >
-                📖 Ver guia completo
+                📖 {t("locationPermission.helpModal.completeGuide")}
               </a>
             </div>
           </div>

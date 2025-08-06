@@ -403,11 +403,13 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
     } else {
       navigate("/");
     }
-    // Scroll para o próximo elemento após o mapa
+    // Scroll para a seção Real Time Tracking após o mapa
     setTimeout(() => {
-      const nextSection = document.getElementById("explore-section");
-      if (nextSection) {
-        nextSection.scrollIntoView({ behavior: "smooth" });
+      const realTimeSection = document.getElementById(
+        "real-time-tracking-section"
+      );
+      if (realTimeSection) {
+        realTimeSection.scrollIntoView({ behavior: "smooth" });
       }
     }, 200);
   };
