@@ -101,3 +101,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Garantir que o Dialog apareça sobre o mapa Leaflet */
+[data-radix-popper-content-wrapper],
+[data-radix-dialog-overlay],
+[data-radix-dialog-content] {
+  z-index: 10000 !important;
+}
+
+/* Garantir que todos os elementos do Dialog tenham z-index alto */
+.leaflet-container ~ div[data-radix-dialog-overlay] {
+  z-index: 10000 !important;
+}
+
+.leaflet-container ~ div[data-radix-dialog-content] {
+  z-index: 10001 !important;
+}

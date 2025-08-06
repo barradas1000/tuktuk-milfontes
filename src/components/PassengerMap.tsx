@@ -2,11 +2,20 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { supabase } from "../lib/supabase";
 import { UserLocationMarker } from "./UserLocationMarker";
 import { LocationPermissionButton } from "./LocationPermissionButton";
 import { DistanceCalculator } from "./DistanceCalculator";
 import { LocationDebug } from "./LocationDebug";
+import ReservationForm from "./ReservationForm";
 import { Coordinates } from "../utils/locationUtils";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
@@ -82,6 +91,7 @@ const PassengerMap: React.FC = () => {
   const [userInteracted, setUserInteracted] = useState(false);
   const [alertaProximidade, setAlertaProximidade] = useState(false);
   const [tempoEstimado, setTempoEstimado] = useState<number | null>(null);
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
 
   // Função para calcular distância (haversine)
   function calcularDistanciaMetros(
@@ -510,7 +520,10 @@ const PassengerMap: React.FC = () => {
       setUserPosition({ lat, lng });
       setShowUserLocation(true);
     } else {
-      console.error("⚠️ Coordenadas do usuário inválidas:", { lat, lng });
+      console.error(
+        "⚠️ **Coordenadas do usuário inválidas:** Não foi possível obter uma localização válida.",
+        { lat, lng }
+      );
       setShowUserLocation(false);
       setUserPosition(null);
     }
@@ -539,8 +552,11 @@ const PassengerMap: React.FC = () => {
 
     if (activeConductors.length === 0) {
       return (
-        <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000]">
-          <p className="text-sm">🚫 TukTuk offline</p>
+        <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000] max-w-xs">
+          <p className="text-sm font-semibold">🚫 **TukTuk offline**</p>
+          <p className="text-xs mt-1">
+            O TukTuk não está disponível neste momento
+          </p>
         </div>
       );
     }
@@ -586,8 +602,9 @@ const PassengerMap: React.FC = () => {
 
     // Status "available" ou padrão (incluindo quando passou do horário de ocupação)
     return (
-      <div className="absolute bottom-4 left-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-[1000]">
-        <p className="text-sm">🟢 TukTuk Neste Momento Disponível</p>
+      <div className="absolute bottom-4 left-4 bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded z-[1000] max-w-xs">
+        <p className="text-sm font-semibold">🟢 **TukTuk disponível agora!**</p>
+        <p className="text-xs mt-1">✨ Pronto para o levar numa aventura</p>
       </div>
     );
   };
@@ -597,7 +614,12 @@ const PassengerMap: React.FC = () => {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p>Carregando localização do TukTuk...</p>
+          <p className="text-lg font-medium">
+            🔄 **A carregar localização do TukTuk...**
+          </p>
+          <p className="text-sm text-gray-500 mt-1">
+            Por favor aguarde um momento ⏳
+          </p>
         </div>
       </div>
     );
@@ -682,8 +704,8 @@ const PassengerMap: React.FC = () => {
         {renderTuktukStatus()}
       </div>
 
-      {/* Botão de localização do usuário FORA do mapa */}
-      <div className="mt-4 flex flex-col gap-2 items-start">
+      {/* Botões de controle FORA do mapa */}
+      <div className="mt-4 flex flex-col sm:flex-row gap-2 items-center sm:items-start">
         <LocationPermissionButton
           onLocationGranted={handleLocationGranted}
           onLocationDenied={handleLocationDenied}
@@ -691,6 +713,39 @@ const PassengerMap: React.FC = () => {
         >
           📍 Localizar-me
         </LocationPermissionButton>
+
+        {/* Botão de reserva com mesmo visual do "Reseve Agora" */}
+        <Dialog
+          open={isReservationModalOpen}
+          onOpenChange={setIsReservationModalOpen}
+        >
+          <DialogTrigger asChild>
+            <Button
+              size="lg"
+              className="bg-amber-500 hover:bg-amber-600 text-blue-900 font-bold text-lg px-8 py-3 rounded-xl shadow-xl hover:shadow-amber-500/25 transition-all duration-300 hover:scale-105"
+            >
+              Faça a Sua Reserva Aqui!
+            </Button>
+          </DialogTrigger>
+          <DialogContent
+            className="max-w-4xl max-h-[90vh] overflow-y-auto"
+            style={{
+              zIndex: 10000,
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <DialogHeader>
+              <DialogTitle className="sr-only">
+                Formulário de Reserva
+              </DialogTitle>
+            </DialogHeader>
+            <ReservationForm />
+          </DialogContent>
+        </Dialog>
+
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold shadow hover:bg-blue-700 transition-colors"
           onClick={handleRecenter}

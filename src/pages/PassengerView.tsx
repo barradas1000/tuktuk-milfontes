@@ -39,9 +39,25 @@ const PassengerView: React.FC = () => {
               <CardTitle className="text-lg">ℹ️ Como funciona</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-gray-600">
-              <div>• O ponto azul mostra a localização atual do TukTuk</div>
-              <div>• A localização é atualizada automaticamente</div>
-              <div>• Se não vir o ponto, o TukTuk pode estar offline</div>
+              <div>
+                • 📍 Clique em "Localizar-me" para ver a sua posição no mapa
+              </div>
+              <div>
+                • 🚗 O ícone do TukTuk mostra a localização atual em tempo real
+              </div>
+              <div>
+                • 🟢/🔴 O status indica se o TukTuk está disponível ou ocupado
+              </div>
+              <div>
+                • 📏 A distância e tempo estimado são calculados automaticamente
+              </div>
+              <div>
+                • 📝 Use "Faça a Sua Reserva Aqui!" para reservar o serviço
+              </div>
+              <div>
+                • 🎯 "Centralizar mapa" ajusta a vista para melhor visualização
+              </div>
+              <div>• 🚫 Se não vir o TukTuk, pode estar offline</div>
             </CardContent>
           </Card>
 
@@ -57,7 +73,7 @@ const PassengerView: React.FC = () => {
           </Card>
         </div>
 
-        {/* Link para reserva */}
+        {/* Link para voltar ao site principal */}
         <div className="text-center mt-8">
           <a
             href="/"

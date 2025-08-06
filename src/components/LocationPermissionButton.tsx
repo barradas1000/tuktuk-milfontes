@@ -28,7 +28,9 @@ export const LocationPermissionButton: React.FC<
 
   const handleClick = () => {
     if (!isSupported) {
-      alert("Geolocalização não é suportada neste navegador");
+      alert(
+        "❌ A geolocalização não é suportada neste navegador.\n\n💡 Tente usar um navegador mais recente como Chrome, Firefox ou Safari."
+      );
       return;
     }
 
@@ -70,9 +72,9 @@ export const LocationPermissionButton: React.FC<
   }, [error, onLocationDenied]);
 
   const getButtonText = () => {
-    if (isLoading) return "📍 Localizando...";
-    if (permission === "denied") return "📍 Permissão Negada";
-    if (position) return "📍 Você está aqui!";
+    if (isLoading) return "📍 A localizar...";
+    if (permission === "denied") return "� Permissão Negada";
+    if (position) return "✅ Localizado!";
     return children || "📍 Localizar-me";
   };
 
@@ -88,12 +90,13 @@ export const LocationPermissionButton: React.FC<
   };
 
   const getStatusText = () => {
-    if (!isSupported) return "Geolocalização não suportada";
-    if (isLoading) return "Obtendo localização...";
-    if (error) return error;
-    if (permission === "denied") return "Permissão negada";
-    if (position) return "Localização obtida";
-    return "Clique para localizar";
+    if (!isSupported) return "❌ Geolocalização não suportada neste navegador";
+    if (isLoading) return "🔄 A obter a sua localização...";
+    if (error) return `❌ Erro: ${error}`;
+    if (permission === "denied")
+      return "🔒 Permissão negada - Clique para ajuda";
+    if (position) return "✅ Localização obtida com sucesso!";
+    return "👆 Clique para descobrir a sua localização";
   };
 
   const detectMobileOS = () => {
@@ -119,49 +122,52 @@ export const LocationPermissionButton: React.FC<
 
     if (os === "android") {
       return {
-        title: "Como permitir localização no Android",
+        title: "📱 Como permitir localização no Android",
         steps: [
-          "1. Toque nos três pontos (⋮) no canto superior direito do Chrome",
-          '2. Selecione "Configurações"',
-          '3. Toque em "Site settings" ou "Configurações do site"',
-          '4. Toque em "Localização"',
-          '5. Encontre este site na lista e mude para "Permitir"',
-          "6. Volte para o site e atualize a página",
+          "**🔧 Método completo:**",
+          "1️⃣ Toque nos **três pontos** (⋮) no canto superior direito do Chrome",
+          '2️⃣ Selecione **"Configurações"**',
+          '3️⃣ Toque em **"Site settings"** ou **"Configurações do site"**',
+          '4️⃣ Toque em **"Localização"**',
+          '5️⃣ Encontre este site na lista e mude para **"Permitir"**',
+          "6️⃣ Volte para o site e **atualize a página** 🔄",
           "",
-          "Alternativa mais fácil:",
-          "• Procure por um ícone de localização 📍 na barra de endereços",
-          "• Ou um ícone de cadeado 🔒 ao lado do endereço",
-          '• Toque nele e selecione "Permitir"',
+          "**⚡ Método rápido (mais fácil):**",
+          "• Procure pelo ícone **📍** na barra de endereços",
+          "• Ou pelo ícone **🔒** ao lado do endereço",
+          '• Toque nele e selecione **"Permitir"**',
           "",
-          "Se não vir esses ícones:",
-          "• Toque na barra de endereços para ver mais opções",
-          "• Ou procure por um ícone de informação (ⓘ)",
+          "**🔍 Se não encontrar os ícones:**",
+          "• Toque na **barra de endereços** para ver mais opções",
+          "• Procure pelo ícone de **informação** (ⓘ)",
         ],
       };
     } else if (os === "ios") {
       return {
-        title: "Como permitir localização no iPhone/iPad",
+        title: "🍎 Como permitir localização no iPhone/iPad",
         steps: [
-          '1. Toque no ícone "AA" na barra de endereços',
-          '2. Selecione "Configurações do site"',
-          '3. Toque em "Localização"',
-          '4. Mude para "Permitir"',
-          "5. Volte para o site e atualize a página",
+          "**📱 Passos no Safari:**",
+          '1️⃣ Toque no ícone **"AA"** na barra de endereços',
+          '2️⃣ Selecione **"Configurações do site"**',
+          '3️⃣ Toque em **"Localização"**',
+          '4️⃣ Mude para **"Permitir"**',
+          "5️⃣ Volte para o site e **atualize a página** 🔄",
           "",
-          "Alternativa:",
-          "• Procure por um ícone de localização 📍 na barra de endereços",
-          '• Toque nele e selecione "Permitir"',
+          "**⚡ Método alternativo:**",
+          "• Procure pelo ícone **📍** na barra de endereços",
+          '• Toque nele e selecione **"Permitir"**',
         ],
       };
     } else {
       return {
-        title: "Como permitir localização no navegador",
+        title: "💻 Como permitir localização no navegador",
         steps: [
-          "1. Toque no ícone de localização na barra de endereços",
-          '2. Selecione "Permitir" quando aparecer o popup',
-          "3. Se não aparecer, verifique as configurações do navegador",
-          '4. Procure por "Permissões" ou "Configurações do site"',
-          "5. Habilite a permissão de localização para este site",
+          "**🖱️ Passos simples:**",
+          "1️⃣ Procure pelo ícone **📍** na barra de endereços",
+          '2️⃣ Clique nele e selecione **"Permitir"** quando aparecer o popup',
+          "3️⃣ Se não aparecer, verifique as **configurações do navegador** ⚙️",
+          '4️⃣ Procure por **"Permissões"** ou **"Configurações do site"**',
+          "5️⃣ **Habilite** a permissão de localização para este site ✅",
         ],
       };
     }
@@ -194,17 +200,19 @@ export const LocationPermissionButton: React.FC<
       {showPermissionAlert && (
         <div className="permission-alert-banner">
           <div className="permission-alert-content">
-            <div className="permission-alert-icon">⚠️</div>
+            <div className="permission-alert-icon">🔐</div>
             <div className="permission-alert-text">
-              <strong>Permissão de localização necessária</strong>
+              <strong>📍 Permissão de localização necessária</strong>
               <p>
-                Para mostrar sua localização no mapa, precisamos da sua
-                permissão.
+                Para **mostrar a sua localização** no mapa e calcular a
+                **distância até ao TukTuk**, precisamos da sua permissão de
+                localização. ✨
               </p>
             </div>
             <button
               className="permission-alert-close"
               onClick={() => setShowPermissionAlert(false)}
+              title="Fechar aviso"
             >
               ✕
             </button>
@@ -263,8 +271,8 @@ export const LocationPermissionButton: React.FC<
                       </div>
                     </div>
                     <p className="visual-note">
-                      Procure por estes ícones na barra de endereços do seu
-                      navegador
+                      **🔍 Procure por estes ícones** na barra de endereços do
+                      seu navegador
                     </p>
                   </div>
                 </div>
@@ -275,7 +283,7 @@ export const LocationPermissionButton: React.FC<
                 className="help-modal-button"
                 onClick={() => setShowHelpModal(false)}
               >
-                Entendi
+                ✅ Entendi, obrigado!
               </button>
               <a
                 href="/docs/PERMISSAO-LOCALIZACAO.md"
