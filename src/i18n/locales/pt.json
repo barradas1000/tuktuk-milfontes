@@ -304,5 +304,111 @@
   "aerialViewMilfontes": {
     "title": "Vista Aérea de Milfontes",
     "description": "Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes, Alentejo - Portugal."
+  },
+  "tracking": {
+    "title": "TukTuk em Tempo Real",
+    "subtitle": "Acompanhe a localização do nosso TukTuk em Vila Nova de Milfontes",
+    "currentLocation": "Localização Atual",
+    "howItWorks": "Como funciona",
+    "contact": "Contacto",
+    "backToMainSite": "Voltar ao site principal",
+    "loading": "A carregar localização do TukTuk...",
+    "pleaseWait": "Por favor aguarde...",
+    "mapCentering": "Centralizar mapa",
+    "makeReservation": "Faça a Sua Reserva Aqui!",
+    "reservationDialog": "Formulário de Reserva",
+    "tuktukAvailable": "TukTuk disponível agora!",
+    "tuktukBusy": "TukTuk Neste Momento Está Ocupado",
+    "readyForAdventure": "Pronto para o levar numa aventura",
+    "busyUntil": "até às",
+    "availableAgainAt": "Voltará a estar disponível às",
+    "instructions": {
+      "locateMe": "Clique em \"Localizar-me\" para ver a sua posição no mapa",
+      "tuktukIcon": "O ícone do TukTuk mostra a localização atual em tempo real",
+      "statusIndicator": "O status indica se o TukTuk está disponível ou ocupado",
+      "distanceCalculation": "A distância e tempo estimado são calculados automaticamente",
+      "makeReservation": "Use \"Faça a Sua Reserva Aqui!\" para reservar o serviço",
+      "centerMap": "\"Centralizar mapa\" ajusta a vista para melhor visualização",
+      "offlineNote": "Se não vir o TukTuk, pode estar offline"
+    },
+    "contactInfo": {
+      "phone": "Telefone: 963 496 320",
+      "whatsapp": "WhatsApp: Disponível no site principal",
+      "email": "Email: diogo.carias@outlook.pt"
+    }
+  },
+  "locationPermission": {
+    "grantAccess": "Localizar-me",
+    "locating": "A localizar...",
+    "permissionDenied": "Permissão Negada",
+    "located": "Localizado!",
+    "permissionNeeded": "Permissão de localização necessária",
+    "permissionDescription": "Para **mostrar a sua localização** no mapa e calcular a **distância até ao TukTuk**, precisamos da sua permissão de localização.",
+    "clickForHelp": "Clique para ajuda",
+    "helpInstructions": {
+      "android": {
+        "title": "Como permitir localização no Android",
+        "method1": "Método completo:",
+        "method2": "Método rápido (mais fácil):",
+        "method3": "Se não encontrar os ícones:",
+        "steps": {
+          "complete": [
+            "Toque nos **três pontos** (⋮) no canto superior direito do Chrome",
+            "Selecione **\"Configurações\"**",
+            "Toque em **\"Site settings\"** ou **\"Configurações do site\"**",
+            "Toque em **\"Localização\"**",
+            "Encontre este site na lista e mude para **\"Permitir\"**",
+            "Volte para o site e **atualize a página**"
+          ],
+          "quick": [
+            "Procure pelo ícone **📍** na barra de endereços",
+            "Ou pelo ícone **🔒** ao lado do endereço",
+            "Toque nele e selecione **\"Permitir\"\""
+          ],
+          "alternative": [
+            "Toque na **barra de endereços** para ver mais opções",
+            "Procure pelo ícone de **informação** (ⓘ)"
+          ]
+        }
+      },
+      "ios": {
+        "title": "Como permitir localização no iPhone/iPad",
+        "steps": [
+          "Toque no ícone **\"AA\"** na barra de endereços",
+          "Selecione **\"Configurações do site\"**",
+          "Toque em **\"Localização\"**",
+          "Mude para **\"Permitir\"**",
+          "Volte para o site e **atualize a página**"
+        ],
+        "alternative": [
+          "Procure pelo ícone **📍** na barra de endereços",
+          "Toque nele e selecione **\"Permitir\"\""
+        ]
+      },
+      "desktop": {
+        "title": "Como permitir localização no navegador",
+        "steps": [
+          "Procure pelo ícone **📍** na barra de endereços",
+          "Clique nele e selecione **\"Permitir\"** quando aparecer o popup",
+          "Se não aparecer, verifique as **configurações do navegador**",
+          "Procure por **\"Permissões\"** ou **\"Configurações do site\"**",
+          "**Habilite** a permissão de localização para este site"
+        ]
+      }
+    },
+    "statusMessages": {
+      "unsupported": "Geolocalização não suportada neste navegador",
+      "obtaining": "A obter a sua localização...",
+      "error": "Erro:",
+      "denied": "Permissão negada - Clique para ajuda",
+      "success": "Localização obtida com sucesso!",
+      "clickToDiscover": "Clique para descobrir a sua localização"
+    },
+    "helpModal": {
+      "understood": "Entendi, obrigado!",
+      "completeGuide": "Ver guia completo",
+      "lookForIcons": "Onde encontrar os ícones:",
+      "visualNote": "**🔍 Procure por estes ícones** na barra de endereços do seu navegador"
+    }
   }
 }

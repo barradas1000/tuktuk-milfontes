@@ -1,4 +1,10 @@
 import React, { useState, useRef } from "react";
+import { useTranslation }   const getButtonText = () => {
+    if (isLoading) return "📍 " + t("locationPermission.locating");
+    if (permission === "denied") return "🔒 " + t("locationPermission.permissionDenied");
+    if (position) return "✅ " + t("locationPermission.located");
+    return children || "📍 " + t("locationPermission.grantAccess");
+  };react-i18next";
 import { useGeolocation } from "../hooks/useGeolocation";
 
 import { GeolocationPosition as CustomGeolocationPosition } from "../hooks/useGeolocation";
@@ -20,6 +26,7 @@ export const LocationPermissionButton: React.FC<
   children,
   showStatus = true,
 }) => {
+  const { t } = useTranslation();
   const { position, error, permission, isLoading, isSupported, getLocation } =
     useGeolocation();
   const [showHelpModal, setShowHelpModal] = useState(false);

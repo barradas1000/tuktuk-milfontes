@@ -1,8 +1,11 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PassengerMap from "../components/PassengerMap";
 
 const PassengerView: React.FC = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -10,10 +13,10 @@ const PassengerView: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
             <h1 className="text-3xl font-bold text-gray-900 text-center">
-              🛺 TukTuk em Tempo Real
+              🛺 {t("tracking.title")}
             </h1>
             <p className="text-center text-gray-600 mt-2">
-              Acompanhe a localização do nosso TukTuk em Vila Nova de Milfontes
+              {t("tracking.subtitle")}
             </p>
           </div>
         </div>
@@ -24,7 +27,7 @@ const PassengerView: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              📍 Localização Atual
+              📍 {t("tracking.currentLocation")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -36,39 +39,39 @@ const PassengerView: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">ℹ️ Como funciona</CardTitle>
+              <CardTitle className="text-lg">ℹ️ {t("tracking.howItWorks")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-gray-600">
               <div>
-                • 📍 Clique em "Localizar-me" para ver a sua posição no mapa
+                • {t("tracking.instructions.locateMe")}
               </div>
               <div>
-                • 🚗 O ícone do TukTuk mostra a localização atual em tempo real
+                • {t("tracking.instructions.tuktukIcon")}
               </div>
               <div>
-                • 🟢/🔴 O status indica se o TukTuk está disponível ou ocupado
+                • {t("tracking.instructions.statusIndicator")}
               </div>
               <div>
-                • 📏 A distância e tempo estimado são calculados automaticamente
+                • {t("tracking.instructions.distanceCalculation")}
               </div>
               <div>
-                • 📝 Use "Faça a Sua Reserva Aqui!" para reservar o serviço
+                • {t("tracking.instructions.makeReservation")}
               </div>
               <div>
-                • 🎯 "Centralizar mapa" ajusta a vista para melhor visualização
+                • {t("tracking.instructions.centerMap")}
               </div>
-              <div>• 🚫 Se não vir o TukTuk, pode estar offline</div>
+              <div>• {t("tracking.instructions.offlineNote")}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">📞 Contacto</CardTitle>
+              <CardTitle className="text-lg">📞 {t("tracking.contact")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm text-gray-600">
-              <div>• Telefone: 963 496 320</div>
-              <div>• WhatsApp: Disponível no site principal</div>
-              <div>• Email: diogo.carias@outlook.pt</div>
+              <div>• {t("tracking.contactInfo.phone")}</div>
+              <div>• {t("tracking.contactInfo.whatsapp")}</div>
+              <div>• {t("tracking.contactInfo.email")}</div>
             </CardContent>
           </Card>
         </div>
@@ -79,7 +82,7 @@ const PassengerView: React.FC = () => {
             href="/"
             className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
           >
-            ← Voltar ao site principal
+            ← {t("tracking.backToMainSite")}
           </a>
         </div>
       </div>

@@ -303,5 +303,111 @@
   "aerialViewMilfontes": {
     "title": "Aerial View of Milfontes",
     "description": "Aerial view on a winter afternoon over Vila Nova de Milfontes, Alentejo - Portugal."
+  },
+  "tracking": {
+    "title": "TukTuk in Real Time",
+    "subtitle": "Follow the location of our TukTuk in Vila Nova de Milfontes",
+    "currentLocation": "Current Location",
+    "howItWorks": "How it works",
+    "contact": "Contact",
+    "backToMainSite": "Back to main site",
+    "loading": "Loading TukTuk location...",
+    "pleaseWait": "Please wait...",
+    "mapCentering": "Center map",
+    "makeReservation": "Make Your Reservation Here!",
+    "reservationDialog": "Reservation Form",
+    "tuktukAvailable": "TukTuk available now!",
+    "tuktukBusy": "TukTuk Currently Busy",
+    "readyForAdventure": "Ready to take you on an adventure",
+    "busyUntil": "until",
+    "availableAgainAt": "Will be available again at",
+    "instructions": {
+      "locateMe": "Click \"Locate me\" to see your position on the map",
+      "tuktukIcon": "The TukTuk icon shows the current location in real time",
+      "statusIndicator": "The status indicates if the TukTuk is available or busy",
+      "distanceCalculation": "Distance and estimated time are calculated automatically",
+      "makeReservation": "Use \"Make Your Reservation Here!\" to book the service",
+      "centerMap": "\"Center map\" adjusts the view for better visualization",
+      "offlineNote": "If you don't see the TukTuk, it may be offline"
+    },
+    "contactInfo": {
+      "phone": "Phone: 963 496 320",
+      "whatsapp": "WhatsApp: Available on main site",
+      "email": "Email: diogo.carias@outlook.pt"
+    }
+  },
+  "locationPermission": {
+    "grantAccess": "Locate me",
+    "locating": "Locating...",
+    "permissionDenied": "Permission Denied",
+    "located": "Located!",
+    "permissionNeeded": "Location permission needed",
+    "permissionDescription": "To **show your location** on the map and calculate the **distance to the TukTuk**, we need your location permission.",
+    "clickForHelp": "Click for help",
+    "helpInstructions": {
+      "android": {
+        "title": "How to allow location on Android",
+        "method1": "Complete method:",
+        "method2": "Quick method (easier):",
+        "method3": "If you can't find the icons:",
+        "steps": {
+          "complete": [
+            "Tap the **three dots** (⋮) in the top right corner of Chrome",
+            "Select **\"Settings\"**",
+            "Tap **\"Site settings\"**",
+            "Tap **\"Location\"**",
+            "Find this site in the list and change to **\"Allow\"**",
+            "Go back to the site and **refresh the page**"
+          ],
+          "quick": [
+            "Look for the **📍** icon in the address bar",
+            "Or the **🔒** icon next to the address",
+            "Tap it and select **\"Allow\"\""
+          ],
+          "alternative": [
+            "Tap the **address bar** to see more options",
+            "Look for the **information** icon (ⓘ)"
+          ]
+        }
+      },
+      "ios": {
+        "title": "How to allow location on iPhone/iPad",
+        "steps": [
+          "Tap the **\"AA\"** icon in the address bar",
+          "Select **\"Website Settings\"**",
+          "Tap **\"Location\"**",
+          "Change to **\"Allow\"**",
+          "Go back to the site and **refresh the page**"
+        ],
+        "alternative": [
+          "Look for the **📍** icon in the address bar",
+          "Tap it and select **\"Allow\"\""
+        ]
+      },
+      "desktop": {
+        "title": "How to allow location in browser",
+        "steps": [
+          "Look for the **📍** icon in the address bar",
+          "Click it and select **\"Allow\"** when the popup appears",
+          "If it doesn't appear, check the **browser settings**",
+          "Look for **\"Permissions\"** or **\"Site settings\"**",
+          "**Enable** location permission for this site"
+        ]
+      }
+    },
+    "statusMessages": {
+      "unsupported": "Geolocation not supported in this browser",
+      "obtaining": "Getting your location...",
+      "error": "Error:",
+      "denied": "Permission denied - Click for help",
+      "success": "Location obtained successfully!",
+      "clickToDiscover": "Click to discover your location"
+    },
+    "helpModal": {
+      "understood": "Got it, thank you!",
+      "completeGuide": "View complete guide",
+      "lookForIcons": "Where to find the icons:",
+      "visualNote": "**🔍 Look for these icons** in your browser's address bar"
+    }
   }
 }
