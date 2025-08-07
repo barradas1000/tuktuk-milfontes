@@ -418,8 +418,10 @@ export const determineSlotStatus = (
   reservations: ReservationData[],
   blockedPeriods: BlockedPeriod[] = []
 ): SlotStatus => {
-  console.log(`🔍 Verificando slot ${slotTime} - ${reservations.length} reservas encontradas`);
-  
+  console.log(
+    `🔍 Verificando slot ${slotTime} - ${reservations.length} reservas encontradas`
+  );
+
   // Verificar se está bloqueado manualmente
   const isManuallyBlocked = blockedPeriods.some((period) => {
     // Lógica para verificar se o slot está em um período bloqueado
@@ -434,14 +436,18 @@ export const determineSlotStatus = (
 
   // Verificar PRIMEIRO se há uma reserva que começa exatamente neste horário
   for (const reservation of reservations) {
-    console.log(`🔍 Verificando slot ${slotTime} para reserva às ${reservation.reservation_time}`);
-    
+    console.log(
+      `🔍 Verificando slot ${slotTime} para reserva às ${reservation.reservation_time}`
+    );
+
     // Comparação exata de horários (normalizar formato)
     const reservationTime = reservation.reservation_time.trim();
     const currentSlot = slotTime.trim();
-    
+
     if (reservationTime === currentSlot) {
-      console.log(`✅ MATCH EXATO encontrado! Slot ${slotTime} = reserva ${reservationTime}. Status: occupied`);
+      console.log(
+        `✅ MATCH EXATO encontrado! Slot ${slotTime} = reserva ${reservationTime}. Status: occupied`
+      );
       return "occupied";
     }
   }
@@ -452,12 +458,15 @@ export const determineSlotStatus = (
       reservation.reservation_time,
       reservation.tour_type
     );
-    
+
     // Verificar se está dentro do período mas NÃO é o horário exato de início
-    const isWithinDuration = slotTime > reservation.reservation_time && slotTime < tourEnd;
-    
+    const isWithinDuration =
+      slotTime > reservation.reservation_time && slotTime < tourEnd;
+
     if (isWithinDuration) {
-      console.log(`🟡 Slot ${slotTime} dentro do buffer (${reservation.reservation_time}-${tourEnd}). Status: buffer`);
+      console.log(
+        `🟡 Slot ${slotTime} dentro do buffer (${reservation.reservation_time}-${tourEnd}). Status: buffer`
+      );
       return "buffer";
     }
   }
@@ -473,22 +482,44 @@ export const generateDayAvailability = async (
   date: string
 ): Promise<DayAvailability> => {
   const isConfigured = checkSupabaseConfiguration();
+  console.log(`🚀 [generateDayAvailability] Iniciando para data: ${date}`);
 
   try {
     // Buscar reservas do dia
     let reservations: ReservationData[] = [];
     if (isConfigured) {
-      const { data } = await supabase
+      console.log(
+        `📡 [generateDayAvailability] Buscando reservas no Supabase para ${date}`
+      );
+      const { data, error } = await supabase
         .from("reservations")
         .select(
-          "id, reservation_date, reservation_time, number_of_people, tour_type, status"
+          "id, reservation_date, reservation_time, number_of_people, tour_type, status, customer_name"
         )
         .eq("reservation_date", date)
         .neq("status", "cancelled");
+
+      if (error) {
+        console.error(
+          "❌ [generateDayAvailability] Erro ao buscar reservas:",
+          error
+        );
+      } else {
+        console.log(
+          `📋 [generateDayAvailability] ${
+            data?.length || 0
+          } reservas encontradas:`,
+          data
+        );
+      }
+
       reservations = data || [];
     } else {
       reservations = mockReservations.filter(
         (r) => r.reservation_date === date && r.status !== "cancelled"
+      );
+      console.log(
+        `📋 [generateDayAvailability] Usando mock data: ${reservations.length} reservas`
       );
     }
 
@@ -500,15 +531,22 @@ export const generateDayAvailability = async (
         .select("*")
         .eq("date", date);
       blockedPeriods = data || [];
+      console.log(
+        `🔒 [generateDayAvailability] ${blockedPeriods.length} períodos bloqueados encontrados`
+      );
     }
 
     // Gerar slots para o dia
     const timeSlots = generateDynamicTimeSlots();
+    console.log(
+      `⏰ [generateDayAvailability] Gerando ${timeSlots.length} slots de tempo`
+    );
+
     const slots: TimeSlot[] = timeSlots.map((time) => {
       const status = determineSlotStatus(time, reservations, blockedPeriods);
       const reservation = reservations.find((r) => r.reservation_time === time);
 
-      return {
+      const slot: TimeSlot = {
         time,
         status,
         blockedBy:
@@ -523,11 +561,38 @@ export const generateDayAvailability = async (
           ? calculateTourEndTime(time, reservation.tour_type)
           : undefined,
       };
+
+      // Log detalhado para slots ocupados
+      if (status === "occupied") {
+        console.log(
+          `🎯 [generateDayAvailability] Slot ${time} marcado como OCCUPIED:`,
+          {
+            reservationId: reservation?.id,
+            tourType: reservation?.tour_type,
+            customer: reservation?.customer_name,
+            endTime: slot.endTime,
+          }
+        );
+      }
+
+      return slot;
     });
 
     const totalAvailable = slots.filter((s) => s.status === "available").length;
     const totalBlocked = slots.filter((s) => s.status === "blocked").length;
+    const totalOccupied = slots.filter((s) => s.status === "occupied").length;
+    const totalBuffer = slots.filter((s) => s.status === "buffer").length;
     const hasReservations = reservations.length > 0;
+
+    console.log(`📊 [generateDayAvailability] Resultado final:`, {
+      date,
+      totalSlots: slots.length,
+      totalAvailable,
+      totalOccupied,
+      totalBuffer,
+      totalBlocked,
+      hasReservations,
+    });
 
     return {
       date,
@@ -537,7 +602,7 @@ export const generateDayAvailability = async (
       hasReservations,
     };
   } catch (error) {
-    console.error("Error generating day availability:", error);
+    console.error("❌ [generateDayAvailability] Erro geral:", error);
     return {
       date,
       timeSlots: [],
