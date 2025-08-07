@@ -419,8 +419,15 @@ export const determineSlotStatus = (
   blockedPeriods: BlockedPeriod[] = []
 ): SlotStatus => {
   console.log(
-    `🔍 Verificando slot ${slotTime} - ${reservations.length} reservas encontradas`
+    `🔍 [determineSlotStatus] Analisando slot ${slotTime} - ${reservations.length} reservas encontradas`
   );
+
+  // Debug: Mostrar todas as reservas
+  reservations.forEach((r, index) => {
+    console.log(
+      `📋 [determineSlotStatus] Reserva ${index + 1}: ${r.reservation_time} (${r.tour_type}), Customer: ${r.customer_name || 'N/A'}`
+    );
+  });
 
   // Verificar se está bloqueado manualmente
   const isManuallyBlocked = blockedPeriods.some((period) => {
@@ -430,23 +437,27 @@ export const determineSlotStatus = (
   });
 
   if (isManuallyBlocked) {
-    console.log(`🔒 Slot ${slotTime}: BLOCKED (manual)`);
+    console.log(`🔒 [determineSlotStatus] Slot ${slotTime}: BLOCKED (manual)`);
     return "blocked";
   }
 
   // Verificar PRIMEIRO se há uma reserva que começa exatamente neste horário
   for (const reservation of reservations) {
     console.log(
-      `🔍 Verificando slot ${slotTime} para reserva às ${reservation.reservation_time}`
+      `🔍 [determineSlotStatus] Comparando slot "${slotTime}" com reserva "${reservation.reservation_time}"`
     );
 
     // Comparação exata de horários (normalizar formato)
     const reservationTime = reservation.reservation_time.trim();
     const currentSlot = slotTime.trim();
 
+    console.log(
+      `🔍 [determineSlotStatus] Comparação normalizada: "${currentSlot}" === "${reservationTime}" = ${currentSlot === reservationTime}`
+    );
+
     if (reservationTime === currentSlot) {
       console.log(
-        `✅ MATCH EXATO encontrado! Slot ${slotTime} = reserva ${reservationTime}. Status: occupied`
+        `✅ [determineSlotStatus] MATCH EXATO encontrado! Slot ${slotTime} = reserva ${reservationTime}. Status: OCCUPIED`
       );
       return "occupied";
     }
@@ -459,19 +470,23 @@ export const determineSlotStatus = (
       reservation.tour_type
     );
 
+    console.log(
+      `🔍 [determineSlotStatus] Verificando se slot ${slotTime} está no período ${reservation.reservation_time} - ${tourEnd}`
+    );
+
     // Verificar se está dentro do período mas NÃO é o horário exato de início
     const isWithinDuration =
       slotTime > reservation.reservation_time && slotTime < tourEnd;
 
     if (isWithinDuration) {
       console.log(
-        `🟡 Slot ${slotTime} dentro do buffer (${reservation.reservation_time}-${tourEnd}). Status: buffer`
+        `🟡 [determineSlotStatus] Slot ${slotTime} dentro do buffer (${reservation.reservation_time}-${tourEnd}). Status: BUFFER`
       );
       return "buffer";
     }
   }
 
-  console.log(`✅ Slot ${slotTime}: AVAILABLE`);
+  console.log(`✅ [determineSlotStatus] Slot ${slotTime}: AVAILABLE`);
   return "available";
 };
 
