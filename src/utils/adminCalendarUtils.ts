@@ -166,6 +166,118 @@ export const sliderStyles = `
     }
     }
   }
+  
+  /* Otimizações para telas maiores - Desktop/PC */
+  @media (min-width: 1024px) {
+    .slot-mobile {
+      min-height: 9.5rem;
+      font-size: 0.7rem;
+      padding: 0.8rem 0.4rem 0.8rem 0.4rem;
+      line-height: 1.25;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      word-break: break-word;
+      white-space: normal;
+    }
+    .slot-mobile .slot-time {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.15rem;
+      word-break: break-word;
+      white-space: normal;
+      text-align: center;
+    }
+    .slot-mobile .slot-status {
+      font-size: 0.7rem !important;
+      margin-top: 0.15rem;
+      line-height: 1.25;
+      word-break: break-word;
+      white-space: normal;
+      text-align: center;
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+    .slot-mobile .slot-status span {
+      font-size: 0.7rem !important;
+      word-break: break-word;
+      white-space: normal;
+    }
+    .slot-mobile .tour-info,
+    .slot-mobile .passenger-info {
+      font-size: 0.65rem;
+      line-height: 1.1;
+      word-break: break-word;
+      white-space: normal;
+      text-align: center;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .slot-mobile {
+      min-height: 11rem;
+      font-size: 0.75rem;
+      padding: 1rem 0.5rem 1rem 0.5rem;
+      line-height: 1.3;
+    }
+    .slot-mobile .slot-time {
+      font-size: 0.9rem;
+      margin-bottom: 0.18rem;
+    }
+    .slot-mobile .slot-status {
+      font-size: 0.75rem !important;
+      margin-top: 0.18rem;
+      line-height: 1.3;
+      word-break: break-word;
+      white-space: normal;
+      text-align: center;
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+    .slot-mobile .slot-status span {
+      font-size: 0.75rem !important;
+      word-break: break-word;
+      white-space: normal;
+    }
+    .slot-mobile .tour-info,
+    .slot-mobile .passenger-info {
+      font-size: 0.7rem;
+      line-height: 1.15;
+    }
+  }
+  
+  @media (min-width: 1536px) {
+    .slot-mobile {
+      min-height: 13rem;
+      font-size: 0.8rem;
+      padding: 1.2rem 0.7rem 1.2rem 0.7rem;
+      line-height: 1.35;
+    }
+    .slot-mobile .slot-time {
+      font-size: 1rem;
+      margin-bottom: 0.22rem;
+    }
+    .slot-mobile .slot-status {
+      font-size: 0.8rem !important;
+      margin-top: 0.22rem;
+      line-height: 1.35;
+      word-break: break-word;
+      white-space: normal;
+      text-align: center;
+      max-width: 100%;
+      overflow-wrap: break-word;
+    }
+    .slot-mobile .slot-status span {
+      font-size: 0.8rem !important;
+      word-break: break-word;
+      white-space: normal;
+    }
+    .slot-mobile .passenger-info,
+    .slot-mobile .tour-info {
+      font-size: 0.4rem;
+      line-height: 1.15;
+    }
+  }
 `;
 
 // Condutores fallback caso não carregue do banco

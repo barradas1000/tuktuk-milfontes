@@ -1068,6 +1068,33 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     [calendarDate, getReservationsByDate]
   );
 
+  // Próximos 10 dias com status de bloqueio
+  const next10Days = useMemo(() => {
+    const days = [];
+    const today = new Date();
+
+    for (let i = 0; i < 10; i++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      const dateString = format(date, "yyyy-MM-dd");
+      const isBlocked = isDayBlocked(date);
+      const blockReason = isBlocked ? getDayBlockReason(date) : null;
+
+      days.push({
+        date,
+        dateString,
+        isBlocked,
+        blockReason,
+        dayName: format(date, "EEE", { locale: pt }),
+        dayNumber: format(date, "dd"),
+        monthName: format(date, "MMM", { locale: pt }),
+        isToday: i === 0,
+      });
+    }
+
+    return days;
+  }, [isDayBlocked, getDayBlockReason]);
+
   // Nova lógica para availability slots usando a grid avançada
   const availabilitySlots = useMemo(() => {
     if (useAdvancedGrid && dayAvailability) {
@@ -1695,7 +1722,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                       (slot.tourType ? `${slot.tourType}` : "Ocupado");
                     break;
                   case "blocked":
-                    cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
+                    cardClass =
+                      "border-red-500 bg-red-50 hover:bg-red-100 border-2";
                     textClass = "text-red-600";
                     statusText = slot.statusMessage || "Bloqueado";
                     break;
@@ -1721,7 +1749,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     statusText = "Reserva confirmada";
                     break;
                   case "blocked_by_admin":
-                    cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
+                    cardClass =
+                      "border-red-500 bg-red-50 hover:bg-red-100 border-2";
                     textClass = "text-red-600";
                     statusText = "Bloqueado pelo admin";
                     break;
@@ -1742,7 +1771,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               return (
                 <div
                   key={slot.time}
-                  className={`slot-mobile p-3 h-24 sm:h-22 md:h-24 lg:h-20 xl:h-18 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
+                  className={`slot-mobile p-3 h-24 sm:h-22 md:h-24 lg:h-28 xl:h-32 2xl:h-36 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
                   title={
                     useAdvancedGrid && slot.conflictReason
                       ? `${statusText} - ${slot.conflictReason}`
@@ -1774,8 +1803,12 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                       {slot.time.substring(0, 5)}
                     </span>
                     <span className="hidden sm:inline">{slot.time}</span>
-                    {slot.status !== "available" && (
-                      <Lock className="w-3 h-3 sm:w-4 sm:h-4 inline ml-1" />
+                    {(slot.status === "blocked" ||
+                      slot.status === "blocked_by_admin") && (
+                      <Lock className="w-4 h-4 sm:w-5 sm:h-5 inline ml-1 text-red-600" />
+                    )}
+                    {slot.status === "blocked_by_reservation" && (
+                      <Lock className="w-3 h-3 sm:w-4 sm:h-4 inline ml-1 text-orange-600" />
                     )}
                   </div>
 
@@ -1801,9 +1834,27 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     className={`slot-status text-sm sm:text-base font-medium mt-1 ${textClass} text-center leading-tight`}
                   >
                     <span className="sm:hidden block whitespace-normal break-words">
-                      {statusText}
+                      {slot.status === "blocked" ||
+                      slot.status === "blocked_by_admin" ? (
+                        <span className="flex items-center justify-center gap-1">
+                          <Lock className="w-3 h-3" />
+                          {statusText}
+                        </span>
+                      ) : (
+                        statusText
+                      )}
                     </span>
-                    <span className="hidden sm:inline">{statusText}</span>
+                    <span className="hidden sm:inline">
+                      {slot.status === "blocked" ||
+                      slot.status === "blocked_by_admin" ? (
+                        <span className="flex items-center justify-center gap-1">
+                          <Lock className="w-3 h-3" />
+                          {statusText}
+                        </span>
+                      ) : (
+                        statusText
+                      )}
+                    </span>
                   </div>
                 </div>
               );
@@ -1921,6 +1972,128 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                 </div>
                 <span>Dia disponível (clique para bloquear)</span>
               </div>
+            </div>
+          </div>
+
+          {/* Visualização dos Próximos 10 Dias */}
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="font-semibold text-blue-900 flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                Próximos 10 Dias - Status de Bloqueio
+              </h4>
+              <div className="flex items-center gap-2 text-sm">
+                <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full">
+                  {next10Days.filter((d) => d.isBlocked).length} bloqueados
+                </span>
+                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                  {next10Days.filter((d) => !d.isBlocked).length} disponíveis
+                </span>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-2">
+              {next10Days.map((day, index) => (
+                <div
+                  key={day.dateString}
+                  className={`
+                    relative p-2 rounded-lg border-2 transition-all cursor-pointer text-center
+                    ${
+                      day.isBlocked
+                        ? "bg-red-100 border-red-500 hover:bg-red-150"
+                        : "bg-green-100 border-green-300 hover:bg-green-150"
+                    }
+                    ${day.isToday ? "ring-2 ring-blue-500" : ""}
+                    ${
+                      format(calendarDate, "yyyy-MM-dd") === day.dateString
+                        ? "ring-2 ring-blue-500"
+                        : ""
+                    }
+                  `}
+                  onClick={() => {
+                    // Se está bloqueado, desbloquear; se não está, navegar para o dia
+                    if (day.isBlocked) {
+                      unblockDay(day.date);
+                    } else {
+                      setCalendarDate(day.date);
+                      onDateSelect(day.dateString);
+                    }
+                  }}
+                  onContextMenu={(e) => {
+                    // Clique direito para bloquear/desbloquear
+                    e.preventDefault();
+                    if (day.isBlocked) {
+                      unblockDay(day.date);
+                    } else {
+                      blockDay(day.date, "Bloqueado via visualização rápida");
+                    }
+                  }}
+                  title={
+                    day.isBlocked
+                      ? `${day.blockReason} (Clique para desbloquear ou botão direito)`
+                      : "Clique para navegar ou botão direito para bloquear"
+                  }
+                >
+                  {/* Indicador de dia atual */}
+                  {day.isToday && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></div>
+                  )}
+
+                  {/* Dia da semana */}
+                  <div className="text-xs font-medium text-gray-600 uppercase">
+                    {day.dayName}
+                  </div>
+
+                  {/* Número do dia */}
+                  <div
+                    className={`text-lg font-bold ${
+                      day.isBlocked ? "text-red-700" : "text-green-700"
+                    }`}
+                  >
+                    {day.isBlocked ? (
+                      <div className="flex items-center justify-center">
+                        <Lock className="w-4 h-4" />
+                      </div>
+                    ) : (
+                      day.dayNumber
+                    )}
+                  </div>
+
+                  {/* Mês */}
+                  <div className="text-xs text-gray-500">{day.monthName}</div>
+
+                  {/* Status visual */}
+                  <div
+                    className={`absolute bottom-1 left-1 right-1 h-1 rounded ${
+                      day.isBlocked ? "bg-red-400" : "bg-green-400"
+                    }`}
+                  ></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Legenda específica */}
+            <div className="mt-3 flex flex-wrap gap-4 text-xs">
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-green-100 border border-green-300 rounded"></div>
+                <span>Dia disponível</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-red-100 border border-red-300 rounded flex items-center justify-center">
+                  <Lock className="w-2 h-2" />
+                </div>
+                <span>Dia bloqueado</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <span>Hoje</span>
+              </div>
+            </div>
+
+            {/* Instruções de uso */}
+            <div className="mt-2 p-2 bg-blue-100 rounded text-xs text-blue-800">
+              <strong>💡 Dicas:</strong> Clique esquerdo para navegar | Clique
+              direito para bloquear/desbloquear | Dias bloqueados: clique
+              esquerdo para desbloquear
             </div>
           </div>
         </CardContent>
