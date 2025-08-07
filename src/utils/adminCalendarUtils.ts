@@ -11,15 +11,15 @@ export const sliderStyles = `
   /* Otimizações para slots em mobile */
   @media (max-width: 475px) {
     .grid-mobile-optimized {
-      gap: 0.3rem;
-      padding: 0.3rem;
+      gap: 0.4rem;
+      padding: 0.4rem;
     }
     
     .slot-mobile {
-      min-height: 4rem;
-      font-size: 0.75rem;
-      padding: 0.25rem;
-      border-radius: 0.375rem;
+      min-height: 6rem;
+      font-size: 0.85rem;
+      padding: 0.4rem;
+      border-radius: 0.5rem;
       transition: all 0.2s ease-in-out;
       border-width: 1px;
     }
@@ -30,95 +30,139 @@ export const sliderStyles = `
     }
     
     .slot-mobile .slot-time {
-      font-size: 0.8rem;
+      font-size: 0.9rem;
       font-weight: 600;
-      line-height: 1.2;
+      line-height: 1.3;
       color: #1f2937;
+      margin-bottom: 0.2rem;
     }
     
     .slot-mobile .slot-status {
-      font-size: 0.7rem;
-      line-height: 1.1;
+      font-size: 0.8rem;
+      line-height: 1.3;
       margin-top: 0.2rem;
       max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow: visible;
+      text-overflow: unset;
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-word;
       opacity: 0.9;
+      text-align: center;
     }
   }
   
   @media (max-width: 640px) {
     .grid-mobile-optimized {
-      gap: 0.35rem;
-      padding: 0.35rem;
+      gap: 0.4rem;
+      padding: 0.4rem;
     }
     
     .slot-mobile {
-      min-height: 4.5rem;
-      font-size: 0.8rem;
-      padding: 0.3rem;
+      min-height: 5.5rem;
+      font-size: 0.9rem;
+      padding: 0.4rem;
       border-radius: 0.5rem;
     }
     
     .slot-mobile .slot-time {
-      font-size: 0.85rem;
+      font-size: 0.95rem;
       font-weight: 600;
       line-height: 1.3;
+      margin-bottom: 0.15rem;
     }
     
     .slot-mobile .slot-status {
-      font-size: 0.75rem;
-      line-height: 1.2;
-      margin-top: 0.25rem;
+      font-size: 0.85rem;
+      line-height: 1.3;
+      margin-top: 0.15rem;
       max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      overflow: visible;
+      text-overflow: unset;
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-word;
+      text-align: center;
     }
   }
   
   @media (max-width: 480px) {
     .grid-mobile-optimized {
-      gap: 0.25rem;
-      padding: 0.25rem;
+      gap: 0.3rem;
+      padding: 0.3rem;
     }
     
     .slot-mobile {
-      min-height: 3.5rem;
-      font-size: 0.7rem;
-      padding: 0.2rem;
+      min-height: 5rem;
+      font-size: 0.8rem;
+      padding: 0.3rem;
     }
     
     .slot-mobile .slot-time {
-      font-size: 0.8rem;
-      line-height: 1.2;
+      font-size: 0.85rem;
+      line-height: 1.3;
+      margin-bottom: 0.1rem;
     }
     
     .slot-mobile .slot-status {
-      font-size: 0.65rem;
-      margin-top: 0.15rem;
+      font-size: 0.75rem;
+      margin-top: 0.1rem;
+      line-height: 1.3;
+      overflow: visible;
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-word;
+      text-align: center;
     }
   }
   
   @media (max-width: 375px) {
     .grid-mobile-optimized {
-      gap: 0.2rem;
+      gap: 0.25rem;
     }
     
     .slot-mobile {
-      min-height: 3.2rem;
-      font-size: 0.65rem;
-      padding: 0.15rem;
+      min-height: 4.5rem;
+      font-size: 0.75rem;
+      padding: 0.25rem;
     }
     
     .slot-mobile .slot-time {
-      font-size: 0.75rem;
+      font-size: 0.8rem;
+      margin-bottom: 0.1rem;
     }
     
     .slot-mobile .slot-status {
-      font-size: 0.6rem;
+      font-size: 0.7rem;
       margin-top: 0.1rem;
+      line-height: 1.3;
+      overflow: visible;
+      white-space: normal;
+      word-wrap: break-word;
+      word-break: break-word;
+      text-align: center;
+    }
+    
+    /* Otimizações específicas para informações de passageiro */
+    .slot-mobile .passenger-info {
+      font-size: 0.7rem;
+      line-height: 1.2;
+      margin: 0.1rem 0;
+      word-wrap: break-word;
+      word-break: break-word;
+      overflow-wrap: break-word;
+      hyphens: auto;
+      text-align: center;
+    }
+    
+    .slot-mobile .tour-info {
+      font-size: 0.65rem;
+      line-height: 1.1;
+      margin-top: 0.1rem;
+      font-weight: 500;
+      color: #374151;
+      word-wrap: break-word;
+      text-align: center;
     }
     }
   }

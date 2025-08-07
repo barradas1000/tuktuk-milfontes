@@ -25,6 +25,7 @@ export default {
       },
       height: {
         "18": "4.5rem",
+        "22": "5.5rem",
       },
       colors: {
         border: "hsl(var(--border))",

@@ -1716,7 +1716,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               return (
                 <div
                   key={slot.time}
-                  className={`slot-mobile p-2 h-16 sm:h-18 md:h-20 lg:h-16 rounded-md text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
+                  className={`slot-mobile p-3 h-24 sm:h-22 md:h-24 lg:h-20 xl:h-18 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
                   title={
                     useAdvancedGrid && slot.conflictReason
                       ? `${statusText} - ${slot.conflictReason}`
@@ -1760,22 +1760,22 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                         <div className="text-xs">até {slot.endTime}</div>
                       )}
                       {slot.tourDuration && slot.status !== "available" && (
-                        <div className="text-sm opacity-75">
+                        <div className="text-sm opacity-75 text-center">
                           ({slot.tourDuration}m)
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-gray-600 text-center leading-tight">
                       {slot.reserved}/{slot.capacity} pessoas
                     </div>
                   )}
 
                   <div
-                    className={`slot-status text-sm sm:text-base font-medium mt-1 ${textClass} truncate`}
+                    className={`slot-status text-sm sm:text-base font-medium mt-1 ${textClass} text-center leading-tight`}
                   >
-                    <span className="sm:hidden">
-                      {getCondensedStatusText(statusText)}
+                    <span className="sm:hidden block whitespace-normal break-words">
+                      {statusText}
                     </span>
                     <span className="hidden sm:inline">{statusText}</span>
                   </div>
