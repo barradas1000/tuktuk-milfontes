@@ -68,6 +68,12 @@ import {
   getAvailabilityWithBlocks,
   generateDynamicTimeSlots,
 } from "@/utils/reservationUtils";
+// Importar novas funções e tipos da grid avançada
+import {
+  type DayAvailability,
+  type TimeSlot,
+  type SlotStatus,
+} from "@/services/availabilityService";
 import ToggleTrackingButton from "../ToggleTrackingButton";
 
 // --- Helper Functions (pode ser movido para um arquivo separado, ex: utils/time.ts ou utils/format.ts) ---
@@ -113,6 +119,10 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     getAvailabilityForDate,
     updateReservation,
     refetch,
+    // Novas funções da grid avançada
+    generateDayAvailability,
+    generateWeeklyAvailability,
+    canScheduleTour,
   } = useAdminReservations();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -130,6 +140,12 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const [blockModalOpen, setBlockModalOpen] = useState(false);
   const [blockDate, setBlockDate] = useState<Date | null>(null); // Data atualmente selecionada para bloquear/desbloquear
   const [blockTab, setBlockTab] = useState<"day" | "hour" | null>("day"); // Aba ativa no modal de bloqueio
+
+  // Estados para a nova grid avançada
+  const [dayAvailability, setDayAvailability] = useState<DayAvailability | null>(null);
+  const [weeklyAvailability, setWeeklyAvailability] = useState<DayAvailability[]>([]);
+  const [gridLoading, setGridLoading] = useState(false);
+  const [useAdvancedGrid, setUseAdvancedGrid] = useState(true); // Toggle para nova grid
 
   // Estados para bloqueio de dia inteiro/intervalo de dias
   const [blockDayReason, setBlockDayReason] = useState("");
@@ -1058,15 +1074,31 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     () => getReservationsByDate(format(calendarDate, "yyyy-MM-dd")),
     [calendarDate, getReservationsByDate]
   );
+  
+  // Nova lógica para availability slots usando a grid avançada
   const availabilitySlots = useMemo(() => {
-    const slots = getAvailabilityWithBlocks(
-      selectedDateReservations,
-      blockedPeriods,
-      format(calendarDate, "yyyy-MM-dd")
-    );
-    console.log("Availability slots calculated:", slots);
-    return slots;
-  }, [selectedDateReservations, blockedPeriods, calendarDate]);
+    if (useAdvancedGrid && dayAvailability) {
+      // Converter TimeSlot[] para AvailabilitySlot[] para compatibilidade
+      return dayAvailability.timeSlots.map(slot => ({
+        time: slot.time,
+        available: slot.status === 'available' ? 1 : 0,
+        status: slot.status,
+        reservationId: slot.reservationId,
+        tourType: slot.tourType,
+        endTime: slot.endTime,
+        conflictReason: slot.conflictReason,
+      }));
+    } else {
+      // Fallback para lógica antiga
+      const slots = getAvailabilityWithBlocks(
+        selectedDateReservations,
+        blockedPeriods,
+        format(calendarDate, "yyyy-MM-dd")
+      );
+      console.log("Availability slots calculated (legacy):", slots);
+      return slots;
+    }
+  }, [useAdvancedGrid, dayAvailability, selectedDateReservations, blockedPeriods, calendarDate]);
 
   // --- Efeitos (Opcional, para sincronizar state inicial ou outros efeitos colaterais) ---
   // Exemplo: Sincronizar calendarDate com selectedDate se este mudar externamente
@@ -1126,6 +1158,31 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     loadBlockedPeriods();
     loadActiveConductors();
   }, []);
+
+  // Carregar dados da grid avançada quando necessário
+  useEffect(() => {
+    const loadAdvancedGrid = async () => {
+      if (!useAdvancedGrid) return;
+
+      try {
+        setGridLoading(true);
+        console.log("Loading advanced grid for date:", format(calendarDate, "yyyy-MM-dd"));
+        
+        const dayData = await generateDayAvailability(
+          format(calendarDate, "yyyy-MM-dd")
+        );
+        
+        setDayAvailability(dayData);
+        console.log("Advanced grid loaded:", dayData);
+      } catch (error) {
+        console.error("Error loading advanced grid:", error);
+      } finally {
+        setGridLoading(false);
+      }
+    };
+
+    loadAdvancedGrid();
+  }, [useAdvancedGrid, calendarDate, generateDayAvailability]);
 
   // Gerar os próximos 10 dias para o slider
   useEffect(() => {
@@ -1235,6 +1292,30 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           </div>
         </div>
       )} */}
+      
+      {/* Toggle para Grid Avançada */}
+      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
+        <div className="flex flex-col">
+          <span className="font-semibold text-blue-900">Grid Avançada</span>
+          <span className="text-xs text-blue-600">
+            Considera duração dos tours e previne conflitos
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {gridLoading && useAdvancedGrid && (
+            <span className="text-xs text-blue-600">Carregando...</span>
+          )}
+          <Switch
+            checked={useAdvancedGrid}
+            onCheckedChange={setUseAdvancedGrid}
+            id="advanced-grid-toggle"
+          />
+          <span className="text-sm text-blue-700">
+            {useAdvancedGrid ? "Ativa" : "Inativa"}
+          </span>
+        </div>
+      </div>
+
       {/* Painel de seleção de condutores ativos */}
       <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex flex-col gap-3 items-center shadow-md">
         <h2 className="text-lg font-bold text-purple-900 mb-2">
@@ -1557,44 +1638,77 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               let textClass = "";
               let statusText = "";
 
-              switch (slot.status) {
-                case "blocked_by_reservation":
-                  cardClass =
-                    "border-orange-300 bg-orange-50 hover:bg-orange-100";
-                  textClass = "text-orange-600";
-                  statusText = "Reserva confirmada";
-                  break;
-                case "blocked_by_admin":
-                  cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
-                  textClass = "text-red-600";
-                  statusText = "Bloqueado pelo admin";
-                  break;
-                case "available":
-                  cardClass = "border-green-200 bg-green-50 hover:bg-green-100";
-                  textClass = "text-green-600";
-                  statusText = "Disponível";
-                  break;
-                default:
-                  cardClass =
-                    "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
-                  textClass = "text-gray-500";
-                  statusText = "Indisponível";
+              // Se estivermos usando a grid avançada, temos novos status
+              if (useAdvancedGrid && slot.status) {
+                switch (slot.status) {
+                  case "available":
+                    cardClass = "border-green-200 bg-green-50 hover:bg-green-100";
+                    textClass = "text-green-600";
+                    statusText = "Disponível";
+                    break;
+                  case "occupied":
+                    cardClass = "border-orange-300 bg-orange-50 hover:bg-orange-100";
+                    textClass = "text-orange-600";
+                    statusText = slot.tourType ? `${slot.tourType}` : "Ocupado";
+                    break;
+                  case "blocked":
+                    cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
+                    textClass = "text-red-600";
+                    statusText = "Bloqueado";
+                    break;
+                  case "buffer":
+                    cardClass = "border-yellow-300 bg-yellow-50 hover:bg-yellow-100";
+                    textClass = "text-yellow-600";
+                    statusText = "Buffer/Preparação";
+                    break;
+                  default:
+                    cardClass = "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
+                    textClass = "text-gray-500";
+                    statusText = "Indisponível";
+                }
+              } else {
+                // Lógica antiga para compatibilidade
+                switch (slot.status) {
+                  case "blocked_by_reservation":
+                    cardClass = "border-orange-300 bg-orange-50 hover:bg-orange-100";
+                    textClass = "text-orange-600";
+                    statusText = "Reserva confirmada";
+                    break;
+                  case "blocked_by_admin":
+                    cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
+                    textClass = "text-red-600";
+                    statusText = "Bloqueado pelo admin";
+                    break;
+                  case "available":
+                    cardClass = "border-green-200 bg-green-50 hover:bg-green-100";
+                    textClass = "text-green-600";
+                    statusText = "Disponível";
+                    break;
+                  default:
+                    cardClass = "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
+                    textClass = "text-gray-500";
+                    statusText = "Indisponível";
+                }
               }
 
               return (
                 <div
                   key={slot.time}
                   className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
-                  title={slot.reason || statusText}
+                  title={
+                    useAdvancedGrid && slot.conflictReason
+                      ? `${statusText} - ${slot.conflictReason}`
+                      : slot.reason || statusText
+                  }
                   onClick={() => {
-                    if (slot.status === "blocked_by_reservation") {
+                    if (slot.status === "blocked_by_reservation" || slot.status === "occupied") {
                       toast({
                         title: "Não é possível desbloquear",
                         description:
-                          "Este horário está bloqueado por uma reserva confirmada. Cancele a reserva primeiro.",
+                          "Este horário está ocupado por uma reserva confirmada. Cancele a reserva primeiro.",
                         variant: "destructive",
                       });
-                    } else if (slot.status === "blocked_by_admin") {
+                    } else if (slot.status === "blocked_by_admin" || slot.status === "blocked") {
                       unblockTime(calendarDate, slot.time);
                     } else if (slot.status === "available") {
                       blockTime(calendarDate, slot.time, "");
@@ -1607,9 +1721,20 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                       <Lock className="w-4 h-4 inline ml-1" />
                     )}
                   </div>
-                  <div className="text-xs text-gray-600">
-                    {slot.reserved}/{slot.capacity} pessoas
-                  </div>
+                  
+                  {/* Informação adicional para grid avançada */}
+                  {useAdvancedGrid ? (
+                    <div className="text-xs text-gray-600 text-center">
+                      {slot.endTime && slot.status === "occupied" && (
+                        <div>até {slot.endTime}</div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-xs text-gray-600">
+                      {slot.reserved}/{slot.capacity} pessoas
+                    </div>
+                  )}
+                  
                   <div className={`text-xs font-medium mt-1 ${textClass}`}>
                     {statusText}
                   </div>

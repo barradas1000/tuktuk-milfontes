@@ -7,14 +7,14 @@ import { generateDynamicTimeSlots } from "@/utils/reservationUtils";
 export interface TimeSlot {
   time: string;
   status: SlotStatus;
-  blockedBy?: 'reservation' | 'manual_block';
+  blockedBy?: "reservation" | "manual_block";
   reservationId?: string;
   tourType?: string;
   endTime?: string;
   conflictReason?: string;
 }
 
-export type SlotStatus = 'available' | 'occupied' | 'blocked' | 'buffer';
+export type SlotStatus = "available" | "occupied" | "blocked" | "buffer";
 
 // Interface para dados de reserva
 export interface ReservationData {
@@ -186,7 +186,9 @@ export const checkAvailability = async (
     if (isConfigured) {
       const { data, error } = await supabase
         .from("reservations")
-        .select("id, reservation_date, reservation_time, number_of_people, tour_type, status")
+        .select(
+          "id, reservation_date, reservation_time, number_of_people, tour_type, status"
+        )
         .eq("reservation_date", date)
         .neq("status", "cancelled");
       if (error) {
@@ -282,7 +284,9 @@ export const generateAlternativeTimes = async (
     if (isConfigured) {
       const { data } = await supabase
         .from("reservations")
-        .select("id, reservation_date, reservation_time, number_of_people, tour_type, status")
+        .select(
+          "id, reservation_date, reservation_time, number_of_people, tour_type, status"
+        )
         .eq("reservation_date", date)
         .neq("status", "cancelled");
       existingReservations = data || [];
@@ -340,7 +344,9 @@ export const getAvailabilityForDate = async (
       if (isConfigured) {
         const { data } = await supabase
           .from("reservations")
-          .select("id, reservation_date, reservation_time, number_of_people, tour_type, status")
+          .select(
+            "id, reservation_date, reservation_time, number_of_people, tour_type, status"
+          )
           .eq("reservation_date", date)
           .eq("reservation_time", timeSlot)
           .neq("status", "cancelled");
@@ -381,7 +387,10 @@ export const formatTime = (time: string): string => {
 /**
  * Calcula o horário de fim de um tour
  */
-export const calculateTourEndTime = (startTime: string, tourType: string): string => {
+export const calculateTourEndTime = (
+  startTime: string,
+  tourType: string
+): string => {
   const duration = TOUR_DURATIONS[tourType] || 45;
   return addMinutesToTime(startTime, duration);
 };
@@ -397,7 +406,7 @@ export const toursConflict = (
 ): boolean => {
   const tour1End = calculateTourEndTime(tour1Start, tour1Type);
   const tour2End = calculateTourEndTime(tour2Start, tour2Type);
-  
+
   return intervalsOverlap(tour1Start, tour1End, tour2Start, tour2End);
 };
 
@@ -410,54 +419,63 @@ export const determineSlotStatus = (
   blockedPeriods: BlockedPeriod[] = []
 ): SlotStatus => {
   // Verificar se está bloqueado manualmente
-  const isManuallyBlocked = blockedPeriods.some(period => {
+  const isManuallyBlocked = blockedPeriods.some((period) => {
     // Lógica para verificar se o slot está em um período bloqueado
     // Isso depende da estrutura da tabela blocked_periods
     return period.start_time <= slotTime && slotTime < period.end_time;
   });
-  
+
   if (isManuallyBlocked) {
-    return 'blocked';
+    return "blocked";
   }
 
   // Verificar se há uma reserva que começa exatamente neste horário
-  const exactReservation = reservations.find(r => r.reservation_time === slotTime);
+  const exactReservation = reservations.find(
+    (r) => r.reservation_time === slotTime
+  );
   if (exactReservation) {
-    return 'occupied';
+    return "occupied";
   }
 
   // Verificar se este slot está dentro da duração de alguma reserva
-  const isWithinTourDuration = reservations.some(reservation => {
-    const tourEnd = calculateTourEndTime(reservation.reservation_time, reservation.tour_type);
+  const isWithinTourDuration = reservations.some((reservation) => {
+    const tourEnd = calculateTourEndTime(
+      reservation.reservation_time,
+      reservation.tour_type
+    );
     return slotTime >= reservation.reservation_time && slotTime < tourEnd;
   });
 
   if (isWithinTourDuration) {
-    return 'buffer';
+    return "buffer";
   }
 
-  return 'available';
+  return "available";
 };
 
 /**
  * Gera grid de disponibilidade para um dia específico
  */
-export const generateDayAvailability = async (date: string): Promise<DayAvailability> => {
+export const generateDayAvailability = async (
+  date: string
+): Promise<DayAvailability> => {
   const isConfigured = checkSupabaseConfiguration();
-  
+
   try {
     // Buscar reservas do dia
     let reservations: ReservationData[] = [];
     if (isConfigured) {
       const { data } = await supabase
         .from("reservations")
-        .select("id, reservation_date, reservation_time, number_of_people, tour_type, status")
+        .select(
+          "id, reservation_date, reservation_time, number_of_people, tour_type, status"
+        )
         .eq("reservation_date", date)
         .neq("status", "cancelled");
       reservations = data || [];
     } else {
       reservations = mockReservations.filter(
-        r => r.reservation_date === date && r.status !== "cancelled"
+        (r) => r.reservation_date === date && r.status !== "cancelled"
       );
     }
 
@@ -473,23 +491,29 @@ export const generateDayAvailability = async (date: string): Promise<DayAvailabi
 
     // Gerar slots para o dia
     const timeSlots = generateDynamicTimeSlots();
-    const slots: TimeSlot[] = timeSlots.map(time => {
+    const slots: TimeSlot[] = timeSlots.map((time) => {
       const status = determineSlotStatus(time, reservations, blockedPeriods);
-      const reservation = reservations.find(r => r.reservation_time === time);
-      
+      const reservation = reservations.find((r) => r.reservation_time === time);
+
       return {
         time,
         status,
-        blockedBy: status === 'occupied' ? 'reservation' : 
-                  status === 'blocked' ? 'manual_block' : undefined,
+        blockedBy:
+          status === "occupied"
+            ? "reservation"
+            : status === "blocked"
+            ? "manual_block"
+            : undefined,
         reservationId: reservation?.id,
         tourType: reservation?.tour_type,
-        endTime: reservation ? calculateTourEndTime(time, reservation.tour_type) : undefined
+        endTime: reservation
+          ? calculateTourEndTime(time, reservation.tour_type)
+          : undefined,
       };
     });
 
-    const totalAvailable = slots.filter(s => s.status === 'available').length;
-    const totalBlocked = slots.filter(s => s.status === 'blocked').length;
+    const totalAvailable = slots.filter((s) => s.status === "available").length;
+    const totalBlocked = slots.filter((s) => s.status === "blocked").length;
     const hasReservations = reservations.length > 0;
 
     return {
@@ -497,7 +521,7 @@ export const generateDayAvailability = async (date: string): Promise<DayAvailabi
       timeSlots: slots,
       totalAvailable,
       totalBlocked,
-      hasReservations
+      hasReservations,
     };
   } catch (error) {
     console.error("Error generating day availability:", error);
@@ -506,7 +530,7 @@ export const generateDayAvailability = async (date: string): Promise<DayAvailabi
       timeSlots: [],
       totalAvailable: 0,
       totalBlocked: 0,
-      hasReservations: false
+      hasReservations: false,
     };
   }
 };
@@ -515,20 +539,20 @@ export const generateDayAvailability = async (date: string): Promise<DayAvailabi
  * Gera grid de disponibilidade para múltiplos dias
  */
 export const generateWeeklyAvailability = async (
-  startDate: string, 
+  startDate: string,
   days: number = 7
 ): Promise<DayAvailability[]> => {
   const results: DayAvailability[] = [];
-  
+
   for (let i = 0; i < days; i++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(currentDate.getDate() + i);
-    const dateString = currentDate.toISOString().split('T')[0];
-    
+    const dateString = currentDate.toISOString().split("T")[0];
+
     const dayAvailability = await generateDayAvailability(dateString);
     results.push(dayAvailability);
   }
-  
+
   return results;
 };
 
@@ -539,45 +563,57 @@ export const canScheduleTour = async (
   date: string,
   time: string,
   tourType: string
-): Promise<{ canSchedule: boolean; conflicts: ReservationData[]; reason?: string }> => {
+): Promise<{
+  canSchedule: boolean;
+  conflicts: ReservationData[];
+  reason?: string;
+}> => {
   const isConfigured = checkSupabaseConfiguration();
-  
+
   try {
     let existingReservations: ReservationData[] = [];
     if (isConfigured) {
       const { data } = await supabase
         .from("reservations")
-        .select("id, reservation_date, reservation_time, number_of_people, tour_type, status")
+        .select(
+          "id, reservation_date, reservation_time, number_of_people, tour_type, status"
+        )
         .eq("reservation_date", date)
         .neq("status", "cancelled");
       existingReservations = data || [];
     } else {
       existingReservations = mockReservations.filter(
-        r => r.reservation_date === date && r.status !== "cancelled"
+        (r) => r.reservation_date === date && r.status !== "cancelled"
       );
     }
 
     // Verificar conflitos com tours existentes
-    const conflicts = existingReservations.filter(reservation => 
-      toursConflict(time, tourType, reservation.reservation_time, reservation.tour_type)
+    const conflicts = existingReservations.filter((reservation) =>
+      toursConflict(
+        time,
+        tourType,
+        reservation.reservation_time,
+        reservation.tour_type
+      )
     );
 
     const canSchedule = conflicts.length === 0;
-    const reason = conflicts.length > 0 
-      ? `Conflito com ${conflicts.length} reserva(s) existente(s)`
-      : undefined;
+    const reason =
+      conflicts.length > 0
+        ? `Conflito com ${conflicts.length} reserva(s) existente(s)`
+        : undefined;
 
     return {
       canSchedule,
       conflicts,
-      reason
+      reason,
     };
   } catch (error) {
     console.error("Error checking tour scheduling:", error);
     return {
       canSchedule: false,
       conflicts: [],
-      reason: "Erro ao verificar disponibilidade"
+      reason: "Erro ao verificar disponibilidade",
     };
   }
 };

@@ -17,6 +17,14 @@ import {
   calculateStatistics,
   getAvailabilityForDate,
 } from "@/utils/reservationUtils";
+// Importar novas funções da grid avançada
+import {
+  generateDayAvailability,
+  generateWeeklyAvailability,
+  canScheduleTour,
+  type DayAvailability,
+  type TimeSlot,
+} from "@/services/availabilityService";
 
 export const useAdminReservations = () => {
   const { toast } = useToast();
@@ -158,5 +166,9 @@ export const useAdminReservations = () => {
     getAvailabilityForDate: getAvailabilityForDateWrapper,
     isUsingMockData,
     isSupabaseConfigured: !isUsingMockData, // For compatibility
+    // Novas funções da grid avançada
+    generateDayAvailability,
+    generateWeeklyAvailability,
+    canScheduleTour,
   };
 };
