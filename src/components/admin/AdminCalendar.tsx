@@ -175,6 +175,13 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const [cancelReason, setCancelReason] = useState("");
   const [isCancelling, setIsCancelling] = useState(false);
 
+  // Estados para seleção múltipla de slots
+  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectionStart, setSelectionStart] = useState<string | null>(null);
+  const [bulkBlockModalOpen, setBulkBlockModalOpen] = useState(false);
+  const [bulkBlockReason, setBulkBlockReason] = useState("");
+
   // Estados para edição de mensagens do WhatsApp
   const [whatsappMessageModalOpen, setWhatsappMessageModalOpen] =
     useState(false);
@@ -639,7 +646,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
       );
 
       if (adminBlock) {
-        return adminBlock.reason || "Bloqueado pelo administrador";
+        const reason = adminBlock.reason || "Bloqueio manual";
+        const createdBy = adminBlock.createdBy || "Admin";
+        return `${reason} - por ${createdBy}`;
       }
 
       // Verificar se o dia inteiro está bloqueado
@@ -648,7 +657,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
       );
 
       if (dayBlock) {
-        return dayBlock.reason || "Dia bloqueado pelo administrador";
+        const reason = dayBlock.reason || "Dia bloqueado";
+        const createdBy = dayBlock.createdBy || "Admin";
+        return `${reason} - por ${createdBy}`;
       }
 
       return "Horário bloqueado";
@@ -695,6 +706,45 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
 
   const session = useSession();
   const userEmail = session?.user?.email || "admin";
+
+  // Nova lógica para availability slots usando a grid avançada
+  const availabilitySlots = useMemo(() => {
+    if (useAdvancedGrid && dayAvailability) {
+      // Converter TimeSlot[] para AvailabilitySlot[] para compatibilidade
+      return dayAvailability.timeSlots.map((slot) => ({
+        time: slot.time,
+        available: slot.status === "available" ? 1 : 0,
+        status: slot.status,
+        reservationId: slot.reservationId,
+        tourType: slot.tourType,
+        endTime: slot.endTime,
+        conflictReason: slot.conflictReason,
+        // Incluir as novas propriedades
+        customerName: slot.customerName,
+        tourDuration: slot.tourDuration,
+        tourDisplayName: slot.tourDisplayName,
+        statusMessage: slot.statusMessage,
+      }));
+    } else {
+      // Fallback para lógica antiga
+      const selectedDateReservations = getReservationsByDate(
+        format(calendarDate, "yyyy-MM-dd")
+      );
+      const slots = getAvailabilityWithBlocks(
+        selectedDateReservations,
+        blockedPeriods,
+        format(calendarDate, "yyyy-MM-dd")
+      );
+      console.log("Availability slots calculated (legacy):", slots);
+      return slots;
+    }
+  }, [
+    useAdvancedGrid,
+    dayAvailability,
+    getReservationsByDate,
+    blockedPeriods,
+    calendarDate,
+  ]);
 
   const blockDay = useCallback(
     async (date: Date, reason: string) => {
@@ -760,7 +810,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           date: dateString,
           startTime: time,
           endTime: time,
-          reason,
+          reason: reason || "Bloqueado pelo administrador",
           createdBy: userEmail,
         });
         setBlockedPeriods((prev) => {
@@ -781,6 +831,65 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
       }
     },
     [blockedPeriods, userEmail, toast]
+  );
+
+  // Função para bloqueio múltiplo
+  const bulkBlockTimes = useCallback(
+    async (times: string[], reason: string) => {
+      const dateString = format(calendarDate, "yyyy-MM-dd");
+      try {
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const time of times) {
+          // Verificar se já está bloqueado
+          const alreadyBlocked = blockedPeriods.some(
+            (b) => b.date === dateString && b.startTime === time
+          );
+
+          if (!alreadyBlocked) {
+            try {
+              const newBlock = await createBlockedPeriod({
+                date: dateString,
+                startTime: time,
+                endTime: time,
+                reason: reason || "Bloqueado pelo administrador",
+                createdBy: userEmail,
+              });
+              setBlockedPeriods((prev) => [...prev, newBlock]);
+              successCount++;
+            } catch (error) {
+              console.error(`Erro ao bloquear ${time}:`, error);
+              errorCount++;
+            }
+          }
+        }
+
+        if (successCount > 0) {
+          toast({
+            title: `${successCount} horário(s) bloqueado(s) com sucesso!`,
+            description: errorCount > 0 ? `${errorCount} falhas` : undefined,
+            variant: "success",
+          });
+        }
+
+        if (errorCount > 0 && successCount === 0) {
+          toast({
+            title: "Erro ao bloquear horários",
+            description: `Falha em ${errorCount} horário(s)`,
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        console.error("Error in bulk block:", error);
+        toast({
+          title: "Erro ao bloquear horários",
+          description: error instanceof Error ? error.message : String(error),
+          variant: "destructive",
+        });
+      }
+    },
+    [calendarDate, blockedPeriods, userEmail, toast]
   );
 
   const unblockTime = useCallback(
@@ -858,6 +967,72 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     days.forEach((day) => blockDay(day, blockDayReason));
   }, [blockDaysStart, blockDaysEnd, blockDayReason, blockDay]);
 
+  // Funções para seleção múltipla
+  const handleSlotMouseDown = useCallback(
+    (time: string, slotStatus: string) => {
+      // Só permite seleção em slots disponíveis
+      if (slotStatus === "available") {
+        setIsSelecting(true);
+        setSelectionStart(time);
+        setSelectedSlots([time]);
+      }
+    },
+    []
+  );
+
+  const handleSlotMouseEnter = useCallback(
+    (time: string, slotStatus: string) => {
+      if (isSelecting && selectionStart && slotStatus === "available") {
+        const startIndex = timeSlots.indexOf(selectionStart);
+        const currentIndex = timeSlots.indexOf(time);
+
+        if (startIndex !== -1 && currentIndex !== -1) {
+          const start = Math.min(startIndex, currentIndex);
+          const end = Math.max(startIndex, currentIndex);
+          const selection = timeSlots.slice(start, end + 1);
+
+          // Filtrar apenas slots disponíveis
+          const availableSelection = selection.filter((slotTime) => {
+            const slot = availabilitySlots.find((s) => s.time === slotTime);
+            return slot?.status === "available";
+          });
+
+          setSelectedSlots(availableSelection);
+        }
+      }
+    },
+    [isSelecting, selectionStart, availabilitySlots, timeSlots]
+  );
+
+  const handleSlotMouseUp = useCallback(() => {
+    if (isSelecting && selectedSlots.length > 0) {
+      if (selectedSlots.length === 1) {
+        // Bloqueio individual imediato
+        blockTime(calendarDate, selectedSlots[0], "");
+      } else {
+        // Bloqueio múltiplo - abrir modal
+        setBulkBlockModalOpen(true);
+      }
+    }
+    setIsSelecting(false);
+    setSelectionStart(null);
+  }, [isSelecting, selectedSlots, calendarDate, blockTime]);
+
+  const confirmBulkBlock = useCallback(() => {
+    if (selectedSlots.length > 0) {
+      bulkBlockTimes(selectedSlots, bulkBlockReason);
+      setBulkBlockModalOpen(false);
+      setSelectedSlots([]);
+      setBulkBlockReason("");
+    }
+  }, [selectedSlots, bulkBlockReason, bulkBlockTimes]);
+
+  const cancelBulkBlock = useCallback(() => {
+    setBulkBlockModalOpen(false);
+    setSelectedSlots([]);
+    setBulkBlockReason("");
+  }, []);
+
   const blockTimeRange = useCallback(
     async (date: Date, startTime: string, endTime: string, reason: string) => {
       const dateString = format(date, "yyyy-MM-dd");
@@ -871,11 +1046,11 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         );
 
         // Gerar timeSlots atualizados para slots de 15 minutos
-        const timeSlots = generateDynamicTimeSlots();
+        const timeSlotsArray = timeSlots;
 
         // Encontrar os índices dos horários no array timeSlots
-        const startIndex = timeSlots.indexOf(startTime);
-        const endIndex = timeSlots.indexOf(endTime);
+        const startIndex = timeSlotsArray.indexOf(startTime);
+        const endIndex = timeSlotsArray.indexOf(endTime);
 
         if (startIndex === -1 || endIndex === -1) {
           alert("Horários não encontrados nos slots disponíveis.");
@@ -889,7 +1064,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
 
         // Bloquear cada horário no intervalo
         for (let i = startIndex; i <= endIndex; i++) {
-          const time = timeSlots[i];
+          const time = timeSlotsArray[i];
           await blockTime(date, time, reason);
         }
 
@@ -904,7 +1079,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         alert("Erro ao bloquear o intervalo. Tente novamente.");
       }
     },
-    [blockTime]
+    [blockTime, timeSlots]
   );
 
   // --- Handlers de Eventos ---
@@ -1095,46 +1270,14 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     return days;
   }, [isDayBlocked, getDayBlockReason]);
 
-  // Nova lógica para availability slots usando a grid avançada
-  const availabilitySlots = useMemo(() => {
-    if (useAdvancedGrid && dayAvailability) {
-      // Converter TimeSlot[] para AvailabilitySlot[] para compatibilidade
-      return dayAvailability.timeSlots.map((slot) => ({
-        time: slot.time,
-        available: slot.status === "available" ? 1 : 0,
-        status: slot.status,
-        reservationId: slot.reservationId,
-        tourType: slot.tourType,
-        endTime: slot.endTime,
-        conflictReason: slot.conflictReason,
-        // Incluir as novas propriedades
-        customerName: slot.customerName,
-        tourDuration: slot.tourDuration,
-        tourDisplayName: slot.tourDisplayName,
-        statusMessage: slot.statusMessage,
-      }));
-    } else {
-      // Fallback para lógica antiga
-      const slots = getAvailabilityWithBlocks(
-        selectedDateReservations,
-        blockedPeriods,
-        format(calendarDate, "yyyy-MM-dd")
-      );
-      console.log("Availability slots calculated (legacy):", slots);
-      return slots;
-    }
-  }, [
-    useAdvancedGrid,
-    dayAvailability,
-    selectedDateReservations,
-    blockedPeriods,
-    calendarDate,
-  ]);
-
   // --- Efeitos (Opcional, para sincronizar state inicial ou outros efeitos colaterais) ---
   // Exemplo: Sincronizar calendarDate com selectedDate se este mudar externamente
   useEffect(() => {
     setCalendarDate(new Date(selectedDate));
+    // Limpar seleção ao mudar de data
+    setSelectedSlots([]);
+    setIsSelecting(false);
+    setSelectionStart(null);
   }, [selectedDate]);
 
   // Recarregar dados quando calendarDate mudar
@@ -1150,6 +1293,11 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     };
 
     loadDataForDate();
+
+    // Limpar seleção quando mudar de data
+    setSelectedSlots([]);
+    setIsSelecting(false);
+    setSelectionStart(null);
   }, [calendarDate]);
 
   // --- Efeitos para carregar dados do Supabase ---
@@ -1663,7 +1811,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             <div className="text-sm font-medium text-gray-700 mb-2">
               Legenda dos horários:
             </div>
-            <div className="flex flex-wrap gap-4 text-xs">
+            <div className="flex flex-wrap gap-4 text-xs mb-3">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 bg-green-50 border-2 border-green-200 rounded"></div>
                 <span className="text-green-600">Disponível</span>
@@ -1680,6 +1828,15 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                 <div className="w-4 h-4 bg-gray-200 border-2 border-gray-400 rounded"></div>
                 <span className="text-gray-500">Indisponível</span>
               </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-blue-100 border-2 border-blue-400 rounded ring-2 ring-blue-400"></div>
+                <span className="text-blue-600">Selecionado</span>
+              </div>
+            </div>
+            <div className="text-xs text-blue-700 bg-blue-50 p-2 rounded border border-blue-200">
+              <strong>💡 Como bloquear:</strong> Clique e arraste sobre slots
+              disponíveis para selecionar múltiplos horários. Clique simples
+              para bloquear um horário individual.
             </div>
           </div>
 
@@ -1748,12 +1905,20 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     textClass = "text-orange-600";
                     statusText = "Reserva confirmada";
                     break;
-                  case "blocked_by_admin":
+                  case "blocked_by_admin": {
                     cardClass =
                       "border-red-500 bg-red-50 hover:bg-red-100 border-2";
                     textClass = "text-red-600";
-                    statusText = "Bloqueado pelo admin";
+                    // Obter informação detalhada do bloqueio
+                    const blockInfo = getTimeBlockReason(
+                      calendarDate,
+                      slot.time
+                    );
+                    statusText = blockInfo.includes(" - por ")
+                      ? blockInfo.split(" - por ")[0]
+                      : "Bloqueado";
                     break;
+                  }
                   case "available":
                     cardClass =
                       "border-green-200 bg-green-50 hover:bg-green-100";
@@ -1768,16 +1933,37 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                 }
               }
 
+              // Adicionar classe para slots selecionados
+              const isSelected = selectedSlots.includes(slot.time);
+              const finalCardClass = isSelected
+                ? `${cardClass} ring-4 ring-blue-400 bg-blue-100 border-blue-400`
+                : cardClass;
+
               return (
                 <div
                   key={slot.time}
-                  className={`slot-mobile p-3 h-24 sm:h-22 md:h-24 lg:h-28 xl:h-32 2xl:h-36 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
+                  className={`slot-mobile p-3 h-24 sm:h-22 md:h-24 lg:h-28 xl:h-32 2xl:h-36 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${finalCardClass} select-none`}
                   title={
                     useAdvancedGrid && slot.conflictReason
                       ? `${statusText} - ${slot.conflictReason}`
+                      : slot.status === "blocked_by_admin"
+                      ? getTimeBlockReason(calendarDate, slot.time)
                       : slot.reason || statusText
                   }
-                  onClick={() => {
+                  onMouseDown={() =>
+                    handleSlotMouseDown(slot.time, slot.status)
+                  }
+                  onMouseEnter={() =>
+                    handleSlotMouseEnter(slot.time, slot.status)
+                  }
+                  onMouseUp={handleSlotMouseUp}
+                  onClick={(e) => {
+                    // Prevenir o comportamento padrão se estamos selecionando
+                    if (isSelecting) {
+                      e.preventDefault();
+                      return;
+                    }
+
                     if (
                       slot.status === "blocked_by_reservation" ||
                       slot.status === "occupied"
@@ -1793,7 +1979,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                       slot.status === "blocked"
                     ) {
                       unblockTime(calendarDate, slot.time);
-                    } else if (slot.status === "available") {
+                    } else if (slot.status === "available" && !isSelecting) {
+                      // Bloqueio individual direto apenas se não estamos selecionando
                       blockTime(calendarDate, slot.time, "");
                     }
                   }}
@@ -3053,6 +3240,61 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               <Button variant="outline">Cancelar</Button>
             </DialogClose>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal de bloqueio múltiplo */}
+      <Dialog open={bulkBlockModalOpen} onOpenChange={setBulkBlockModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              Bloquear Múltiplos Horários
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="text-sm text-blue-900 font-medium">
+                Horários selecionados: {selectedSlots.length}
+              </div>
+              <div className="text-xs text-blue-700 mt-1">
+                {selectedSlots.join(", ")}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">
+                Motivo do bloqueio (opcional):
+              </label>
+              <input
+                type="text"
+                value={bulkBlockReason}
+                onChange={(e) => setBulkBlockReason(e.target.value)}
+                placeholder="Ex: Manutenção, Evento especial..."
+                className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+              />
+            </div>
+
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800">
+                <strong>Atenção:</strong> Ao bloquear estes horários:
+              </p>
+              <ul className="text-sm text-yellow-700 mt-1 list-disc list-inside">
+                <li>Não será possível fazer novas reservas</li>
+                <li>Os horários ficarão marcados como bloqueados</li>
+                <li>Será registrado quem fez o bloqueio</li>
+              </ul>
+            </div>
+
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={cancelBulkBlock}>
+                Cancelar
+              </Button>
+              <Button onClick={confirmBulkBlock}>
+                Confirmar Bloqueio ({selectedSlots.length} horários)
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
