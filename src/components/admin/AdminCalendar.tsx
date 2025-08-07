@@ -552,15 +552,23 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const isTimeBlocked = useCallback(
     (date: Date, time: string) => {
       const dateString = format(date, "yyyy-MM-dd");
-      // Verificar se há bloqueio manual do admin
+
+      // Verificar se o dia inteiro está bloqueado
+      const isDayBlocked = blockedPeriods.some(
+        (b) => b.date === dateString && !b.startTime && !b.endTime
+      );
+
+      // Verificar se há bloqueio manual do admin para este horário específico
       const adminBlocked = blockedPeriods.some(
         (b) => b.date === dateString && b.startTime === time
       );
+
       // Verificar se há reserva confirmada
       const hasConfirmedReservation = getReservationsByDate(dateString).some(
         (r) => r.reservation_time === time && r.status === "confirmed"
       );
-      return adminBlocked || hasConfirmedReservation;
+
+      return isDayBlocked || adminBlocked || hasConfirmedReservation;
     },
     [blockedPeriods, getReservationsByDate]
   );
@@ -590,9 +598,18 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const isBlockedByAdmin = useCallback(
     (date: Date, time: string) => {
       const dateString = format(date, "yyyy-MM-dd");
-      return blockedPeriods.some(
+
+      // Verificar se o dia inteiro está bloqueado
+      const isDayBlocked = blockedPeriods.some(
+        (b) => b.date === dateString && !b.startTime && !b.endTime
+      );
+
+      // Verificar se há bloqueio manual para este horário específico
+      const isHourBlocked = blockedPeriods.some(
         (b) => b.date === dateString && b.startTime === time
       );
+
+      return isDayBlocked || isHourBlocked;
     },
     [blockedPeriods]
   );
@@ -616,13 +633,22 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         return `Reserva confirmada: ${confirmedReservation.customer_name}`;
       }
 
-      // Verificar se está bloqueado manualmente pelo admin
+      // Verificar se está bloqueado manualmente pelo admin para horário específico
       const adminBlock = blockedPeriods.find(
         (b) => b.date === dateString && b.startTime === time
       );
 
       if (adminBlock) {
         return adminBlock.reason || "Bloqueado pelo administrador";
+      }
+
+      // Verificar se o dia inteiro está bloqueado
+      const dayBlock = blockedPeriods.find(
+        (b) => b.date === dateString && !b.startTime && !b.endTime
+      );
+
+      if (dayBlock) {
+        return dayBlock.reason || "Dia bloqueado pelo administrador";
       }
 
       return "Horário bloqueado";

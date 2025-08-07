@@ -89,7 +89,12 @@ export interface AvailabilitySlot {
 
 export const getAvailabilityWithBlocks = (
   reservations: AdminReservation[],
-  blockedPeriods: { date: string; startTime?: string; reason?: string }[],
+  blockedPeriods: {
+    date: string;
+    startTime?: string;
+    endTime?: string;
+    reason?: string;
+  }[],
   date: string
 ): AvailabilitySlot[] => {
   const timeSlots = generateDynamicTimeSlots();
@@ -119,7 +124,7 @@ export const getAvailabilityWithBlocks = (
       };
     }
 
-    // Verifica bloqueio manual do admin
+    // Verifica bloqueio manual do admin para horário específico
     const adminBlock = blockedPeriods.find(
       (b) => b.date === date && b.startTime === time
     );
@@ -131,6 +136,21 @@ export const getAvailabilityWithBlocks = (
         capacity: 4,
         reserved,
         reason: adminBlock.reason,
+      };
+    }
+
+    // Verifica se o dia inteiro está bloqueado
+    const dayBlock = blockedPeriods.find(
+      (b) => b.date === date && !b.startTime && !b.endTime
+    );
+    if (dayBlock) {
+      return {
+        date,
+        time,
+        status: "blocked_by_admin",
+        capacity: 4,
+        reserved,
+        reason: dayBlock.reason || "Dia bloqueado pelo administrador",
       };
     }
 

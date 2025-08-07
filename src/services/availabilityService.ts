@@ -490,7 +490,12 @@ export const determineSlotStatus = (
 
   // Verificar se está bloqueado manualmente
   const isManuallyBlocked = blockedPeriods.some((period) => {
-    return period.start_time <= slotTime && slotTime < period.end_time;
+    // Verificar se é um bloqueio de horário específico
+    if (period.start_time && period.end_time) {
+      return period.start_time <= slotTime && slotTime < period.end_time;
+    }
+    // Verificar se é um bloqueio de dia inteiro (sem start_time e end_time)
+    return !period.start_time && !period.end_time;
   });
 
   if (isManuallyBlocked) {
