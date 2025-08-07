@@ -150,6 +150,16 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const [gridLoading, setGridLoading] = useState(false);
   const [useAdvancedGrid, setUseAdvancedGrid] = useState(true); // Toggle para nova grid
 
+  // Debug: Log quando o componente carrega
+  useEffect(() => {
+    console.log("🎯 [AdminCalendar] Componente carregado!");
+    console.log("🎯 [AdminCalendar] useAdvancedGrid inicial:", useAdvancedGrid);
+    console.log(
+      "🎯 [AdminCalendar] generateDayAvailability função:",
+      !!generateDayAvailability
+    );
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Estados para bloqueio de dia inteiro/intervalo de dias
   const [blockDayReason, setBlockDayReason] = useState("");
   const [blockDaysStart, setBlockDaysStart] = useState<string>("");
@@ -1326,7 +1336,10 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           )}
           <Switch
             checked={useAdvancedGrid}
-            onCheckedChange={setUseAdvancedGrid}
+            onCheckedChange={(checked) => {
+              console.log("🔄 [AdminCalendar] Toggle changed to:", checked);
+              setUseAdvancedGrid(checked);
+            }}
             id="advanced-grid-toggle"
           />
           <span className="text-sm text-blue-700">

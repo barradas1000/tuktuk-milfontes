@@ -425,7 +425,9 @@ export const determineSlotStatus = (
   // Debug: Mostrar todas as reservas
   reservations.forEach((r, index) => {
     console.log(
-      `📋 [determineSlotStatus] Reserva ${index + 1}: ${r.reservation_time} (${r.tour_type}), Customer: ${r.customer_name || 'N/A'}`
+      `📋 [determineSlotStatus] Reserva ${index + 1}: ${r.reservation_time} (${
+        r.tour_type
+      }), Customer: ${r.customer_name || "N/A"}`
     );
   });
 
@@ -452,7 +454,9 @@ export const determineSlotStatus = (
     const currentSlot = slotTime.trim();
 
     console.log(
-      `🔍 [determineSlotStatus] Comparação normalizada: "${currentSlot}" === "${reservationTime}" = ${currentSlot === reservationTime}`
+      `🔍 [determineSlotStatus] Comparação normalizada: "${currentSlot}" === "${reservationTime}" = ${
+        currentSlot === reservationTime
+      }`
     );
 
     if (reservationTime === currentSlot) {
