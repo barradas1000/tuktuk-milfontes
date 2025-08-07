@@ -429,12 +429,13 @@ export const determineSlotStatus = (
 
   // Verificar PRIMEIRO se há uma reserva que começa exatamente neste horário
   for (const reservation of reservations) {
-    const reservationTime = reservation.reservation_time.trim();
+    // Normalizar formatos: remover segundos se existir
+    const reservationTime = reservation.reservation_time.trim().substring(0, 5); // "14:00:00" -> "14:00"
     const currentSlot = slotTime.trim();
 
     if (reservationTime === currentSlot) {
       console.log(
-        `✅ [MATCH] Slot ${slotTime} = reserva ${reservationTime} (${reservation.tour_type}) - STATUS: OCCUPIED`
+        `✅ [MATCH] Slot ${slotTime} = reserva ${reservation.reservation_time} (normalizado: ${reservationTime}) (${reservation.tour_type}) - STATUS: OCCUPIED`
       );
       return "occupied";
     }
@@ -442,13 +443,15 @@ export const determineSlotStatus = (
 
   // Verificar se este slot está dentro da duração de alguma reserva
   for (const reservation of reservations) {
+    // Normalizar formato da hora de início
+    const normalizedStartTime = reservation.reservation_time.trim().substring(0, 5);
     const tourEnd = calculateTourEndTime(
-      reservation.reservation_time,
+      normalizedStartTime,
       reservation.tour_type
     );
 
     const isWithinDuration =
-      slotTime > reservation.reservation_time && slotTime < tourEnd;
+      slotTime > normalizedStartTime && slotTime < tourEnd;
 
     if (isWithinDuration) {
       return "buffer";
@@ -495,9 +498,9 @@ export const generateDayAvailability = async (
         });
         
         // Debug: verificar especificamente reservas às 14:00
-        const reserva14h = data?.find(r => r.reservation_time === "14:00");
+        const reserva14h = data?.find(r => r.reservation_time.trim().substring(0, 5) === "14:00");
         if (reserva14h) {
-          console.log(`🎯 [GRID] RESERVA 14:00 ENCONTRADA:`, reserva14h);
+          console.log(`🎯 [GRID] RESERVA 14:00 ENCONTRADA (formato: ${reserva14h.reservation_time}):`, reserva14h);
         } else {
           console.log(`⚠️ [GRID] Nenhuma reserva às 14:00 encontrada. Todas as reservas:`, data?.map(r => `${r.reservation_time} na data ${r.reservation_date}`));
         }
@@ -528,7 +531,8 @@ export const generateDayAvailability = async (
 
     const slots: TimeSlot[] = timeSlots.map((time) => {
       const status = determineSlotStatus(time, reservations, blockedPeriods);
-      const reservation = reservations.find((r) => r.reservation_time === time);
+      // Buscar reserva normalizando formato de hora
+      const reservation = reservations.find((r) => r.reservation_time.trim().substring(0, 5) === time);
 
       const slot: TimeSlot = {
         time,
