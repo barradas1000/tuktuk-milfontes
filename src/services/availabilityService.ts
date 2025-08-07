@@ -418,6 +418,8 @@ export const determineSlotStatus = (
   reservations: ReservationData[],
   blockedPeriods: BlockedPeriod[] = []
 ): SlotStatus => {
+  console.log(`🔍 Verificando slot ${slotTime} - ${reservations.length} reservas encontradas`);
+  
   // Verificar se está bloqueado manualmente
   const isManuallyBlocked = blockedPeriods.some((period) => {
     // Lógica para verificar se o slot está em um período bloqueado
@@ -426,30 +428,41 @@ export const determineSlotStatus = (
   });
 
   if (isManuallyBlocked) {
+    console.log(`🔒 Slot ${slotTime}: BLOCKED (manual)`);
     return "blocked";
   }
 
-  // Verificar se há uma reserva que começa exatamente neste horário
-  const exactReservation = reservations.find(
-    (r) => r.reservation_time === slotTime
-  );
-  if (exactReservation) {
-    return "occupied";
+  // Verificar PRIMEIRO se há uma reserva que começa exatamente neste horário
+  for (const reservation of reservations) {
+    console.log(`🔍 Verificando slot ${slotTime} para reserva às ${reservation.reservation_time}`);
+    
+    // Comparação exata de horários (normalizar formato)
+    const reservationTime = reservation.reservation_time.trim();
+    const currentSlot = slotTime.trim();
+    
+    if (reservationTime === currentSlot) {
+      console.log(`✅ MATCH EXATO encontrado! Slot ${slotTime} = reserva ${reservationTime}. Status: occupied`);
+      return "occupied";
+    }
   }
 
-  // Verificar se este slot está dentro da duração de alguma reserva
-  const isWithinTourDuration = reservations.some((reservation) => {
+  // Verificar se este slot está dentro da duração de alguma reserva (mas não é o horário de início)
+  for (const reservation of reservations) {
     const tourEnd = calculateTourEndTime(
       reservation.reservation_time,
       reservation.tour_type
     );
-    return slotTime >= reservation.reservation_time && slotTime < tourEnd;
-  });
-
-  if (isWithinTourDuration) {
-    return "buffer";
+    
+    // Verificar se está dentro do período mas NÃO é o horário exato de início
+    const isWithinDuration = slotTime > reservation.reservation_time && slotTime < tourEnd;
+    
+    if (isWithinDuration) {
+      console.log(`🟡 Slot ${slotTime} dentro do buffer (${reservation.reservation_time}-${tourEnd}). Status: buffer`);
+      return "buffer";
+    }
   }
 
+  console.log(`✅ Slot ${slotTime}: AVAILABLE`);
   return "available";
 };
 
