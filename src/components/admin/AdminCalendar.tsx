@@ -152,12 +152,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
 
   // Debug: Log quando o componente carrega
   useEffect(() => {
-    console.log("🎯 [AdminCalendar] Componente carregado!");
-    console.log("🎯 [AdminCalendar] useAdvancedGrid inicial:", useAdvancedGrid);
-    console.log(
-      "🎯 [AdminCalendar] generateDayAvailability função:",
-      !!generateDayAvailability
-    );
+    console.log("🎯 [ADMIN] Componente AdminCalendar carregado");
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Estados para bloqueio de dia inteiro/intervalo de dias
@@ -1181,30 +1176,27 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // Carregar dados da grid avançada quando necessário
   useEffect(() => {
     const loadAdvancedGrid = async () => {
-      console.log("🔄 useEffect triggered - useAdvancedGrid:", useAdvancedGrid);
+      console.log("🔄 [ADMIN] Grid toggle:", useAdvancedGrid);
       if (!useAdvancedGrid) {
-        console.log("⏭️ Advanced grid disabled, skipping...");
+        console.log("⏭️ [ADMIN] Grid avançada desativada");
         return;
       }
 
       try {
         setGridLoading(true);
         const targetDate = format(calendarDate, "yyyy-MM-dd");
-        console.log("🚀 Loading advanced grid for date:", targetDate);
-        console.log("📅 Calendar date object:", calendarDate);
+        console.log("🚀 [ADMIN] Carregando grid para:", targetDate);
 
         if (!generateDayAvailability) {
-          console.error("❌ generateDayAvailability function is undefined!");
+          console.error("❌ [ADMIN] Função generateDayAvailability não encontrada!");
           return;
         }
 
-        console.log("✅ Calling generateDayAvailability...");
         const dayData = await generateDayAvailability(targetDate);
-
         setDayAvailability(dayData);
-        console.log("🎯 Advanced grid loaded successfully:", dayData);
+        console.log("✅ [ADMIN] Grid carregada com sucesso");
       } catch (error) {
-        console.error("❌ Error loading advanced grid:", error);
+        console.error("❌ [ADMIN] Erro ao carregar grid:", error);
       } finally {
         setGridLoading(false);
       }
@@ -1337,7 +1329,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           <Switch
             checked={useAdvancedGrid}
             onCheckedChange={(checked) => {
-              console.log("🔄 [AdminCalendar] Toggle changed to:", checked);
+              console.log("🔄 [ADMIN] Toggle mudou para:", checked);
               setUseAdvancedGrid(checked);
             }}
             id="advanced-grid-toggle"
