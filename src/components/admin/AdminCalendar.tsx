@@ -73,23 +73,16 @@ import {
   type DayAvailability,
   type TimeSlot,
   type SlotStatus,
+  generateDayAvailability,
 } from "@/services/availabilityService";
 import ToggleTrackingButton from "../ToggleTrackingButton";
-
-// --- Helper Functions (pode ser movido para um arquivo separado, ex: utils/time.ts ou utils/format.ts) ---
-// Gera todos os horários de meia em meia hora das 08:00 às 23:00
-const timeSlots = generateDynamicTimeSlots();
-
-// CSS personalizado para esconder scrollbar
-const sliderStyles = `
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-`;
+import {
+  sliderStyles,
+  FALLBACK_CONDUCTORS,
+  getTourDisplayName,
+  getStatusConfig,
+  getCondensedStatusText,
+} from "@/utils/adminCalendarUtils";
 
 // --- Interfaces ---
 interface AdminCalendarProps {
@@ -98,20 +91,6 @@ interface AdminCalendarProps {
 }
 
 // --- Componente Principal ---
-// Fallback para condutores caso não carregue do banco
-const FALLBACK_CONDUCTORS = [
-  {
-    id: "condutor1",
-    name: "Condutor 1",
-    whatsapp: "351963496320",
-  },
-  {
-    id: "condutor2",
-    name: "Condutor 2",
-    whatsapp: "351968784043",
-  },
-];
-
 const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // --- Hooks de Dados/Serviços ---
   const {
@@ -119,10 +98,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     getAvailabilityForDate,
     updateReservation,
     refetch,
-    // Novas funções da grid avançada
-    generateDayAvailability,
-    generateWeeklyAvailability,
-    canScheduleTour,
   } = useAdminReservations();
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -150,10 +125,13 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const [gridLoading, setGridLoading] = useState(false);
   const [useAdvancedGrid, setUseAdvancedGrid] = useState(true); // Toggle para nova grid
 
+  // Gerar timeSlots usando useMemo para otimização
+  const timeSlots = useMemo(() => generateDynamicTimeSlots(), []);
+
   // Debug: Log quando o componente carrega
   useEffect(() => {
     console.log("🎯 [ADMIN] Componente AdminCalendar carregado");
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Estados para bloqueio de dia inteiro/intervalo de dias
   const [blockDayReason, setBlockDayReason] = useState("");
@@ -161,7 +139,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const [blockDaysEnd, setBlockDaysEnd] = useState<string>("");
 
   // Estados para bloqueio de horários específicos
-  const [blockHourStart, setBlockHourStart] = useState("09:00");
+  const [blockHourStart, setBlockHourStart] = useState("09:30");
   const [blockHourEnd, setBlockHourEnd] = useState("10:00");
   const [blockTimeReason, setBlockTimeReason] = useState<{
     [key: string]: string;
@@ -260,14 +238,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     { id: "night", name: "Passeio noturno" },
     { id: "fishermen", name: "Rota dos Pescadores" },
   ];
-
-  /**
-   * Função para converter código do tour em nome amigável
-   */
-  const getTourDisplayName = (tourType: string): string => {
-    const tour = tourTypes.find((t) => t.id === tourType);
-    return tour ? tour.name : tourType;
-  };
 
   /**
    * Função para obter o nome do tour traduzido no idioma do cliente
@@ -874,6 +844,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           endTime
         );
 
+        // Gerar timeSlots atualizados para slots de 15 minutos
+        const timeSlots = generateDynamicTimeSlots();
+
         // Encontrar os índices dos horários no array timeSlots
         const startIndex = timeSlots.indexOf(startTime);
         const endIndex = timeSlots.indexOf(endTime);
@@ -994,30 +967,16 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   };
 
   const getStatusBadge = useCallback((status: string) => {
-    const statusConfig = {
-      pending: {
-        color: "bg-yellow-100 text-yellow-800",
-        icon: AlertCircle,
-        text: "Pendente",
-      },
-      confirmed: {
-        color: "bg-green-100 text-green-800",
-        icon: CheckCircle,
-        text: "Confirmada",
-      },
-      cancelled: {
-        color: "bg-red-100 text-red-800",
-        icon: XCircle,
-        text: "Cancelada",
-      },
-      completed: {
-        color: "bg-blue-100 text-blue-800",
-        icon: CheckCircle,
-        text: "Concluída",
-      },
+    const statusIcons = {
+      pending: AlertCircle,
+      confirmed: CheckCircle,
+      cancelled: XCircle,
+      completed: CheckCircle,
     };
-    const config = statusConfig[status as keyof typeof statusConfig];
-    const Icon = config.icon;
+
+    const config = getStatusConfig(status);
+    const Icon = statusIcons[status as keyof typeof statusIcons] || CheckCircle;
+
     return (
       <Badge className={`${config.color} flex items-center gap-1`}>
         <Icon className="h-3 w-3" />
@@ -1191,17 +1150,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         setGridLoading(true);
         const targetDate = format(calendarDate, "yyyy-MM-dd");
         console.log("🚀 [ADMIN] Carregando grid para:", targetDate);
-        console.log(
-          "🔧 [ADMIN] generateDayAvailability existe?",
-          !!generateDayAvailability
-        );
-
-        if (!generateDayAvailability) {
-          console.error(
-            "❌ [ADMIN] Função generateDayAvailability não encontrada!"
-          );
-          return;
-        }
 
         console.log("🏃 [ADMIN] Executando generateDayAvailability...");
         const dayData = await generateDayAvailability(targetDate);
@@ -1229,7 +1177,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     };
 
     loadAdvancedGrid();
-  }, [useAdvancedGrid, calendarDate, generateDayAvailability]);
+  }, [useAdvancedGrid, calendarDate]);
 
   // Gerar os próximos 10 dias para o slider
   useEffect(() => {
@@ -1682,7 +1630,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2">
+          <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 xl:grid-cols-16 2xl:grid-cols-20 gap-1 grid-mobile-optimized">
             {availabilitySlots.map((slot) => {
               let cardClass = "";
               let textClass = "";
@@ -1768,7 +1716,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               return (
                 <div
                   key={slot.time}
-                  className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
+                  className={`slot-mobile p-2 h-16 sm:h-18 md:h-20 lg:h-16 rounded-md text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
                   title={
                     useAdvancedGrid && slot.conflictReason
                       ? `${statusText} - ${slot.conflictReason}`
@@ -1795,10 +1743,11 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     }
                   }}
                 >
-                  <div className="font-semibold flex items-center justify-center gap-1">
-                    {slot.time}{" "}
+                  <div className="slot-time font-semibold flex items-center justify-center gap-1 text-sm sm:text-base">
+                    <span className="sm:hidden">{slot.time.substring(0, 5)}</span>
+                    <span className="hidden sm:inline">{slot.time}</span>
                     {slot.status !== "available" && (
-                      <Lock className="w-4 h-4 inline ml-1" />
+                      <Lock className="w-3 h-3 sm:w-4 sm:h-4 inline ml-1" />
                     )}
                   </div>
 
@@ -1806,22 +1755,23 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   {useAdvancedGrid ? (
                     <div className="text-xs text-gray-600 text-center">
                       {slot.endTime && slot.status === "occupied" && (
-                        <div>até {slot.endTime}</div>
+                        <div className="text-xs">até {slot.endTime}</div>
                       )}
                       {slot.tourDuration && slot.status !== "available" && (
-                        <div className="text-xs opacity-75">
-                          ({slot.tourDuration} min)
+                        <div className="text-sm opacity-75">
+                          ({slot.tourDuration}m)
                         </div>
                       )}
                     </div>
                   ) : (
-                    <div className="text-xs text-gray-600">
+                    <div className="text-sm text-gray-600">
                       {slot.reserved}/{slot.capacity} pessoas
                     </div>
                   )}
 
-                  <div className={`text-xs font-medium mt-1 ${textClass}`}>
-                    {statusText}
+                  <div className={`slot-status text-sm sm:text-base font-medium mt-1 ${textClass} truncate`}>
+                    <span className="sm:hidden">{getCondensedStatusText(statusText)}</span>
+                    <span className="hidden sm:inline">{statusText}</span>
                   </div>
                 </div>
               );

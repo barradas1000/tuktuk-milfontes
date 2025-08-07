@@ -15,18 +15,33 @@ export const getReservationsByDate = (
 };
 
 export const generateDynamicTimeSlots = (
-  startHour = 8,
-  endHour = 23,
-  intervalMinutes = 30
+  startHour = 9,
+  endHour = 22,
+  intervalMinutes = 15
 ): string[] => {
   const slots: string[] = [];
-  for (let hour = startHour; hour <= endHour; hour++) {
-    for (let min = 0; min < 60; min += intervalMinutes) {
-      const h = hour.toString().padStart(2, "0");
-      const m = min.toString().padStart(2, "0");
-      slots.push(`${h}:${m}`);
+
+  // Horário de funcionamento: 09:30 às 22:30
+  let currentHour = startHour;
+  let currentMinute = 30; // Começar às 09:30
+  const endMinute = 30; // Terminar às 22:30
+
+  while (
+    currentHour < endHour ||
+    (currentHour === endHour && currentMinute <= endMinute)
+  ) {
+    const h = currentHour.toString().padStart(2, "0");
+    const m = currentMinute.toString().padStart(2, "0");
+    slots.push(`${h}:${m}`);
+
+    // Incrementar 15 minutos
+    currentMinute += intervalMinutes;
+    if (currentMinute >= 60) {
+      currentMinute = 0;
+      currentHour++;
     }
   }
+
   return slots;
 };
 
