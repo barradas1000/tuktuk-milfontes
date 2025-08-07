@@ -482,11 +482,25 @@ export const generateDayAvailability = async (
       if (error) {
         console.error("❌ [GRID] Erro ao buscar reservas:", error);
       } else {
-        console.log(`📋 [GRID] ${data?.length || 0} reservas encontradas para ${date}`);
+        console.log(
+          `📋 [GRID] ${data?.length || 0} reservas encontradas para ${date}`
+        );
         // Mostrar apenas as reservas encontradas
         data?.forEach((r) => {
-          console.log(`   - ${r.reservation_time} (${r.tour_type}) - ${r.customer_name || 'N/A'}`);
+          console.log(
+            `   - ${r.reservation_time} (${r.tour_type}) - ${
+              r.customer_name || "N/A"
+            } [Data: ${r.reservation_date}]`
+          );
         });
+        
+        // Debug: verificar especificamente reservas às 14:00
+        const reserva14h = data?.find(r => r.reservation_time === "14:00");
+        if (reserva14h) {
+          console.log(`🎯 [GRID] RESERVA 14:00 ENCONTRADA:`, reserva14h);
+        } else {
+          console.log(`⚠️ [GRID] Nenhuma reserva às 14:00 encontrada. Todas as reservas:`, data?.map(r => `${r.reservation_time} na data ${r.reservation_date}`));
+        }
       }
 
       reservations = data || [];
@@ -494,7 +508,9 @@ export const generateDayAvailability = async (
       reservations = mockReservations.filter(
         (r) => r.reservation_date === date && r.status !== "cancelled"
       );
-      console.log(`📋 [GRID] Usando mock data: ${reservations.length} reservas`);
+      console.log(
+        `📋 [GRID] Usando mock data: ${reservations.length} reservas`
+      );
     }
 
     // Buscar períodos bloqueados
@@ -536,7 +552,9 @@ export const generateDayAvailability = async (
     const totalOccupied = slots.filter((s) => s.status === "occupied").length;
     const totalBuffer = slots.filter((s) => s.status === "buffer").length;
 
-    console.log(`📊 [GRID] Resultado: ${totalOccupied} ocupados, ${totalBuffer} buffer`);
+    console.log(
+      `📊 [GRID] Resultado: ${totalOccupied} ocupados, ${totalBuffer} buffer`
+    );
 
     return {
       date,

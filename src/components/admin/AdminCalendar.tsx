@@ -1188,7 +1188,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         console.log("🚀 [ADMIN] Carregando grid para:", targetDate);
 
         if (!generateDayAvailability) {
-          console.error("❌ [ADMIN] Função generateDayAvailability não encontrada!");
+          console.error(
+            "❌ [ADMIN] Função generateDayAvailability não encontrada!"
+          );
           return;
         }
 
