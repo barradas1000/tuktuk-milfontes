@@ -170,28 +170,35 @@ export const getStatusConfig = (status: string) => {
 };
 
 // Função para obter texto de status condensado para mobile
-export const getCondensedStatusText = (status: string, statusMessage?: string): string => {
+export const getCondensedStatusText = (
+  status: string,
+  statusMessage?: string
+): string => {
   if (statusMessage && statusMessage.length > 0) {
     // Para mobile, truncar mensagens longas
     if (window.innerWidth < 640) {
-      return statusMessage.length > 8 ? statusMessage.substring(0, 8) + "..." : statusMessage;
+      return statusMessage.length > 8
+        ? statusMessage.substring(0, 8) + "..."
+        : statusMessage;
     }
-    return statusMessage.length > 12 ? statusMessage.substring(0, 12) + "..." : statusMessage;
+    return statusMessage.length > 12
+      ? statusMessage.substring(0, 12) + "..."
+      : statusMessage;
   }
-  
+
   // Status padrão condensados para mobile
   const condensedStatus = {
-    "available": "Livre",
-    "occupied": "Ocupado", 
-    "blocked": "Bloq.",
-    "buffer": "Tour",
-    "Disponível": "Livre",
-    "Ocupado": "Ocupado",
-    "Bloqueado": "Bloq.",
+    available: "Livre",
+    occupied: "Ocupado",
+    blocked: "Bloq.",
+    buffer: "Tour",
+    Disponível: "Livre",
+    Ocupado: "Ocupado",
+    Bloqueado: "Bloq.",
     "Tour em andamento": "Tour",
     "Reserva confirmada": "Reserva",
-    "Bloqueado pelo admin": "Bloq."
+    "Bloqueado pelo admin": "Bloq.",
   };
-  
+
   return condensedStatus[status as keyof typeof condensedStatus] || status;
 };

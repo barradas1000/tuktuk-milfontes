@@ -1744,7 +1744,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   }}
                 >
                   <div className="slot-time font-semibold flex items-center justify-center gap-1 text-sm sm:text-base">
-                    <span className="sm:hidden">{slot.time.substring(0, 5)}</span>
+                    <span className="sm:hidden">
+                      {slot.time.substring(0, 5)}
+                    </span>
                     <span className="hidden sm:inline">{slot.time}</span>
                     {slot.status !== "available" && (
                       <Lock className="w-3 h-3 sm:w-4 sm:h-4 inline ml-1" />
@@ -1769,8 +1771,12 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     </div>
                   )}
 
-                  <div className={`slot-status text-sm sm:text-base font-medium mt-1 ${textClass} truncate`}>
-                    <span className="sm:hidden">{getCondensedStatusText(statusText)}</span>
+                  <div
+                    className={`slot-status text-sm sm:text-base font-medium mt-1 ${textClass} truncate`}
+                  >
+                    <span className="sm:hidden">
+                      {getCondensedStatusText(statusText)}
+                    </span>
                     <span className="hidden sm:inline">{statusText}</span>
                   </div>
                 </div>
