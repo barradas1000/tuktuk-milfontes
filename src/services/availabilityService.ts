@@ -12,6 +12,11 @@ export interface TimeSlot {
   tourType?: string;
   endTime?: string;
   conflictReason?: string;
+  // Novas propriedades para interface amigável
+  customerName?: string;
+  tourDuration?: number;
+  tourDisplayName?: string;
+  statusMessage?: string;
 }
 
 export type SlotStatus = "available" | "occupied" | "blocked" | "buffer";
@@ -77,6 +82,56 @@ const TOUR_DURATIONS: Record<string, number> = {
   sunset: 90,
   night: 35,
   fishermen: 45,
+};
+
+// Nomes amigáveis dos tours
+const TOUR_DISPLAY_NAMES: Record<string, string> = {
+  panoramic: "Tour Panorâmico",
+  furnas: "Tour das Furnas",
+  bridge: "Tour da Ponte",
+  sunset: "Tour do Pôr-do-Sol",
+  night: "Tour Noturno",
+  fishermen: "Tour dos Pescadores",
+};
+
+// Função para obter nome amigável do tour
+/**
+ * Função para obter nome amigável dos tours
+ */
+export const getTourDisplayName = (tourType: string): string => {
+  return TOUR_DISPLAY_NAMES[tourType] || tourType;
+};
+
+/**
+ * Função para gerar mensagem de status amigável
+ */
+export const getStatusMessage = (
+  status: SlotStatus,
+  reservation?: ReservationData
+): string => {
+  switch (status) {
+    case "occupied":
+      if (reservation) {
+        const customerName = reservation.customer_name || "Cliente";
+        const tourName = getTourDisplayName(reservation.tour_type);
+        return `${customerName} - ${tourName}`;
+      }
+      return "Ocupado";
+
+    case "buffer":
+      if (reservation) {
+        const tourName = getTourDisplayName(reservation.tour_type);
+        return `Tour em andamento - ${tourName}`;
+      }
+      return "Tour em andamento";
+
+    case "blocked":
+      return "Período bloqueado";
+
+    case "available":
+    default:
+      return "Disponível";
+  }
 };
 
 // Função utilitária para somar minutos a uma hora (HH:mm)
@@ -417,14 +472,29 @@ export const determineSlotStatus = (
   slotTime: string,
   reservations: ReservationData[],
   blockedPeriods: BlockedPeriod[] = []
-): SlotStatus => {
+): {
+  status: SlotStatus;
+  reservation?: ReservationData;
+  relatedReservation?: ReservationData;
+} => {
+  // Debug: Log para verificar dados de entrada
+  if (slotTime === "14:00" || slotTime === "15:30") {
+    console.log(`🔍 [DEBUG] Analisando slot ${slotTime}:`);
+    console.log(`   - Total reservas recebidas: ${reservations.length}`);
+    reservations.forEach((r) => {
+      console.log(
+        `   - Reserva: ${r.reservation_time} (${r.customer_name}) - ${r.tour_type}`
+      );
+    });
+  }
+
   // Verificar se está bloqueado manualmente
   const isManuallyBlocked = blockedPeriods.some((period) => {
     return period.start_time <= slotTime && slotTime < period.end_time;
   });
 
   if (isManuallyBlocked) {
-    return "blocked";
+    return { status: "blocked" };
   }
 
   // Verificar PRIMEIRO se há uma reserva que começa exatamente neste horário
@@ -433,18 +503,24 @@ export const determineSlotStatus = (
     const reservationTime = reservation.reservation_time.trim().substring(0, 5); // "14:00:00" -> "14:00"
     const currentSlot = slotTime.trim();
 
+    console.log(
+      `🔍 [COMPARE] Slot: "${currentSlot}" vs Reserva: "${reservation.reservation_time}" (normalizado: "${reservationTime}")`
+    );
+
     if (reservationTime === currentSlot) {
       console.log(
         `✅ [MATCH] Slot ${slotTime} = reserva ${reservation.reservation_time} (normalizado: ${reservationTime}) (${reservation.tour_type}) - STATUS: OCCUPIED`
       );
-      return "occupied";
+      return { status: "occupied", reservation };
     }
   }
 
   // Verificar se este slot está dentro da duração de alguma reserva
   for (const reservation of reservations) {
     // Normalizar formato da hora de início
-    const normalizedStartTime = reservation.reservation_time.trim().substring(0, 5);
+    const normalizedStartTime = reservation.reservation_time
+      .trim()
+      .substring(0, 5);
     const tourEnd = calculateTourEndTime(
       normalizedStartTime,
       reservation.tour_type
@@ -454,11 +530,11 @@ export const determineSlotStatus = (
       slotTime > normalizedStartTime && slotTime < tourEnd;
 
     if (isWithinDuration) {
-      return "buffer";
+      return { status: "buffer", relatedReservation: reservation };
     }
   }
 
-  return "available";
+  return { status: "available" };
 };
 
 /**
@@ -490,19 +566,28 @@ export const generateDayAvailability = async (
         );
         // Mostrar apenas as reservas encontradas
         data?.forEach((r) => {
+          const customerName = r.customer_name || "N/A";
           console.log(
-            `   - ${r.reservation_time} (${r.tour_type}) - ${
-              r.customer_name || "N/A"
-            } [Data: ${r.reservation_date}]`
+            `   - ${r.reservation_time} (${r.tour_type}) - ${customerName} [Data: ${r.reservation_date}]`
           );
         });
-        
+
         // Debug: verificar especificamente reservas às 14:00
-        const reserva14h = data?.find(r => r.reservation_time.trim().substring(0, 5) === "14:00");
+        const reserva14h = data?.find(
+          (r) => r.reservation_time.trim().substring(0, 5) === "14:00"
+        );
         if (reserva14h) {
-          console.log(`🎯 [GRID] RESERVA 14:00 ENCONTRADA (formato: ${reserva14h.reservation_time}):`, reserva14h);
+          console.log(
+            `🎯 [GRID] RESERVA 14:00 ENCONTRADA (formato: ${reserva14h.reservation_time}):`,
+            reserva14h
+          );
         } else {
-          console.log(`⚠️ [GRID] Nenhuma reserva às 14:00 encontrada. Todas as reservas:`, data?.map(r => `${r.reservation_time} na data ${r.reservation_date}`));
+          console.log(
+            `⚠️ [GRID] Nenhuma reserva às 14:00 encontrada. Todas as reservas:`,
+            data?.map(
+              (r) => `${r.reservation_time} na data ${r.reservation_date}`
+            )
+          );
         }
       }
 
@@ -530,9 +615,30 @@ export const generateDayAvailability = async (
     const timeSlots = generateDynamicTimeSlots();
 
     const slots: TimeSlot[] = timeSlots.map((time) => {
-      const status = determineSlotStatus(time, reservations, blockedPeriods);
-      // Buscar reserva normalizando formato de hora
-      const reservation = reservations.find((r) => r.reservation_time.trim().substring(0, 5) === time);
+      const result = determineSlotStatus(time, reservations, blockedPeriods);
+      const { status, reservation, relatedReservation } = result;
+
+      // Buscar informações sobre a reserva para este slot
+      const currentReservation = reservation || relatedReservation;
+
+      // Debug para slots ocupados ou buffer
+      if (status === "occupied" || status === "buffer") {
+        console.log(`🔍 [SLOT] ${time} - Status: ${status}, Reserva:`, {
+          id: currentReservation?.id,
+          customer: currentReservation?.customer_name,
+          time: currentReservation?.reservation_time,
+          tour: currentReservation?.tour_type,
+        });
+      }
+
+      let endTime = undefined;
+      if (currentReservation) {
+        // Para calcular o endTime, sempre usar o horário de início real da reserva
+        const startTime = currentReservation.reservation_time
+          .trim()
+          .substring(0, 5);
+        endTime = calculateTourEndTime(startTime, currentReservation.tour_type);
+      }
 
       const slot: TimeSlot = {
         time,
@@ -543,11 +649,17 @@ export const generateDayAvailability = async (
             : status === "blocked"
             ? "manual_block"
             : undefined,
-        reservationId: reservation?.id,
-        tourType: reservation?.tour_type,
-        endTime: reservation
-          ? calculateTourEndTime(time, reservation.tour_type)
+        reservationId: currentReservation?.id,
+        tourType: currentReservation?.tour_type,
+        endTime,
+        customerName: currentReservation?.customer_name,
+        tourDuration: currentReservation
+          ? TOUR_DURATIONS[currentReservation.tour_type]
           : undefined,
+        tourDisplayName: currentReservation
+          ? getTourDisplayName(currentReservation.tour_type)
+          : undefined,
+        statusMessage: getStatusMessage(status, currentReservation),
       };
 
       return slot;

@@ -1095,6 +1095,11 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         tourType: slot.tourType,
         endTime: slot.endTime,
         conflictReason: slot.conflictReason,
+        // Incluir as novas propriedades
+        customerName: slot.customerName,
+        tourDuration: slot.tourDuration,
+        tourDisplayName: slot.tourDisplayName,
+        statusMessage: slot.statusMessage,
       }));
     } else {
       // Fallback para lógica antiga
@@ -1186,6 +1191,10 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         setGridLoading(true);
         const targetDate = format(calendarDate, "yyyy-MM-dd");
         console.log("🚀 [ADMIN] Carregando grid para:", targetDate);
+        console.log(
+          "🔧 [ADMIN] generateDayAvailability existe?",
+          !!generateDayAvailability
+        );
 
         if (!generateDayAvailability) {
           console.error(
@@ -1194,9 +1203,24 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           return;
         }
 
+        console.log("🏃 [ADMIN] Executando generateDayAvailability...");
         const dayData = await generateDayAvailability(targetDate);
         setDayAvailability(dayData);
-        console.log("✅ [ADMIN] Grid carregada com sucesso");
+        console.log(
+          "✅ [ADMIN] Grid carregada com sucesso. Slots encontrados:",
+          dayData.timeSlots?.length
+        );
+        console.log(
+          "📊 [ADMIN] Slots detalhados:",
+          dayData.timeSlots
+            ?.filter((s) => s.status !== "available")
+            .map((s) => ({
+              time: s.time,
+              status: s.status,
+              customer: s.customerName,
+              statusMessage: s.statusMessage,
+            }))
+        );
       } catch (error) {
         console.error("❌ [ADMIN] Erro ao carregar grid:", error);
       } finally {
@@ -1664,6 +1688,20 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               let textClass = "";
               let statusText = "";
 
+              // Debug temporário
+              if (slot.status === "occupied" || slot.status === "buffer") {
+                console.log(
+                  "🔍 [RENDER] Slot:",
+                  slot.time,
+                  "Status:",
+                  slot.status,
+                  "Message:",
+                  slot.statusMessage,
+                  "Customer:",
+                  slot.customerName
+                );
+              }
+
               // Se estivermos usando a grid avançada, temos novos status
               if (useAdvancedGrid && slot.status) {
                 switch (slot.status) {
@@ -1677,18 +1715,21 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     cardClass =
                       "border-orange-300 bg-orange-50 hover:bg-orange-100";
                     textClass = "text-orange-600";
-                    statusText = slot.tourType ? `${slot.tourType}` : "Ocupado";
+                    // Usar informação detalhada se disponível
+                    statusText =
+                      slot.statusMessage ||
+                      (slot.tourType ? `${slot.tourType}` : "Ocupado");
                     break;
                   case "blocked":
                     cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
                     textClass = "text-red-600";
-                    statusText = "Bloqueado";
+                    statusText = slot.statusMessage || "Bloqueado";
                     break;
                   case "buffer":
                     cardClass =
                       "border-yellow-300 bg-yellow-50 hover:bg-yellow-100";
                     textClass = "text-yellow-600";
-                    statusText = "Buffer/Preparação";
+                    statusText = slot.statusMessage || "Tour em andamento";
                     break;
                   default:
                     cardClass =
@@ -1766,6 +1807,11 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     <div className="text-xs text-gray-600 text-center">
                       {slot.endTime && slot.status === "occupied" && (
                         <div>até {slot.endTime}</div>
+                      )}
+                      {slot.tourDuration && slot.status !== "available" && (
+                        <div className="text-xs opacity-75">
+                          ({slot.tourDuration} min)
+                        </div>
                       )}
                     </div>
                   ) : (
