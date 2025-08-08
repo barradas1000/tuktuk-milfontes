@@ -3,6 +3,7 @@ import { mockReservations } from "@/data/mockReservations";
 import { checkSupabaseConfiguration } from "./supabaseService";
 import { generateDynamicTimeSlots } from "@/utils/reservationUtils";
 
+<<<<<<< HEAD
 // Tipos para slots de tempo
 export interface TimeSlot {
   time: string;
@@ -45,13 +46,18 @@ export interface BlockedPeriod {
 }
 
 // Interfaces existentes mantidas para compatibilidade
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 export interface AvailabilityCheck {
   isAvailable: boolean;
   existingReservations: number;
   maxCapacity: number;
   alternativeTimes: string[];
   message: string;
+<<<<<<< HEAD
   timeSlot?: TimeSlot; // Nova propriedade para informações detalhadas
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 }
 
 export interface ReservationConflict {
@@ -60,6 +66,7 @@ export interface ReservationConflict {
   existingPeople: number;
   requestedPeople: number;
   maxCapacity: number;
+<<<<<<< HEAD
   conflictingReservations?: ReservationData[]; // Nova propriedade para detalhes dos conflitos
 }
 
@@ -70,6 +77,8 @@ export interface DayAvailability {
   totalAvailable: number;
   totalBlocked: number;
   hasReservations: boolean;
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 }
 
 const MAX_CAPACITY = 1; // Máximo de 1 reserva por horário (não importa o número de pessoas)
@@ -84,6 +93,7 @@ const TOUR_DURATIONS: Record<string, number> = {
   fishermen: 45,
 };
 
+<<<<<<< HEAD
 // Nomes amigáveis dos tours
 const TOUR_DISPLAY_NAMES: Record<string, string> = {
   panoramic: "Tour Panorâmico",
@@ -134,6 +144,8 @@ export const getStatusMessage = (
   }
 };
 
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 // Função utilitária para somar minutos a uma hora (HH:mm)
 function addMinutesToTime(time: string, minutes: number): string {
   const [h, m] = time.split(":").map(Number);
@@ -162,7 +174,11 @@ function findNextAvailableTime(
   date: string,
   requestedTime: string,
   duration: number,
+<<<<<<< HEAD
   existingReservations: ReservationData[]
+=======
+  existingReservations: any[]
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 ): string | null {
   // Ordenar reservas por hora de início
   const sorted = existingReservations
@@ -237,6 +253,7 @@ export const checkAvailability = async (
 ): Promise<AvailabilityCheck> => {
   const isConfigured = checkSupabaseConfiguration();
   try {
+<<<<<<< HEAD
     let existingReservations: ReservationData[] = [];
     if (isConfigured) {
       const { data, error } = await supabase
@@ -244,6 +261,13 @@ export const checkAvailability = async (
         .select(
           "id, reservation_date, reservation_time, number_of_people, tour_type, status"
         )
+=======
+    let existingReservations: any[] = [];
+    if (isConfigured) {
+      const { data, error } = await supabase
+        .from("reservations")
+        .select("number_of_people, status, reservation_time, tour_type")
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
         .eq("reservation_date", date)
         .neq("status", "cancelled");
       if (error) {
@@ -335,6 +359,7 @@ export const generateAlternativeTimes = async (
   const alternatives: string[] = [];
   try {
     const timeSlots = generateDynamicTimeSlots();
+<<<<<<< HEAD
     let existingReservations: ReservationData[] = [];
     if (isConfigured) {
       const { data } = await supabase
@@ -342,6 +367,13 @@ export const generateAlternativeTimes = async (
         .select(
           "id, reservation_date, reservation_time, number_of_people, tour_type, status"
         )
+=======
+    let existingReservations: any[] = [];
+    if (isConfigured) {
+      const { data } = await supabase
+        .from("reservations")
+        .select("number_of_people, status, reservation_time, tour_type")
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
         .eq("reservation_date", date)
         .neq("status", "cancelled");
       existingReservations = data || [];
@@ -394,14 +426,22 @@ export const getAvailabilityForDate = async (
   try {
     const timeSlots = generateDynamicTimeSlots();
     for (const timeSlot of timeSlots) {
+<<<<<<< HEAD
       let existingReservations: ReservationData[] = [];
+=======
+      let existingReservations: any[] = [];
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
       if (isConfigured) {
         const { data } = await supabase
           .from("reservations")
+<<<<<<< HEAD
           .select(
             "id, reservation_date, reservation_time, number_of_people, tour_type, status"
           )
+=======
+          .select("number_of_people, status")
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           .eq("reservation_date", date)
           .eq("reservation_time", timeSlot)
           .neq("status", "cancelled");
@@ -434,6 +474,7 @@ export const formatTime = (time: string): string => {
   const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
   return `${displayHour}:${minutes} ${ampm}`;
 };
+<<<<<<< HEAD
 
 // ============================
 // NOVAS FUNÇÕES PARA GRID AVANÇADA
@@ -778,3 +819,5 @@ export const canScheduleTour = async (
     };
   }
 };
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363

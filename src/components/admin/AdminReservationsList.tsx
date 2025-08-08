@@ -179,7 +179,11 @@ const AdminReservationsList = () => {
       const { error } = await supabase.from("reservations").insert([
         {
           customer_name: formData.name,
+<<<<<<< HEAD
           customer_email: (formData.email || "").trim(),
+=======
+          customer_email: formData.email,
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           customer_phone: formData.phone,
           reservation_date: formData.date,
           reservation_time: formData.time,
@@ -527,7 +531,11 @@ const AdminReservationsList = () => {
                 />
               </div>
               <div>
+<<<<<<< HEAD
                 <Label>Email</Label>
+=======
+                <Label>Email *</Label>
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
                 <Input
                   type="email"
                   value={formData.email}

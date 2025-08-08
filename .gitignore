@@ -11,6 +11,7 @@ node_modules/
 # Vite
 .vite/
 
+<<<<<<< HEAD
 # Tooling caches
 .cache/
 .parcel-cache/
@@ -22,16 +23,22 @@ node_modules/
 # ESLint
 .eslintcache
 
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 # Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+<<<<<<< HEAD
 lerna-debug.log*
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 # Ambiente
 .env
 .env.*
+<<<<<<< HEAD
 .env.local
 .env.*.local
 .envrc
@@ -44,18 +51,29 @@ lerna-debug.log*
 supabase/.temp/
 supabase/.output/
 supabase/.branches/
+=======
+
+# Supabase
+.supabase/
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 # Sistema
 .DS_Store
 Thumbs.db
+<<<<<<< HEAD
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 # IDEs
 .vscode/
 .idea/
+<<<<<<< HEAD
 /.vs/
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 *.suo
 *.ntvs*
 *.njsproj
@@ -66,8 +84,11 @@ $RECYCLE.BIN/
 *.log
 *.swp
 *.tmp
+<<<<<<< HEAD
 *.orig
 *.rej
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 # Lockfiles alternativos
 bun.lockb
@@ -76,17 +97,21 @@ yarn.lock
 
 # Testes
 coverage/
+<<<<<<< HEAD
 .nyc_output/
 cypress/screenshots/
 cypress/videos/
 playwright-report/
 test-results/
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 # Variáveis de ambiente locais
 .env
 
 # Documentação interna
 /docs/
+<<<<<<< HEAD
 
 # VSCode history
 .history/
@@ -98,3 +123,5 @@ storybook-static/
 
 # Dev Containers
 .devcontainer/
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363

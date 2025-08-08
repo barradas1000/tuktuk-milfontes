@@ -280,6 +280,7 @@
     "title": "Luchtfoto van Milfontes",
     "description": "Luchtfoto op een wintermiddag boven Vila Nova de Milfontes, Alentejo - Portugal."
   },
+<<<<<<< HEAD
   "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}",
   "tracking": {
     "title": "TukTuk in Real-time",
@@ -402,4 +403,7 @@
     "description": "Zie waar onze TukTuk nu is en volg zijn locatie in real-time",
     "buttonText": "📍 TukTuk in Real-time Bekijken"
   }
+=======
+  "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}"
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 }

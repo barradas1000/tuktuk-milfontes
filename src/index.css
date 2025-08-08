@@ -100,6 +100,7 @@
   body {
     @apply bg-background text-foreground;
   }
+<<<<<<< HEAD
 }
 
 /* Garantir que o Dialog apareça sobre o mapa Leaflet */
@@ -117,3 +118,6 @@
 .leaflet-container ~ div[data-radix-dialog-content] {
   z-index: 10001 !important;
 }
+=======
+}
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363

@@ -43,7 +43,10 @@ import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import LanguageSelector from "@/components/LanguageSelector";
 import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 import VideoModal from "../components/VideoModal";
+<<<<<<< HEAD
 import ResponsiveImage from "@/components/ResponsiveImage";
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 const Index = () => {
   console.log("Index component rendering");
@@ -179,8 +182,11 @@ const Index = () => {
                   alt="TukTuk Milfontes Logo"
                   className="w-full h-full object-contain rounded-full"
                   src="https://tuktuk-milfontes.vercel.app/lovable-uploads/cf00ebfe-2e98-4eb0-bc91-d80954178a9f.png"
+<<<<<<< HEAD
                   loading="lazy"
                   decoding="async"
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
                 />
               </div>
             </div>
@@ -260,8 +266,11 @@ const Index = () => {
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/bc9c590b-26bf-4d4d-a27c-3e917afef291.png"
                 alt="Nosso Tuk-Tuk ao pôr do sol em Milfontes"
                 className="w-full h-64 object-cover rounded-xl shadow-lg"
+<<<<<<< HEAD
                 loading="lazy"
                 decoding="async"
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl"></div>
               <div className="absolute bottom-4 left-4 text-white">
@@ -274,8 +283,11 @@ const Index = () => {
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/ddc85a0b-4a74-44e3-a0a6-bed937a5a686.png"
                 alt="Tuk-Tuk com cobertura contra chuva"
                 className="w-full h-64 object-cover rounded-xl shadow-lg"
+<<<<<<< HEAD
                 loading="lazy"
                 decoding="async"
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl"></div>
               <div className="absolute bottom-4 left-4 text-white">
@@ -567,6 +579,7 @@ const Index = () => {
       </section>
 
       {/* TukTuk Tracking Button Section */}
+<<<<<<< HEAD
       <section
         id="real-time-tracking-section"
         className="py-12 px-4 bg-gradient-to-br from-amber-50 to-blue-50"
@@ -577,12 +590,26 @@ const Index = () => {
           </h3>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             {t("realTimeTracking.description")}
+=======
+      <section className="py-12 px-4 bg-gradient-to-br from-amber-50 to-blue-50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h3 className="text-2xl md:text-3xl font-bold text-blue-900 mb-4">
+            🛺 Acompanhe o nosso TukTuk em tempo real!
+          </h3>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            Veja onde está o nosso TukTuk neste momento e acompanhe a sua
+            localização em tempo real
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           </p>
           <a
             href="/tracking"
             className="inline-flex items-center px-8 py-4 bg-blue-600 text-white font-bold text-lg rounded-xl shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
+<<<<<<< HEAD
             {t("realTimeTracking.buttonText")}
+=======
+            📍 Ver TukTuk em Tempo Real
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           </a>
         </div>
       </section>
@@ -612,8 +639,11 @@ const Index = () => {
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/47a59b02-cbe5-4103-ac4c-ea39946a7b96.png"
                 alt="Vista aérea de Vila Nova de Milfontes"
                 className="w-full h-96 object-cover rounded-xl shadow-lg"
+<<<<<<< HEAD
                 loading="lazy"
                 decoding="async"
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl"></div>
               <div className="absolute bottom-6 left-6 text-white">
@@ -628,8 +658,11 @@ const Index = () => {
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/a736c163-97f6-47cb-80c1-b2ed8d1bf580.png"
                 alt="Forte de Vila Nova de Milfontes"
                 className="w-full h-96 object-cover rounded-xl shadow-lg"
+<<<<<<< HEAD
                 loading="lazy"
                 decoding="async"
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl"></div>
               <div className="absolute bottom-6 left-6 text-white">

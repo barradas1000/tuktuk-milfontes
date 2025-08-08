@@ -3,11 +3,19 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "../lib/supabase";
 
 interface ToggleTrackingButtonProps {
+<<<<<<< HEAD
   conductorId: string;
 }
 
 const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
   conductorId,
+=======
+  driverId: string;
+}
+
+const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
+  driverId,
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 }) => {
   const [isTracking, setIsTracking] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -18,9 +26,15 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
     const checkInitialStatus = async () => {
       try {
         const { data, error } = await supabase
+<<<<<<< HEAD
           .from("conductors")
           .select("is_active")
           .eq("id", conductorId)
+=======
+          .from("drivers")
+          .select("is_active")
+          .eq("id", driverId)
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           .single();
 
         if (!error && data) {
@@ -32,7 +46,11 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
     };
 
     checkInitialStatus();
+<<<<<<< HEAD
   }, [conductorId]);
+=======
+  }, [driverId]);
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
   const startTracking = async () => {
     setLoading(true);
@@ -46,9 +64,15 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
 
       // Atualizar status no Supabase
       const { error: updateError } = await supabase
+<<<<<<< HEAD
         .from("conductors")
         .update({ is_active: true })
         .eq("id", conductorId);
+=======
+        .from("drivers")
+        .update({ is_active: true })
+        .eq("id", driverId);
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
       if (updateError) {
         console.error("Erro ao ativar rastreamento:", updateError);
@@ -62,13 +86,21 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
 
           try {
             await supabase
+<<<<<<< HEAD
               .from("conductors")
+=======
+              .from("drivers")
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
               .update({
                 latitude,
                 longitude,
                 updated_at: new Date().toISOString(),
               })
+<<<<<<< HEAD
               .eq("id", conductorId);
+=======
+              .eq("id", driverId);
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           } catch (error) {
             console.error("Erro ao atualizar localização:", error);
           }
@@ -105,9 +137,15 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
 
       // Atualizar status no Supabase
       const { error } = await supabase
+<<<<<<< HEAD
         .from("conductors")
         .update({ is_active: false })
         .eq("id", conductorId);
+=======
+        .from("drivers")
+        .update({ is_active: false })
+        .eq("id", driverId);
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
       if (error) {
         console.error("Erro ao desativar rastreamento:", error);
