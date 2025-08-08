@@ -179,7 +179,7 @@ const AdminReservationsList = () => {
       const { error } = await supabase.from("reservations").insert([
         {
           customer_name: formData.name,
-          customer_email: formData.email,
+          customer_email: (formData.email || "").trim(),
           customer_phone: formData.phone,
           reservation_date: formData.date,
           reservation_time: formData.time,
@@ -527,7 +527,7 @@ const AdminReservationsList = () => {
                 />
               </div>
               <div>
-                <Label>Email *</Label>
+                <Label>Email</Label>
                 <Input
                   type="email"
                   value={formData.email}

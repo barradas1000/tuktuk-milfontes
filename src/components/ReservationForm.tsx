@@ -199,7 +199,7 @@ const ReservationForm = () => {
       const { error } = await supabase.from("reservations").insert([
         {
           customer_name: formData.name,
-          customer_email: formData.email,
+          customer_email: (formData.email || "").trim(),
           customer_phone: formData.phone,
           reservation_date: formData.date,
           reservation_time: formData.time,
@@ -419,14 +419,13 @@ const ReservationForm = () => {
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-blue-900 font-semibold">
-                {t("reservation.email")} *
+                {t("reservation.email")}
               </Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-                required
                 className="border-2 border-blue-100 focus:border-amber-400"
               />
             </div>
