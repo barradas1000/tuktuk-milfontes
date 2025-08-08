@@ -1,0 +1,409 @@
+{
+  "hero": {
+    "title": "Ontdek Milfontes met Stijl",
+    "subtitle": "Tuk-Tuk Avonturen langs de Vicentijnse Kust",
+    "description": "Verken Vila Nova de Milfontes en omgeving in een unieke tuk-tuk ervaring. Prachtige landschappen, geschiedenis en gegarandeerd plezier!",
+    "descriptionHighlight": "Boek nu uw avontuur!",
+    "reserveNow": "Nu Boeken",
+    "rating": "4.9/5 ⭐ (200+ beoordelingen)"
+  },
+  "benefits": {
+    "title": "Waarom Kiezen voor",
+    "titleHighlight": "Onze Tuk-Tuks?",
+    "subtitle": "Comfort, plezier en unieke ervaringen gegarandeerd voor het hele gezin",
+    "exclusiveRoutes": {
+      "title": "Exclusieve Routes",
+      "description": "Toegang tot unieke locaties en panoramische uitzichten die je alleen kunt bereiken met onze gespecialiseerde tuk-tuks"
+    },
+    "familyComfort": {
+      "title": "Gezinscomfort",
+      "description": "Veilige en comfortabele voertuigen, ideaal voor gezinnen met kinderen en mensen van alle leeftijden"
+    },
+    "quickReservation": {
+      "title": "Snelle Reservering",
+      "description": "Eenvoudig en snel WhatsApp boekingssysteem. Bevestig je tour in slechts een paar minuten"
+    }
+  },
+  "pricing": {
+    "title": "Transparante",
+    "titleHighlight": "Prijzen",
+    "subtitle": "Eerlijke en duidelijke prijzen, geen verrassingen. Gegarandeerd plezier voor het hele gezin!",
+    "upTo2People": "Tot 2 personen",
+    "additionalPeople": "Extra personen",
+    "seeDetailedPrices": "Gedetailleerde Prijzen Bekijken",
+    "detailedPricesTitle": "Volledige Prijstabel",
+    "howPricesWork": "Hoe De Prijzen Werken",
+    "basePrice": "Basisprijs",
+    "basePriceDesc": "vaste prijs tot 2 personen per tuk-tuk",
+    "additionalPeopleDesc": "€3.50 voor elke extra persoon (maximum 4 personen per tuk-tuk)",
+    "priceExamples": "Prijsvoorbeelden:",
+    "person": "persoon",
+    "people": "personen",
+    "makeReservation": "Reservering Maken"
+  },
+  "explore": {
+    "title": "Verken",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Zoals Nooit Tevoren",
+    "description": "Ontdek de best bewaarde geheimen van Vila Nova de Milfontes en de Vicentijnse Kust vanuit een uniek perspectief",
+    "panoramicView": "Uniek Panoramisch Uitzicht",
+    "panoramicViewDesc": "Geniet van de beste uitzichten van de Alentejo kust",
+    "historicHeritage": "Historisch Erfgoed",
+    "historicHeritageDesc": "Leer over de rijke geschiedenis van dit vissersdorp"
+  },
+  "availability": {
+    "title": "Real-time",
+    "titleHighlight": "Beschikbaarheid",
+    "subtitle": "Bekijk beschikbare tijden en boek je perfecte moment",
+    "availabilityToday": "Beschikbaarheid Vandaag",
+    "availableSlots": "Beschikbare tijdsslots voor boekingen",
+    "available": "Beschikbaar",
+    "occupied": "Bezet",
+    "reserveSpecificTime": "Om een specifieke tijd te boeken, gebruik het reserveringsformulier",
+    "morning": "Ochtend (09:30-15:00)",
+    "afternoon": "Middag (15:30-21:30)",
+    "places": "plaatsen",
+    "autoUpdated": "Gegevens automatisch bijgewerkt",
+    "lastUpdate": "Laatste update",
+    "noSlotsAvailable": "Geen slots beschikbaar voor {{period}}",
+    "allSlotsBooked": "Alle slots voor {{period}} zijn al geboekt of geblokkeerd",
+    "contactUs": "Controleer andere dagen of neem contact met ons op"
+  },
+  "testimonials": {
+    "title": "Wat onze",
+    "titleHighlight": "klanten zeggen",
+    "rating": "5.0 (200+ beoordelingen)",
+    "items": {
+      "0": {
+        "quote": "Beste ervaring van de reis! Mijn kinderen vonden het geweldig om de geheime stranden te ontdekken. De gids was fantastisch!",
+        "name": "Ana Silva",
+        "designation": "Lissabon"
+      },
+      "1": {
+        "quote": "Geweldige tour! De tuk-tuk is super comfortabel en de uitzichten zijn adembenemend. Ik beveel het 100% aan!",
+        "name": "João Santos",
+        "designation": "Porto"
+      },
+      "2": {
+        "quote": "Professionele en zeer leuke service. De kinderen stopten niet met glimlachen tijdens de hele tour!",
+        "name": "Maria Costa",
+        "designation": "Coimbra"
+      },
+      "3": {
+        "quote": "We ontdekten ongelooflijke plekken die we nooit alleen zouden hebben gevonden. Een onvergetelijke ervaring!",
+        "name": "Unieke Ervaring",
+        "designation": "Milfontes"
+      },
+      "4": {
+        "quote": "De tuk-tuks zijn modern en veilig. Het hele gezin had een geweldige tijd tijdens de tour!",
+        "name": "Gelukkig Gezin",
+        "designation": "Avontuur"
+      },
+      "5": {
+        "quote": "Zelfs bij speciale evenementen is de service onberispelijk. Plezier en vreugde op elk moment!",
+        "name": "Gegarandeerd Plezier",
+        "designation": "Carnaval"
+      }
+    }
+  },
+  "faq": {
+    "title": "Veelgestelde",
+    "titleHighlight": "Vragen",
+    "subtitle": "We verduidelijken je hoofdvragen over onze tuk-tuk tours",
+    "q1": "Hoeveel mensen passen er in een tuk-tuk?",
+    "a1": "De tuk-tuk biedt plaats aan 4 personen plus de bestuurder.",
+    "q2": "Rijden de tours bij regen?",
+    "a2": "Onze tuk-tuks hebben afdekking, maar bij zware regen kunnen we kosteloos herplannen.",
+    "q3": "Is vooraf boeken nodig?",
+    "a3": "We raden aan om minstens 24 uur van tevoren te boeken, vooral in het hoogseizoen.",
+    "q4": "Zijn er groepskortingen?",
+    "a4": "Ja, we bieden speciale kortingen voor groepen. Neem contact met ons op voor meer informatie.",
+    "q5": "Zijn tuk-tuks veilig voor kinderen?",
+    "a5": "Ja, al onze tuk-tuks zijn uitgerust met veiligheidsgordels en zijn perfect veilig voor kinderen."
+  },
+  "cta": {
+    "title": "Klaar voor het",
+    "titleHighlight": "Avontuur?",
+    "description": "Boek nu je tuk-tuk tour en ontdek Milfontes op een unieke en onvergetelijke manier!",
+    "reserveNow": "Nu Boeken",
+    "talkToUs": "Praat Met Ons",
+    "phone": "968 784 043",
+    "schedule": "Elke dag 9-20 uur"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. Alle rechten voorbehouden.",
+    "insurance": "Verzekering inbegrepen",
+    "photos": "Foto's inbegrepen",
+    "localGuides": "Lokale gidsen"
+  },
+  "tours": {
+    "title": "Onze Tours",
+    "panoramic": {
+      "title": "Panoramische dorpstour",
+      "description": "Ontdek de meest emblematische punten van Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Furnas Strand",
+      "description": "Reis naar het beroemde Furnas Strand met fotostops",
+      "duration": "1u 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Brugoversteek",
+      "description": "Steek de historische brug over met panoramisch uitzicht",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Romantische Zonsondergang",
+      "description": "Geniet van de mooiste zonsondergang aan de kust",
+      "duration": "2u",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Nacht tour",
+      "description": "Verken het dorp bij maanlicht met een uniek perspectief",
+      "duration": "1u",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Vissers Route",
+      "description": "Leer over lokale visserstraditieses",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Neem contact op",
+    "phone": "Telefoon",
+    "whatsapp": "WhatsApp",
+    "email": "Email"
+  },
+  "map": {
+    "title": "Locatie en",
+    "titleHighlight": "Bezienswaardigheden",
+    "subtitle": "Vind ons in het hart van Vila Nova de Milfontes en ontdek de belangrijkste toeristische attracties",
+    "mapTitle": "Locatie",
+    "description": "Vind ons in het hart van Vila Nova de Milfontes",
+    "pointsOfInterest": "Bezienswaardigheden",
+    "historicCenter": "Historisch Centrum",
+    "milfontesBeach": "Milfontes Strand",
+    "fort": "São Clemente Fort",
+    "nearbyBeaches": "Nabije Stranden",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Furnas Strand",
+    "viewpoints": "Panoramische Uitkijkpunten",
+    "openInGoogleMaps": "Openen in Google Maps",
+    "clickToSee": "Klik om op de kaart te zien",
+    "exitMap": "Kaart sluiten"
+  },
+  "reservation": {
+    "title": "Reserveringsaanvraag:",
+    "subtitle": "Vul de details in en bevestig via WhatsApp",
+    "name": "Volledige Naam",
+    "email": "Email",
+    "phone": "Telefoon",
+    "date": "Gewenste Datum",
+    "time": "Gewenste Tijd",
+    "tourType": "Tour Type",
+    "numberOfPeople": "Aantal Personen",
+    "message": "Aanvullend Bericht",
+    "messagePlaceholder": "Eventuele aanvullende informatie of speciale verzoeken...",
+    "selectTour": "Selecteer tour type",
+    "people1": "1 persoon",
+    "people2": "2 personen",
+    "people3": "3 personen",
+    "people4": "4 personen",
+    "confirmWhatsApp": "Bevestigen via WhatsApp",
+    "reservationSent": "Reservering verzonden!",
+    "reservationDescription": "U wordt doorgestuurd naar WhatsApp om uw reservering te bevestigen.",
+    "required": "vereist",
+    "whatsappMessages": {
+      "pending": "Hallo {{name}}, we hebben uw reserveringsaanvraag ontvangen voor de tour '{{tour_type}}' op {{reservation_date}} om {{reservation_time}}. Voor bevestiging is betaling van €{{total_price}} vereist. U kunt een overboeking maken naar IBAN PT50 1234 5678 9012 3456 7890 1 of contant betalen ter plaatse. Na betaling wordt uw reservering automatisch bevestigd.",
+      "confirmed": "Hallo {{name}}, uw reservering voor de tour '{{tour_type}}' is bevestigd voor {{reservation_date}} om {{reservation_time}}! Ontmoet ons in het centrum van Milfontes, naast de openbare tuin. Eventuele vragen, we staan tot uw beschikking.",
+      "cancelled": "Hallo {{name}}, we moeten u helaas informeren dat uw reservering voor de tour '{{tour_type}}' op {{reservation_date}} om {{reservation_time}} is geannuleerd. Als u opnieuw wilt boeken of vragen heeft, neem dan contact met ons op.",
+      "completed": "Hallo {{name}}, bedankt dat u de tour met ons heeft gedaan! We hopen dat u een fantastische ervaring heeft gehad in Milfontes. Beveel ons aan bij uw vrienden en familie. Tot de volgende keer!",
+      "payment_reminder": "Hallo {{name}}, we herinneren u eraan dat uw reservering voor {{reservation_date}} om {{reservation_time}} nog niet is bevestigd. Om uw plek te garanderen, voer de betaling van €{{total_price}} zo spoedig mogelijk uit.",
+      "weather_update": "Hallo {{name}}, vanwege de weersomstandigheden die voor {{reservation_date}} worden voorspeld, moeten we mogelijk uw tour opnieuw inplannen. We nemen contact met u op dichter bij de datum om te bevestigen.",
+      "pickup_reminder": "Hallo {{name}}, we herinneren u eraan dat uw tour gepland staat voor morgen, {{reservation_date}}, om {{reservation_time}}. Ontmoet ons in het centrum van Milfontes, naast de openbare tuin, 10 minuten voor de geplande tijd."
+    },
+    "simpleContactMessage": "Hallo, ik wil graag een reservering maken!",
+    "timeUnavailableWithSuggestion": "De gekozen tijd is al bezet door een andere tour. We stellen het volgende beschikbare tijdstip voor: {{next_available_time}}. Wilt u voor dit nieuwe tijdstip reserveren?",
+    "acceptSuggestion": "Suggestie accepteren",
+    "chooseAnotherTime": "Kies een andere tijd"
+  },
+  "mapDescriptions": {
+    "praiaDaFranquia": "Dicht bij het dorp en ideaal voor gezinnen, bekend om het kalme water en het landschap van de Mira-estuarium.",
+    "praiaDoFarol": "Gelegen nabij de vuurtoren en het centrum, populair vanwege de toegankelijkheid en het uitzicht op de riviermonding.",
+    "praiaDoMalhao": "Een wild en uitgestrekt strand, geliefd bij surfers en natuurliefhebbers vanwege de golven en duinen.",
+    "praiaDasFurnas": "Bekend om de rotsformaties en grotten, biedt een unieke omgeving om te zonnebaden en te verkennen.",
+    "praiaDoPatacho": "Een rustiger en meer afgelegen strand, perfect voor wie rust en contact met de natuur zoekt.",
+    "praiaDoCarreiroDasFazendas": "Gekenmerkt door kliffen en een uitdagendere toegang, een plek van grote natuurlijke schoonheid en rust.",
+    "praiaDoPortoDasBarcas": "Een kleine baai met een traditionele vissershaven, ideaal om het lokale vissersleven te observeren.",
+    "praiaDosAivados": "Een uitgestrekt en golvend strand, zeer populair bij surfers en bodyboarders vanwege de ruige zee.",
+    "forteDeSaoClemente": "Een historische vesting die de monding van de Mira beschermde en panoramisch uitzicht over de kust biedt.",
+    "farolDeMilfontes": "Een iconisch herkenningspunt dat zeelieden begeleidt en een visueel referentiepunt voor het dorp biedt.",
+    "igrejaDeNossaSenhoraDaGraca": "Een religieuze tempel met traditionele lokale architectuur, die het culturele erfgoed van de regio weerspiegelt.",
+    "estatuaDoArcanjo": "Een monument dat opvalt in het dorpsbeeld en een artistiek en symbolisch tintje toevoegt.",
+    "jardimPublico": "Een recreatie- en ontmoetingsruimte in het dorpscentrum, ideaal voor wandelingen en ontspanning.",
+    "parqueNatural": "Een uitgestrekt beschermd gebied dat de regio beslaat en de biodiversiteit en wilde kustlandschappen behoudt.",
+    "parqueInfantil": "Een speeltuin speciaal voor kinderen, met speeltoestellen voor plezier en vermaak.",
+    "jardimParagem": "Een kleine tuin die een aangename plek biedt om op het openbaar vervoer te wachten.",
+    "estuarioDoRioMira": "Een plek van grote natuurlijke schoonheid en ecologisch belang, perfect om vogels te kijken en langs de rivier te wandelen.",
+    "restauranteAChoupana": "Restaurant aan zee, gespecialiseerd in gegrilde gerechten, altijd met verse vis.",
+    "tascaDoCelso": "Een gezellig en populair restaurant, beroemd om het huisgemaakte eten en de familiesfeer.",
+    "aManjedoura": "Afhalen · Dineren ter plaatse · Met terras.",
+    "restauranteRitual": "Restaurant en Tapas-Bar waar de rust van de Alentejo-kust samenkomt met een verfijnde en kosmopolitische sfeer, vol verhalen en reizen van over de hele wereld.",
+    "patioAlentejano": "Een restaurant met een aangenaam terras, waar traditionele Alentejaanse gerechten worden geserveerd in een ontspannen sfeer.",
+    "restauranteHSBeach": "Een restaurant met uitzicht op zee, dat een verscheidenheid aan gerechten serveert, waaronder verse zeevruchten.",
+    "mercadoMilfontes": "Een traditionele markt waar je lokale verse producten en handwerk kunt vinden.",
+    "mercadoBrunheiras": "Een andere lokale markt met een verscheidenheid aan fruit, groenten en andere regionale producten.",
+    "milsuper": "Een supermarkt met een breed assortiment producten voor de dagelijkse behoeften.",
+    "meuSuper": "Een gemakswinkel, ideaal voor snelle en essentiële boodschappen.",
+    "amanhecer": "Een zaak die gespecialiseerd is in verse groenten en fruit, met een gevarieerd aanbod.",
+    "supermercadoSPAR": "Een supermarkt met een compleet aanbod aan voedingsmiddelen en kruidenierswaren.",
+    "campifrias": "Camping bij de markt en visplein.",
+    "jardimParagemDosAutocarros": "Bushalte naast de tuin.",
+    "frutasECompanhiaAmanhecer": "Lokale winkel met vers fruit, groenten en dagelijkse benodigdheden.",
+    "campingMilfontes": "Camping met uitstekende faciliteiten, dicht bij het centrum van Milfontes en de natuur.",
+    "restauranteOasis": "Restaurant met uitzicht op zee in Milfontes.",
+    "portinhoDoCanal": "Traditionele vissershaven en recreatiegebied.",
+    "ponteSobreORioMira": "Brug over de Mira-rivier in Milfontes.",
+    "estaturaDoArcanjo": "Een artistieke en ecologische kreet, gemaakt van gerecycled ijzer, die ons uitdaagt om na te denken en te handelen voor de planeet.",
+    "spotsDeSurfEKayak": "Verhuur van kajaks en kano's.",
+    "restauranteHSMilfontesBeach": "Hotel en restaurant met uitzicht op de monding van de Mira.",
+    "mercadoDeVilaNovaDeMilfontes": "Vis- en fruitmarkt."
+  },
+  "aerialViewMilfontes": {
+    "title": "Luchtfoto van Milfontes",
+    "description": "Luchtfoto op een wintermiddag boven Vila Nova de Milfontes, Alentejo - Portugal."
+  },
+<<<<<<< HEAD
+  "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}",
+  "tracking": {
+    "title": "TukTuk in Real-time",
+    "subtitle": "Volg de locatie van onze TukTuk in Vila Nova de Milfontes",
+    "currentLocation": "Huidige Locatie",
+    "howItWorks": "Hoe het werkt",
+    "contact": "Contact",
+    "backToMainSite": "Terug naar hoofdsite",
+    "loading": "TukTuk locatie laden...",
+    "pleaseWait": "Even geduld...",
+    "mapCentering": "Kaart centreren",
+    "makeReservation": "Maak Hier Uw Reservering!",
+    "reservationDialog": "Reserveringsformulier",
+    "tuktukAvailable": "TukTuk nu beschikbaar!",
+    "tuktukBusy": "TukTuk Momenteel Bezet",
+    "readyForAdventure": "Klaar om je mee te nemen op avontuur",
+    "busyUntil": "tot",
+    "availableAgainAt": "Zal weer beschikbaar zijn om",
+    "instructions": {
+      "locateMe": "Klik op \"Lokaliseer mij\" om uw positie op de kaart te zien",
+      "tuktukIcon": "Het TukTuk-pictogram toont de huidige locatie in real-time",
+      "statusIndicator": "De status geeft aan of de TukTuk beschikbaar of bezet is",
+      "distanceCalculation": "Afstand en geschatte tijd worden automatisch berekend",
+      "makeReservation": "Gebruik \"Maak Hier Uw Reservering!\" om de service te boeken",
+      "centerMap": "\"Kaart centreren\" past de weergave aan voor betere visualisatie",
+      "offlineNote": "Als je de TukTuk niet ziet, kan deze offline zijn"
+    },
+    "contactInfo": {
+      "phone": "Telefoon: 963 496 320",
+      "whatsapp": "WhatsApp: Beschikbaar op hoofdsite",
+      "email": "Email: diogo.carias@outlook.pt"
+    }
+  },
+  "locationPermission": {
+    "grantAccess": "Lokaliseer mij",
+    "locating": "Lokaliseren...",
+    "permissionDenied": "Toestemming Geweigerd",
+    "located": "Gelokaliseerd!",
+    "permissionNeeded": "Locatietoestemming vereist",
+    "permissionDescription": "Om **uw locatie** op de kaart te tonen en de **afstand tot de TukTuk** te berekenen, hebben we uw locatietoestemming nodig.",
+    "clickForHelp": "Klik voor hulp",
+    "helpInstructions": {
+      "android": {
+        "title": "Hoe locatie toestaan op Android",
+        "method1": "Volledige methode:",
+        "method2": "Snelle methode (makkelijker):",
+        "method3": "Als je de pictogrammen niet kunt vinden:",
+        "steps": {
+          "complete": [
+            "Tik op de **drie punten** (⋮) in de rechterbovenhoek van Chrome",
+            "Selecteer **\"Instellingen\"**",
+            "Tik op **\"Site-instellingen\"**",
+            "Tik op **\"Locatie\"**",
+            "Vind deze site in de lijst en verander naar **\"Toestaan\"**",
+            "Ga terug naar de site en **ververs de pagina**"
+          ],
+          "quick": [
+            "Zoek naar het **📍** pictogram in de adresbalk",
+            "Of het **🔒** pictogram naast het adres",
+            "Tik erop en selecteer **\"Toestaan\"\""
+          ],
+          "alternative": [
+            "Tik op de **adresbalk** om meer opties te zien",
+            "Zoek naar het **informatie** pictogram (ⓘ)"
+          ]
+        }
+      },
+      "ios": {
+        "title": "Hoe locatie toestaan op iPhone/iPad",
+        "steps": [
+          "Tik op het **\"AA\"** pictogram in de adresbalk",
+          "Selecteer **\"Website-instellingen\"**",
+          "Tik op **\"Locatie\"**",
+          "Verander naar **\"Toestaan\"**",
+          "Ga terug naar de site en **ververs de pagina**"
+        ],
+        "alternative": [
+          "Zoek naar het **📍** pictogram in de adresbalk",
+          "Tik erop en selecteer **\"Toestaan\"\""
+        ]
+      },
+      "desktop": {
+        "title": "Hoe locatie toestaan in browser",
+        "steps": [
+          "Zoek naar het **📍** pictogram in de adresbalk",
+          "Klik erop en selecteer **\"Toestaan\"** wanneer de popup verschijnt",
+          "Als deze niet verschijnt, controleer de **browserinstellingen**",
+          "Zoek naar **\"Toestemmingen\"** of **\"Site-instellingen\"**",
+          "**Schakel** locatietoestemming in voor deze site"
+        ]
+      }
+    },
+    "statusMessages": {
+      "unsupported": "Geolocatie niet ondersteund in deze browser",
+      "obtaining": "Uw locatie ophalen...",
+      "error": "Fout:",
+      "denied": "Toestemming geweigerd - Klik voor hulp",
+      "success": "Locatie succesvol verkregen!",
+      "clickToDiscover": "Klik om uw locatie te ontdekken"
+    },
+    "helpModal": {
+      "understood": "Begrepen, bedankt!",
+      "completeGuide": "Bekijk volledige gids",
+      "lookForIcons": "Waar de pictogrammen te vinden:",
+      "visualNote": "**🔍 Zoek naar deze pictogrammen** in de adresbalk van uw browser"
+    }
+  },
+  "distanceCalculator": {
+    "waitingLocation": "Wachten op locatie...",
+    "distance": "Afstand:",
+    "estimatedTime": "Geschatte tijd:",
+    "averageSpeed": "Gemiddelde snelheid: {{speed}} km/u",
+    "meters": "meter",
+    "kilometers": "km",
+    "minutes": "min",
+    "hours": "uur"
+  },
+  "realTimeTracking": {
+    "title": "🛺 Volg onze TukTuk in real-time!",
+    "description": "Zie waar onze TukTuk nu is en volg zijn locatie in real-time",
+    "buttonText": "📍 TukTuk in Real-time Bekijken"
+  }
+=======
+  "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}"
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+}

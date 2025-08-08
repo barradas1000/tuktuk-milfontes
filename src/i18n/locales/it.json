@@ -1,0 +1,373 @@
+{
+  "hero": {
+    "title": "Scopri Milfontes con Stile",
+    "subtitle": "Avventure in Tuk-Tuk lungo la Costa Vicentina",
+    "description": "Esplora Vila Nova de Milfontes e dintorni in un'esperienza unica in tuk-tuk. Paesaggi mozzafiato, storia e divertimento garantito!",
+    "descriptionHighlight": "Prenota ora la tua avventura!",
+    "reserveNow": "Prenota Ora",
+    "rating": "4.9/5 ⭐ (200+ recensioni)"
+  },
+  "benefits": {
+    "title": "Perché Scegliere",
+    "titleHighlight": "i Nostri Tuk-Tuk?",
+    "subtitle": "Comfort, divertimento ed esperienze uniche garantite per tutta la famiglia",
+    "exclusiveRoutes": {
+      "title": "Percorsi Esclusivi",
+      "description": "Accesso a luoghi unici e viste panoramiche che puoi raggiungere solo con i nostri tuk-tuk specializzati"
+    },
+    "familyComfort": {
+      "title": "Comfort Familiare",
+      "description": "Veicoli sicuri e confortevoli, ideali per famiglie con bambini e persone di tutte le età"
+    },
+    "quickReservation": {
+      "title": "Prenotazione Rapida",
+      "description": "Sistema di prenotazione WhatsApp semplice e veloce. Conferma il tuo tour in pochi minuti"
+    }
+  },
+  "pricing": {
+    "title": "Prezzi",
+    "titleHighlight": "Trasparenti",
+    "subtitle": "Prezzi giusti e chiari, senza sorprese. Divertimento garantito per tutta la famiglia!",
+    "upTo2People": "Fino a 2 persone",
+    "additionalPeople": "Persone aggiuntive",
+    "seeDetailedPrices": "Visualizza Prezzi Dettagliati",
+    "detailedPricesTitle": "Tabella Prezzi Completa",
+    "howPricesWork": "Come Funzionano i Prezzi",
+    "basePrice": "Prezzo Base",
+    "basePriceDesc": "Prezzo fisso fino a 2 persone per tuk-tuk",
+    "additionalPeopleDesc": "€3.50 per ogni persona aggiuntiva (massimo 4 persone per tuk-tuk)",
+    "priceExamples": "Esempi di Prezzi:",
+    "person": "persona",
+    "people": "persone",
+    "makeReservation": "Effettuare Prenotazione"
+  },
+  "explore": {
+    "title": "Esplora",
+    "titleHighlight": "Milfontes",
+    "subtitle": "Come Mai Prima",
+    "description": "Scopri i segreti meglio custoditi di Vila Nova de Milfontes e della Costa Vicentina da una prospettiva unica",
+    "panoramicView": "Vista Panoramica Unica",
+    "panoramicViewDesc": "Goditi le migliori viste della costa dell'Alentejo",
+    "historicHeritage": "Patrimonio Storico",
+    "historicHeritageDesc": "Scopri la ricca storia di questo villaggio di pescatori"
+  },
+  "availability": {
+    "title": "Disponibilità in",
+    "titleHighlight": "Tempo Reale",
+    "subtitle": "Controlla gli orari disponibili e prenota il tuo momento perfetto",
+    "availabilityToday": "Disponibilità Oggi",
+    "availableSlots": "Slot disponibili per prenotazioni",
+    "available": "Disponibile",
+    "occupied": "Occupato",
+    "reserveSpecificTime": "Per prenotare un orario specifico, usa il modulo di prenotazione",
+    "morning": "Mattina (09:30-15:00)",
+    "afternoon": "Pomeriggio (15:30-21:30)",
+    "places": "posti",
+    "autoUpdated": "Dati aggiornati automaticamente",
+    "lastUpdate": "Ultimo aggiornamento",
+    "noSlotsAvailable": "Nessuno slot disponibile per {{period}}",
+    "allSlotsBooked": "Tutti gli slot per {{period}} sono già prenotati o bloccati",
+    "contactUs": "Controlla altri giorni o contattaci"
+  },
+  "testimonials": {
+    "title": "Cosa dicono i nostri",
+    "titleHighlight": "clienti",
+    "rating": "5.0 (200+ recensioni)"
+  },
+  "faq": {
+    "title": "Domande",
+    "titleHighlight": "Frequenti",
+    "subtitle": "Chiariremo i tuoi principali dubbi sui nostri tour in tuk-tuk",
+    "q1": "Quante persone possono salire su un tuk-tuk?",
+    "a1": "Il tuk-tuk può trasportare 4 persone più il conducente.",
+    "q2": "I tour funzionano con la pioggia?",
+    "a2": "I nostri tuk-tuk hanno coperture, ma in caso di pioggia forte, possiamo riprogrammare senza costi.",
+    "q3": "È necessario prenotare in anticipo?",
+    "a3": "Consigliamo di prenotare almeno 24 ore in anticipo, specialmente in alta stagione.",
+    "q4": "Ci sono sconti per gruppi?",
+    "a4": "Sì, offriamo sconti speciali per gruppi. Contattaci per maggiori informazioni.",
+    "q5": "I tuk-tuk sono sicuri per i bambini?",
+    "a5": "Sì, tutti i nostri tuk-tuk sono dotati di cinture di sicurezza e sono perfettamente sicuri per i bambini."
+  },
+  "cta": {
+    "title": "Pronto per l'",
+    "titleHighlight": "Avventura?",
+    "description": "Prenota ora il tuo tour in tuk-tuk e scopri Milfontes in modo unico e indimenticabile!",
+    "reserveNow": "Prenota Ora",
+    "talkToUs": "Parla Con Noi",
+    "phone": "968 784 043",
+    "schedule": "Ogni giorno 9-20"
+  },
+  "footer": {
+    "copyright": "© 2024 TukTuk Milfontes. Tutti i diritti riservati.",
+    "insurance": "Assicurazione inclusa",
+    "photos": "Foto incluse",
+    "localGuides": "Guide locali"
+  },
+  "tours": {
+    "title": "I nostri Tour",
+    "panoramic": {
+      "title": "Tour panoramico del villaggio",
+      "description": "Scopri i punti più emblematici di Vila Nova de Milfontes",
+      "duration": "45 min",
+      "price": "€10"
+    },
+    "furnas": {
+      "title": "Vila Nova de Milfontes → Spiaggia di Furnas",
+      "description": "Viaggio alla famosa Spiaggia di Furnas con soste fotografiche",
+      "duration": "1h 30min",
+      "price": "€14"
+    },
+    "bridge": {
+      "title": "Attraversamento del ponte",
+      "description": "Attraversa il ponte storico con vista panoramica",
+      "duration": "30 min",
+      "price": "€10"
+    },
+    "sunset": {
+      "title": "Tramonto Romantico",
+      "description": "Goditi il tramonto più bello della costa",
+      "duration": "2h",
+      "price": "€25"
+    },
+    "night": {
+      "title": "Tour notturno",
+      "description": "Esplora il villaggio al chiaro di luna con una prospettiva unica",
+      "duration": "1h",
+      "price": "€8"
+    },
+    "fishermen": {
+      "title": "Rotta dei Pescatori",
+      "description": "Scopri le tradizioni di pesca locali",
+      "duration": "45 min",
+      "price": "€10"
+    }
+  },
+  "contact": {
+    "title": "Contattaci",
+    "phone": "Telefono",
+    "whatsapp": "WhatsApp",
+    "email": "Email"
+  },
+  "map": {
+    "title": "Posizione",
+    "titleHighlight": "Punti di Interesse",
+    "subtitle": "Trovaci nel cuore di Vila Nova de Milfontes e scopri le principali attrazioni turistiche",
+    "mapTitle": "Posizione",
+    "description": "Trovaci nel cuore di Vila Nova de Milfontes",
+    "pointsOfInterest": "Punti di Interesse",
+    "historicCenter": "Centro Storico",
+    "milfontesBeach": "Spiaggia di Milfontes",
+    "fort": "Forte di São Clemente",
+    "nearbyBeaches": "Spiagge Vicine",
+    "lighthouse": "Portinho do Canal",
+    "furnasBeach": "Spiaggia di Furnas",
+    "viewpoints": "Punti Panoramici",
+    "openInGoogleMaps": "Apri in Google Maps",
+    "clickToSee": "Clicca per vedere sulla mappa",
+    "exitMap": "Esci dalla mappa"
+  },
+  "reservation": {
+    "title": "Richiesta di prenotazione:",
+    "subtitle": "Compila i dettagli e conferma via WhatsApp",
+    "name": "Nome Completo",
+    "email": "Email",
+    "phone": "Telefono",
+    "date": "Data Desiderata",
+    "time": "Ora Desiderata",
+    "tourType": "Tipo di Tour",
+    "numberOfPeople": "Numero di Persone",
+    "message": "Messaggio Aggiuntivo",
+    "messagePlaceholder": "Qualsiasi informazione aggiuntiva o richiesta speciale...",
+    "selectTour": "Seleziona tipo di tour",
+    "people1": "1 persona",
+    "people2": "2 persone",
+    "people3": "3 persone",
+    "people4": "4 persone",
+    "confirmWhatsApp": "Conferma via WhatsApp",
+    "reservationSent": "Prenotazione inviata!",
+    "reservationDescription": "Sarai reindirizzato a WhatsApp per confermare la tua prenotazione.",
+    "required": "richiesto",
+    "whatsappMessages": {
+      "pending": "Ciao {{name}}, abbiamo ricevuto la tua richiesta di prenotazione per il tour '{{tour_type}}' il {{reservation_date}} alle {{reservation_time}}. Per confermare, è necessario il pagamento di €{{total_price}}. Puoi fare un bonifico all'IBAN PT50 1234 5678 9012 3456 7890 1 o pagare in contanti in loco. Dopo il pagamento, la tua prenotazione sarà confermata automaticamente.",
+      "confirmed": "Ciao {{name}}, la tua prenotazione per il tour '{{tour_type}}' è confermata per il {{reservation_date}} alle {{reservation_time}}! Incontraci nel centro di Milfontes, accanto al giardino pubblico. Qualsiasi domanda, siamo a tua disposizione.",
+      "cancelled": "Ciao {{name}}, ci dispiace informarti che la tua prenotazione per il tour '{{tour_type}}' del {{reservation_date}} alle {{reservation_time}} è stata annullata. Se hai bisogno di riprogrammare o hai domande, contattaci.",
+      "completed": "Ciao {{name}}, grazie per aver fatto il tour con noi! Speriamo che tu abbia avuto un'esperienza fantastica a Milfontes. Raccomandaci ai tuoi amici e familiari. Alla prossima!",
+      "payment_reminder": "Ciao {{name}}, ti ricordiamo che la tua prenotazione per il {{reservation_date}} alle {{reservation_time}} non è ancora confermata. Per garantire il tuo posto, effettua il pagamento di €{{total_price}} il prima possibile.",
+      "weather_update": "Ciao {{name}}, a causa delle condizioni meteorologiche previste per il {{reservation_date}}, potremmo dover riprogrammare il tuo tour. Ti contatteremo più vicino alla data per confermare.",
+      "pickup_reminder": "Ciao {{name}}, ti ricordiamo che il tuo tour è programmato per domani, {{reservation_date}}, alle {{reservation_time}}. Incontraci nel centro di Milfontes, accanto al giardino pubblico, 10 minuti prima dell'orario programmato."
+    },
+    "simpleContactMessage": "Ciao, vorrei fare una prenotazione!",
+    "clientReservationMessage": "Ciao, vorrei prenotare il tour '{{tour_type}}' per il {{reservation_date}} alle {{reservation_time}} per {{number_of_people}} persone.\nNome: {{name}}\nEmail: {{email}}\nTelefono: {{phone}}\nMessaggio: {{message}}\nRichiesta effettuata il: {{created_at}}"
+  },
+  "mapDescriptions": {
+    "praiaDaFranquia": "Vicino al villaggio e ideale per le famiglie, è conosciuta per le sue acque calme e il paesaggio dell'estuario del Mira.",
+    "praiaDoFarol": "Situata vicino al faro e al centro, questa spiaggia è popolare per la sua accessibilità e le viste sulla foce del fiume.",
+    "praiaDoMalhao": "Una spiaggia più selvaggia ed estesa, ricercata da surfisti e amanti della natura per le sue onde e dune.",
+    "praiaDasFurnas": "Conosciuta per le sue formazioni rocciose e grotte, offre uno scenario unico per prendere il sole ed esplorare.",
+    "praiaDoPatacho": "Una spiaggia più tranquilla e isolata, perfetta per chi cerca tranquillità e contatto con la natura.",
+    "praiaDoCarreiroDasFazendas": "Caratterizzata dalle sue scogliere e da un accesso più impegnativo, è un luogo di grande bellezza naturale e serenità.",
+    "praiaDoPortoDasBarcas": "Una piccola insenatura con un porto di pesca tradizionale, ideale per osservare la vita dei pescatori locali.",
+    "praiaDosAivados": "Una spiaggia vasta e ondosa, molto popolare tra i surfisti e i bodyboarder per il suo mare agitato.",
+    "forteDeSaoClemente": "Una fortificazione storica che proteggeva la foce del fiume Mira, offrendo viste panoramiche sulla costa.",
+    "farolDeMilfontes": "Un punto di riferimento iconico che guida i navigatori, fornendo un punto di riferimento visivo per il villaggio.",
+    "igrejaDeNossaSenhoraDaGraca": "Un tempio religioso con architettura tradizionale locale, che riflette il patrimonio culturale della regione.",
+    "estatuaDoArcanjo": "Un monumento che si distingue nel paesaggio del villaggio, aggiungendo un tocco artistico e simbolico.",
+    "jardimPublico": "Un'area ricreativa e di socializzazione nel centro del villaggio, ideale per passeggiate e momenti di relax.",
+    "parqueNatural": "Un'ampia area protetta che copre la regione, preservando la sua biodiversità e i paesaggi costieri selvaggi.",
+    "parqueInfantil": "Un parco giochi dedicato ai bambini, con attrezzature per il gioco e il divertimento.",
+    "jardimParagem": "Una piccola area verde che offre un luogo piacevole per aspettare i mezzi pubblici.",
+    "estuarioDoRioMira": "Un luogo di grande bellezza naturale e importanza ecologica, perfetto per il birdwatching e le passeggiate lungo il fiume.",
+    "restauranteAChoupana": "Ristorante fronte mare, specializzato in grigliate, sempre con pesce fresco.",
+    "tascaDoCelso": "Un ristorante accogliente e popolare, famoso per la sua cucina casalinga e l'atmosfera familiare.",
+    "aManjedoura": "Take-away · Cena in loco · Con terrazza.",
+    "restauranteRitual": "Ristorante e Tapas-Bar dove la tranquillità della costa dell'Alentejo si fonde con un ambiente raffinato e cosmopolita, impregnato di storie e viaggi da tutto il mondo.",
+    "patioAlentejano": "Un ristorante con un piacevole patio, che serve piatti tradizionali dell'Alentejo in un ambiente rilassato.",
+    "restauranteHSBeach": "Un ristorante con vista mare, che serve una varietà di piatti, compresi frutti di mare freschi.",
+    "mercadoMilfontes": "Un mercato tradizionale dove si possono trovare prodotti locali freschi e artigianato.",
+    "mercadoBrunheiras": "Un altro mercato locale che offre una varietà di frutta, verdura e altri prodotti regionali.",
+    "milsuper": "Un supermercato che offre una vasta gamma di prodotti per le esigenze quotidiane.",
+    "meuSuper": "Un supermercato di convenienza, ideale per acquisti rapidi ed essenziali.",
+    "amanhecer": "Un negozio specializzato in frutta e verdura fresca, con una selezione varia.",
+    "supermercadoSPAR": "Un supermercato che offre una gamma completa di prodotti alimentari e di drogheria.",
+    "campifrias": "Campeggio vicino al mercato e alla piazza del pesce.",
+    "jardimParagemDosAutocarros": "Fermata dell'autobus accanto al giardino.",
+    "frutasECompanhiaAmanhecer": "Negozio locale con frutta fresca, verdura e prodotti essenziali quotidiani.",
+    "campingMilfontes": "Campeggio con ottime strutture, vicino al centro di Milfontes e alla natura.",
+    "restauranteOasis": "Ristorante con vista mare a Milfontes.",
+    "portinhoDoCanal": "Porto di pesca tradizionale e zona ricreativa.",
+    "ponteSobreORioMira": "Ponte sul fiume Mira a Milfontes.",
+    "estaturaDoArcanjo": "Un grido artistico ed ecologico, realizzato in ferro riciclato, che ci invita a pensare e agire per il pianeta.",
+    "spotsDeSurfEKayak": "Noleggio di kayak e canoe.",
+    "restauranteHSMilfontesBeach": "Hotel e ristorante con vista sulla foce del fiume Mira.",
+    "mercadoDeVilaNovaDeMilfontes": "Mercato del pesce e della frutta."
+  },
+  "aerialViewMilfontes": {
+    "title": "Vista Aerea di Milfontes",
+    "description": "Vista aerea in un pomeriggio d'inverno su Vila Nova de Milfontes, Alentejo - Portogallo."
+<<<<<<< HEAD
+  },
+  "tracking": {
+    "title": "TukTuk in Tempo Reale",
+    "subtitle": "Segui la posizione del nostro TukTuk a Vila Nova de Milfontes",
+    "currentLocation": "Posizione Attuale",
+    "howItWorks": "Come funziona",
+    "contact": "Contatto",
+    "backToMainSite": "Torna al sito principale",
+    "loading": "Caricamento posizione TukTuk...",
+    "pleaseWait": "Attendere prego...",
+    "mapCentering": "Centra mappa",
+    "makeReservation": "Fai la Tua Prenotazione Qui!",
+    "reservationDialog": "Modulo di Prenotazione",
+    "tuktukAvailable": "TukTuk disponibile ora!",
+    "tuktukBusy": "TukTuk Attualmente Occupato",
+    "readyForAdventure": "Pronto a portarti in un'avventura",
+    "busyUntil": "fino a",
+    "availableAgainAt": "Sarà disponibile di nuovo alle",
+    "instructions": {
+      "locateMe": "Clicca \"Localizzami\" per vedere la tua posizione sulla mappa",
+      "tuktukIcon": "L'icona del TukTuk mostra la posizione attuale in tempo reale",
+      "statusIndicator": "Lo stato indica se il TukTuk è disponibile o occupato",
+      "distanceCalculation": "Distanza e tempo stimato sono calcolati automaticamente",
+      "makeReservation": "Usa \"Fai la Tua Prenotazione Qui!\" per prenotare il servizio",
+      "centerMap": "\"Centra mappa\" regola la vista per una migliore visualizzazione",
+      "offlineNote": "Se non vedi il TukTuk, potrebbe essere offline"
+    },
+    "contactInfo": {
+      "phone": "Telefono: 963 496 320",
+      "whatsapp": "WhatsApp: Disponibile sul sito principale",
+      "email": "Email: diogo.carias@outlook.pt"
+    }
+  },
+  "locationPermission": {
+    "grantAccess": "Localizzami",
+    "locating": "Localizzazione...",
+    "permissionDenied": "Permesso Negato",
+    "located": "Localizzato!",
+    "permissionNeeded": "Permesso di localizzazione necessario",
+    "permissionDescription": "Per **mostrare la tua posizione** sulla mappa e calcolare la **distanza dal TukTuk**, abbiamo bisogno del tuo permesso di localizzazione.",
+    "clickForHelp": "Clicca per aiuto",
+    "helpInstructions": {
+      "android": {
+        "title": "Come consentire la localizzazione su Android",
+        "method1": "Metodo completo:",
+        "method2": "Metodo veloce (più facile):",
+        "method3": "Se non riesci a trovare le icone:",
+        "steps": {
+          "complete": [
+            "Tocca i **tre punti** (⋮) nell'angolo in alto a destra di Chrome",
+            "Seleziona **\"Impostazioni\"**",
+            "Tocca **\"Impostazioni sito\"**",
+            "Tocca **\"Posizione\"**",
+            "Trova questo sito nell'elenco e cambia in **\"Consenti\"**",
+            "Torna al sito e **aggiorna la pagina**"
+          ],
+          "quick": [
+            "Cerca l'icona **📍** nella barra degli indirizzi",
+            "O l'icona **🔒** accanto all'indirizzo",
+            "Toccala e seleziona **\"Consenti\"\""
+          ],
+          "alternative": [
+            "Tocca la **barra degli indirizzi** per vedere più opzioni",
+            "Cerca l'icona **informazioni** (ⓘ)"
+          ]
+        }
+      },
+      "ios": {
+        "title": "Come consentire la localizzazione su iPhone/iPad",
+        "steps": [
+          "Tocca l'icona **\"AA\"** nella barra degli indirizzi",
+          "Seleziona **\"Impostazioni sito web\"**",
+          "Tocca **\"Posizione\"**",
+          "Cambia in **\"Consenti\"**",
+          "Torna al sito e **aggiorna la pagina**"
+        ],
+        "alternative": [
+          "Cerca l'icona **📍** nella barra degli indirizzi",
+          "Toccala e seleziona **\"Consenti\"\""
+        ]
+      },
+      "desktop": {
+        "title": "Come consentire la localizzazione nel browser",
+        "steps": [
+          "Cerca l'icona **📍** nella barra degli indirizzi",
+          "Cliccaci sopra e seleziona **\"Consenti\"** quando appare il popup",
+          "Se non appare, controlla le **impostazioni del browser**",
+          "Cerca **\"Permessi\"** o **\"Impostazioni sito\"**",
+          "**Abilita** il permesso di localizzazione per questo sito"
+        ]
+      }
+    },
+    "statusMessages": {
+      "unsupported": "Geolocalizzazione non supportata in questo browser",
+      "obtaining": "Ottenendo la tua posizione...",
+      "error": "Errore:",
+      "denied": "Permesso negato - Clicca per aiuto",
+      "success": "Posizione ottenuta con successo!",
+      "clickToDiscover": "Clicca per scoprire la tua posizione"
+    },
+    "helpModal": {
+      "understood": "Capito, grazie!",
+      "completeGuide": "Vedi guida completa",
+      "lookForIcons": "Dove trovare le icone:",
+      "visualNote": "**🔍 Cerca queste icone** nella barra degli indirizzi del tuo browser"
+    }
+  },
+  "distanceCalculator": {
+    "waitingLocation": "In attesa di localizzazione...",
+    "distance": "Distanza:",
+    "estimatedTime": "Tempo stimato:",
+    "averageSpeed": "Velocità media: {{speed}} km/h",
+    "meters": "metri",
+    "kilometers": "km",
+    "minutes": "min",
+    "hours": "h"
+  },
+  "realTimeTracking": {
+    "title": "🛺 Segui il nostro TukTuk in tempo reale!",
+    "description": "Vedi dove si trova il nostro TukTuk in questo momento e segui la sua posizione in tempo reale",
+    "buttonText": "📍 Visualizza TukTuk in Tempo Reale"
+=======
+>>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+  }
+}
