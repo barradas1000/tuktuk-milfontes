@@ -9,12 +9,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-<<<<<<< HEAD
-    "vercel-build": "npm run optimize:images && vite build",
-    "optimize:images": "node scripts/optimize-images.mjs public"
-=======
-    "vercel-build": "vite build"
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+  "vercel-build": "npm run optimize:images && vite build",
+  "optimize:images": "node scripts/optimize-images.mjs public"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",
@@ -90,10 +86,7 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "postcss": "^8.4.47",
-<<<<<<< HEAD
     "sharp": "^0.33.5",
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
