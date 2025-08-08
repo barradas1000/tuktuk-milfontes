@@ -17,6 +17,8 @@ const VideoModal: React.FC = () => {
           src="/lovable-uploads/imagem-videio-aereo.jpg"
           alt={t("aerialViewMilfontes.title")}
           className="video-thumbnail"
+          loading="lazy"
+          decoding="async"
         />
       </div>
       {open && (

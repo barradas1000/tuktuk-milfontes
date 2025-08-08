@@ -9,7 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-  "vercel-build": "npm run optimize:images && vite build",
+    "vercel-build": "npm run optimize:images && vite build",
     "optimize:images": "node scripts/optimize-images.mjs public"
   },
   "dependencies": {

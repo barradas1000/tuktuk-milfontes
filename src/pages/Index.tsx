@@ -43,6 +43,7 @@ import AvailabilityCalendar from "@/components/AvailabilityCalendar";
 import LanguageSelector from "@/components/LanguageSelector";
 import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
 import VideoModal from "../components/VideoModal";
+import ResponsiveImage from "@/components/ResponsiveImage";
 
 const Index = () => {
   console.log("Index component rendering");
@@ -178,6 +179,8 @@ const Index = () => {
                   alt="TukTuk Milfontes Logo"
                   className="w-full h-full object-contain rounded-full"
                   src="https://tuktuk-milfontes.vercel.app/lovable-uploads/cf00ebfe-2e98-4eb0-bc91-d80954178a9f.png"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>
@@ -257,6 +260,8 @@ const Index = () => {
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/bc9c590b-26bf-4d4d-a27c-3e917afef291.png"
                 alt="Nosso Tuk-Tuk ao pôr do sol em Milfontes"
                 className="w-full h-64 object-cover rounded-xl shadow-lg"
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl"></div>
               <div className="absolute bottom-4 left-4 text-white">
@@ -269,6 +274,8 @@ const Index = () => {
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/ddc85a0b-4a74-44e3-a0a6-bed937a5a686.png"
                 alt="Tuk-Tuk com cobertura contra chuva"
                 className="w-full h-64 object-cover rounded-xl shadow-lg"
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl"></div>
               <div className="absolute bottom-4 left-4 text-white">
@@ -605,6 +612,8 @@ const Index = () => {
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/47a59b02-cbe5-4103-ac4c-ea39946a7b96.png"
                 alt="Vista aérea de Vila Nova de Milfontes"
                 className="w-full h-96 object-cover rounded-xl shadow-lg"
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl"></div>
               <div className="absolute bottom-6 left-6 text-white">
@@ -619,6 +628,8 @@ const Index = () => {
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/a736c163-97f6-47cb-80c1-b2ed8d1bf580.png"
                 alt="Forte de Vila Nova de Milfontes"
                 className="w-full h-96 object-cover rounded-xl shadow-lg"
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl"></div>
               <div className="absolute bottom-6 left-6 text-white">

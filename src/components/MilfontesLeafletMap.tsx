@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import ResponsiveImage from "@/components/ResponsiveImage";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -434,16 +435,33 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
                   <div style={{ textAlign: "center" }}>
                     <b>{poi.name}</b>
                     <br />
-                    <img
-                      src={poi.image}
-                      alt={poi.name}
-                      style={{
-                        width: 200,
-                        height: "auto",
-                        borderRadius: 5,
-                        marginBottom: 5,
-                      }}
-                    />
+                    {poi.image.startsWith("/") ? (
+                      <ResponsiveImage
+                        src={poi.image}
+                        alt={poi.name}
+                        sizes="(max-width: 768px) 160px, 200px"
+                        widths={[200, 400]}
+                        style={{
+                          width: 200,
+                          height: "auto",
+                          borderRadius: 5,
+                          marginBottom: 5,
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={poi.image}
+                        alt={poi.name}
+                        style={{
+                          width: 200,
+                          height: "auto",
+                          borderRadius: 5,
+                          marginBottom: 5,
+                        }}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    )}
                     <div
                       style={{ fontSize: 14, color: "#444", marginBottom: 4 }}
                     >
