@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "../lib/supabase";
 import PassengerMap from "../components/PassengerMap";
 import ToggleTrackingButton from "../components/ToggleTrackingButton";
+// Componente de teste removido
 
 const DriverDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -165,6 +166,8 @@ const DriverDashboard: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Componente de teste removido */}
     </div>
   );
 };

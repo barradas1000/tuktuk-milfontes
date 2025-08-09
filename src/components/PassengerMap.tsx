@@ -269,6 +269,61 @@ const PassengerMap: React.FC = () => {
     let conductorChannel: ReturnType<typeof supabase.channel> | null = null;
     let activeChannel: ReturnType<typeof supabase.channel> | null = null;
 
+    // Listen for custom events as fallback
+    const handleConductorStatusChange = (event: CustomEvent) => {
+      const { conductorId, isActive } = event.detail;
+      console.log(
+        `[PassengerMap] Custom event received: ${conductorId} -> ${isActive}`
+      );
+
+      if (!isActive) {
+        // Remove conductor from map immediately
+        setActiveConductors((prev) => prev.filter((c) => c.id !== conductorId));
+      } else {
+        // Force refresh conductor data
+        refreshConductorData(conductorId);
+      }
+    };
+
+    window.addEventListener(
+      "conductorStatusChanged",
+      handleConductorStatusChange
+    );
+
+    const refreshConductorData = async (conductorId: string) => {
+      try {
+        const { data, error } = await supabase
+          .from("conductors")
+          .select("*")
+          .eq("id", conductorId)
+          .eq("is_active", true)
+          .single();
+
+        if (!error && data) {
+          const lat = data.latitude ?? 37.725;
+          const lng = data.longitude ?? -8.783;
+          const statusData = await fetchConductorStatusFromActiveTable(data.id);
+
+          setActiveConductors((prev) => {
+            const others = prev.filter((c) => c.id !== data.id);
+            return [
+              ...others,
+              {
+                id: data.id,
+                lat: lat as number,
+                lng: lng as number,
+                name: data.name ?? "TukTuk",
+                status: statusData.status,
+                occupiedUntil: statusData.occupiedUntil,
+              },
+            ];
+          });
+        }
+      } catch (error) {
+        console.error("Error refreshing conductor data:", error);
+      }
+    };
+
     const fetchConductorStatusFromActiveTable = async (
       conductorId: string
     ): Promise<{ status: ConductorStatus; occupiedUntil: string | null }> => {
@@ -408,6 +463,10 @@ const PassengerMap: React.FC = () => {
     return () => {
       if (conductorChannel) supabase.removeChannel(conductorChannel);
       if (activeChannel) supabase.removeChannel(activeChannel);
+      window.removeEventListener(
+        "conductorStatusChanged",
+        handleConductorStatusChange
+      );
     };
   }, []);
 

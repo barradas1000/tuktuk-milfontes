@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "../lib/supabase";
+import { useDriverTracking } from "@/hooks/useDriverTracking";
 
 interface ToggleTrackingButtonProps {
   conductorId: string;
@@ -11,9 +12,14 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
 }) => {
   const [isTracking, setIsTracking] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [watchId, setWatchId] = useState<number | null>(null);
+  // Inicia o hook de tracking quando isTracking = true
+  const { error: trackError, lastUpdateAt } = useDriverTracking(
+    conductorId,
+    isTracking,
+    { minIntervalMs: 3000, minDeltaMeters: 8 }
+  );
 
-  // Verificar estado inicial
+  // Verificar estado inicial e subscrever mudanças
   useEffect(() => {
     const checkInitialStatus = async () => {
       try {
@@ -25,6 +31,9 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
 
         if (!error && data) {
           setIsTracking(data.is_active);
+          console.log(
+            `[ToggleTrackingButton] Estado inicial: ${data.is_active}`
+          );
         }
       } catch (error) {
         console.error("Erro ao verificar status inicial:", error);
@@ -32,6 +41,60 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
     };
 
     checkInitialStatus();
+
+    // Subscrever mudanças realtime para sincronização entre dispositivos
+    const channel = supabase
+      .channel(`conductor_status_${conductorId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*", // Escutar todos os eventos
+          schema: "public",
+          table: "conductors",
+          filter: `id=eq.${conductorId}`,
+        },
+        (payload) => {
+          console.log(
+            `[ToggleTrackingButton] Mudança realtime recebida:`,
+            payload
+          );
+          if (payload.new && typeof payload.new === "object") {
+            const newData = payload.new as { is_active: boolean };
+            console.log(
+              `[ToggleTrackingButton] Atualizando estado para: ${newData.is_active}`
+            );
+            setIsTracking(newData.is_active);
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log(`[ToggleTrackingButton] Status da subscrição: ${status}`);
+      });
+
+    // Polling como fallback (caso realtime falhe)
+    const pollInterval = setInterval(async () => {
+      try {
+        const { data, error } = await supabase
+          .from("conductors")
+          .select("is_active")
+          .eq("id", conductorId)
+          .single();
+
+        if (!error && data) {
+          setIsTracking(data.is_active);
+        }
+      } catch (error) {
+        console.error("Erro no polling:", error);
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => {
+      console.log(
+        `[ToggleTrackingButton] Limpando subscrições para condutor ${conductorId}`
+      );
+      supabase.removeChannel(channel);
+      clearInterval(pollInterval);
+    };
   }, [conductorId]);
 
   const startTracking = async () => {
@@ -44,48 +107,63 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
         return;
       }
 
-      // Atualizar status no Supabase
-      const { error: updateError } = await supabase
+      // Atualizar status no Supabase (ambas as tabelas)
+      const timestamp = new Date().toISOString();
+
+      // 1. Atualizar tabela conductors
+      const { error: conductorError } = await supabase
         .from("conductors")
-        .update({ is_active: true })
+        .update({
+          is_active: true,
+          updated_at: timestamp,
+        })
         .eq("id", conductorId);
 
-      if (updateError) {
-        console.error("Erro ao ativar rastreamento:", updateError);
+      if (conductorError) {
+        console.error("Erro ao ativar rastreamento:", conductorError);
         return;
       }
 
-      // Iniciar watch de localização
-      const id = navigator.geolocation.watchPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-
-          try {
-            await supabase
-              .from("conductors")
-              .update({
-                latitude,
-                longitude,
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", conductorId);
-          } catch (error) {
-            console.error("Erro ao atualizar localização:", error);
-          }
-        },
-        (error) => {
-          console.error("Erro de geolocalização:", error);
-          alert("Erro ao obter localização. Verifique as permissões.");
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 30000,
-        }
+      console.log(
+        `[ToggleTrackingButton] Condutor ${conductorId} ativado na BD`
       );
 
-      setWatchId(id);
+      // 2. Atualizar/inserir na tabela active_conductors
+      const { error: activeError } = await supabase
+        .from("active_conductors")
+        .upsert({
+          conductor_id: conductorId,
+          is_available: true,
+          updated_at: timestamp,
+        });
+
+      if (activeError) {
+        console.error("Erro ao atualizar active_conductors:", activeError);
+        // Reverter mudança se falhou
+        await supabase
+          .from("conductors")
+          .update({ is_active: false })
+          .eq("id", conductorId);
+        return;
+      }
+
+      console.log(
+        `[ToggleTrackingButton] Active_conductors atualizada para condutor ${conductorId}`
+      );
+
+      // Force local state update immediately
       setIsTracking(true);
+
+      // Trigger a custom event to force other components to update
+      window.dispatchEvent(
+        new CustomEvent("conductorStatusChanged", {
+          detail: { conductorId, isActive: true },
+        })
+      );
+
+      console.log(
+        `[ToggleTrackingButton] Condutor ${conductorId} ativado com sucesso`
+      );
     } catch (error) {
       console.error("Erro ao iniciar rastreamento:", error);
     } finally {
@@ -97,24 +175,61 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
     setLoading(true);
 
     try {
-      // Parar watch de localização
-      if (watchId) {
-        navigator.geolocation.clearWatch(watchId);
-        setWatchId(null);
-      }
+      // Atualizar status no Supabase (ambas as tabelas)
+      const timestamp = new Date().toISOString();
 
-      // Atualizar status no Supabase
-      const { error } = await supabase
+      // 1. Atualizar tabela conductors
+      const { error: conductorError } = await supabase
         .from("conductors")
-        .update({ is_active: false })
+        .update({
+          is_active: false,
+          updated_at: timestamp,
+        })
         .eq("id", conductorId);
 
-      if (error) {
-        console.error("Erro ao desativar rastreamento:", error);
+      if (conductorError) {
+        console.error("Erro ao desativar rastreamento:", conductorError);
         return;
       }
 
+      console.log(
+        `[ToggleTrackingButton] Condutor ${conductorId} desativado na BD`
+      );
+
+      // 2. Remover da tabela active_conductors
+      const { error: activeError } = await supabase
+        .from("active_conductors")
+        .delete()
+        .eq("conductor_id", conductorId);
+
+      if (activeError) {
+        console.error("Erro ao remover de active_conductors:", activeError);
+        // Reverter mudança se falhou
+        await supabase
+          .from("conductors")
+          .update({ is_active: true })
+          .eq("id", conductorId);
+        return;
+      }
+
+      console.log(
+        `[ToggleTrackingButton] Removido de active_conductors: condutor ${conductorId}`
+      );
+
+      // Remover do mapa (será removido via realtime subscription no PassengerMap)
+      console.log(
+        `[ToggleTrackingButton] Condutor ${conductorId} desativado - removendo do mapa via realtime`
+      );
+
+      // Force local state update immediately
       setIsTracking(false);
+
+      // Trigger a custom event to force other components to update
+      window.dispatchEvent(
+        new CustomEvent("conductorStatusChanged", {
+          detail: { conductorId, isActive: false },
+        })
+      );
     } catch (error) {
       console.error("Erro ao parar rastreamento:", error);
     } finally {
@@ -157,6 +272,16 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
       {isTracking && (
         <div className="text-xs text-green-600 bg-green-50 px-3 py-2 rounded">
           📍 Enviando localização em tempo real...
+          {lastUpdateAt && (
+            <span className="ml-2 text-gray-600">
+              últ.: {new Date(lastUpdateAt).toLocaleTimeString()}
+            </span>
+          )}
+        </div>
+      )}
+      {trackError && (
+        <div className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded">
+          ⚠️ {trackError}
         </div>
       )}
     </div>

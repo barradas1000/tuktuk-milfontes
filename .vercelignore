@@ -1,12 +1,15 @@
 # Documentation files
-*.md
+
+\*.md
 !README.md
 
 # Development files
+
 scripts/
 .env.local
 
 # Cache and temporary files
+
 .cache/
 .vite/
-*.tmp
+\*.tmp

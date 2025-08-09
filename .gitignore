@@ -47,6 +47,7 @@ supabase/.branches/
 # Documentation files (development only)
 *.md
 !README.md
+!DEPLOY-*.md
 
 # Development scripts
 scripts/
@@ -118,4 +119,7 @@ storybook-static/
 
 # Cursor local config
 .cursor/
+
+# Test artifacts (remoção de componentes de teste)
+src/components/TestRealtime.tsx
 

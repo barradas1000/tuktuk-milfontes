@@ -3,6 +3,7 @@
 Plataforma web para reservas e gestão de passeios de tuk-tuk em Vila Nova de Milfontes.
 
 ## 🚀 Deploy Status
+
 - **Última atualização**: 09/08/2025
 - **Status**: Corrigindo problemas de deploy no Vercel
 
