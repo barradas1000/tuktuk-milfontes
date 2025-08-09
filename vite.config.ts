@@ -18,18 +18,10 @@ export default defineConfig(({ mode }) => ({
   build: {
     // Increase limit to silence warnings for known larger chunks
     chunkSizeWarningLimit: 1200,
+    // Simplify chunks to avoid context issues
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            // Don't split React to avoid context issues
-            if (id.includes("leaflet")) return "vendor-leaflet";
-            if (id.includes("@supabase")) return "vendor-supabase";
-            if (id.includes("i18next") || id.includes("react-i18next"))
-              return "vendor-i18n";
-            return "vendor";
-          }
-        },
+        manualChunks: undefined, // Let Vite handle chunking automatically
       },
     },
   },
