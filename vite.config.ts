@@ -22,8 +22,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("react") || id.includes("react-dom"))
-              return "vendor-react";
+            // Don't split React to avoid context issues
             if (id.includes("leaflet")) return "vendor-leaflet";
             if (id.includes("@supabase")) return "vendor-supabase";
             if (id.includes("i18next") || id.includes("react-i18next"))
