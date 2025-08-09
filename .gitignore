@@ -20,6 +20,7 @@ node_modules/
 
 # ESLint
 .eslintcache
+
 # Logs
 npm-debug.log*
 yarn-debug.log*
@@ -43,11 +44,29 @@ supabase/.temp/
 supabase/.output/
 supabase/.branches/
 
+# Documentation files (development only)
+*.md
+!README.md
+
+# Development scripts
+scripts/
+test-interpolation.js
+
 # Sistema
 .DS_Store
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+*.tmp
+*.temp
 $RECYCLE.BIN/
 
 # IDEs
