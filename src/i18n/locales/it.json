@@ -5,7 +5,7 @@
     "description": "Esplora Vila Nova de Milfontes e dintorni in un'esperienza unica in tuk-tuk. Paesaggi mozzafiato, storia e divertimento garantito!",
     "descriptionHighlight": "Prenota ora la tua avventura!",
     "reserveNow": "Prenota Ora",
-    "rating": "4.9/5 ⭐ (200+ recensioni)"
+    "rating": "4.9/5 ✰ (200+ recensioni)"
   },
   "benefits": {
     "title": "Perché Scegliere",
@@ -245,7 +245,6 @@
   "aerialViewMilfontes": {
     "title": "Vista Aerea di Milfontes",
     "description": "Vista aerea in un pomeriggio d'inverno su Vila Nova de Milfontes, Alentejo - Portogallo."
-<<<<<<< HEAD
   },
   "tracking": {
     "title": "TukTuk in Tempo Reale",
@@ -290,28 +289,14 @@
     "helpInstructions": {
       "android": {
         "title": "Come consentire la localizzazione su Android",
-        "method1": "Metodo completo:",
-        "method2": "Metodo veloce (più facile):",
-        "method3": "Se non riesci a trovare le icone:",
-        "steps": {
-          "complete": [
-            "Tocca i **tre punti** (⋮) nell'angolo in alto a destra di Chrome",
-            "Seleziona **\"Impostazioni\"**",
-            "Tocca **\"Impostazioni sito\"**",
-            "Tocca **\"Posizione\"**",
-            "Trova questo sito nell'elenco e cambia in **\"Consenti\"**",
-            "Torna al sito e **aggiorna la pagina**"
-          ],
-          "quick": [
-            "Cerca l'icona **📍** nella barra degli indirizzi",
-            "O l'icona **🔒** accanto all'indirizzo",
-            "Toccala e seleziona **\"Consenti\"\""
-          ],
-          "alternative": [
-            "Tocca la **barra degli indirizzi** per vedere più opzioni",
-            "Cerca l'icona **informazioni** (ⓘ)"
-          ]
-        }
+        "steps": [
+          "Tocca i **tre punti** (⋮) nell'angolo in alto a destra di Chrome",
+          "Seleziona **\"Impostazioni\"**",
+          "Tocca **\"Impostazioni sito\"**",
+          "Tocca **\"Posizione\"**",
+          "Trova questo sito nell'elenco e cambia in **\"Consenti\"**",
+          "Torna al sito e **aggiorna la pagina**"
+        ]
       },
       "ios": {
         "title": "Come consentire la localizzazione su iPhone/iPad",
@@ -321,10 +306,6 @@
           "Tocca **\"Posizione\"**",
           "Cambia in **\"Consenti\"**",
           "Torna al sito e **aggiorna la pagina**"
-        ],
-        "alternative": [
-          "Cerca l'icona **📍** nella barra degli indirizzi",
-          "Toccala e seleziona **\"Consenti\"\""
         ]
       },
       "desktop": {
@@ -364,10 +345,8 @@
     "hours": "h"
   },
   "realTimeTracking": {
-    "title": "🛺 Segui il nostro TukTuk in tempo reale!",
+    "title": "�️ Segui il nostro TukTuk in tempo reale!",
     "description": "Vedi dove si trova il nostro TukTuk in questo momento e segui la sua posizione in tempo reale",
     "buttonText": "📍 Visualizza TukTuk in Tempo Reale"
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   }
 }

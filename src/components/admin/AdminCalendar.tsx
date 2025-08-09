@@ -41,7 +41,6 @@ import { useSession } from "@supabase/auth-helpers-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
 import i18n from "../../i18n";
-<<<<<<< HEAD
 import {
   Select,
   SelectTrigger,
@@ -49,9 +48,6 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-=======
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 // --- Hooks & Data ---
 import { useAdminReservations } from "@/hooks/useAdminReservations";
@@ -63,11 +59,8 @@ import {
   updateActiveConductors,
   fetchConductors,
   cleanDuplicateBlockedPeriods,
-<<<<<<< HEAD
   updateTuktukStatus,
   fetchTuktukStatus,
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 } from "@/services/supabaseService";
 import { BlockedPeriod } from "@/types/adminReservations";
 import { AdminReservation } from "@/types/adminReservations";
@@ -193,14 +186,12 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   // --- Estados para seleção de condutores ---
   const [activeConductors, setActiveConductors] = useState<string[]>([]);
   const [conductorsLoading, setConductorsLoading] = useState(true);
-<<<<<<< HEAD
   const [conductors, setConductors] =
     useState<{ id: string; name: string; whatsapp?: string }[]>(
       FALLBACK_CONDUCTORS
     );
   // Novo estado para seleção do motorista para rastreamento
   const [selectedConductorId, setSelectedConductorId] = useState<string>("");
-
   // --- Estados para disponibilidade do TukTuk ---
   const [tuktukStatus, setTuktukStatus] = useState<"available" | "busy">(
     "available"
@@ -223,11 +214,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
       });
     }
   }, [activeConductors]);
-=======
-  const [conductors, setConductors] = useState(FALLBACK_CONDUCTORS);
-  // Novo estado para seleção do motorista para rastreamento
-  const [selectedDriverId, setSelectedDriverId] = useState<string>("");
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
   // Estados para filtros de bloqueios
   const [blockFilterDate, setBlockFilterDate] = useState<string>("");
@@ -894,11 +880,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         alert("Erro ao bloquear o intervalo. Tente novamente.");
       }
     },
-<<<<<<< HEAD
     [blockTime]
-=======
-    [blockTime, timeSlots]
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   );
 
   // --- Handlers de Eventos ---
@@ -1204,7 +1186,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     }
   };
 
-<<<<<<< HEAD
   // --- Função para confirmar tempo ocupado ---
   const confirmOccupiedTime = async () => {
     if (activeConductors.length > 0) {
@@ -1231,9 +1212,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
       }
     }
   };
-
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   // --- Renderização do Componente ---
   return (
     <div>
@@ -1249,12 +1227,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               onClick={handleCleanDuplicates}
               disabled={isCleaningDuplicates}
               className="text-xs"
-            >
-              {isCleaningDuplicates ? "Limpando..." : "Limpar Duplicados"}
-            </Button>
-          </div>
-        </div>
-      )} */}
+          },
+          [blockTime]
       {/* Painel de seleção de condutores ativos */}
       <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex flex-col gap-3 items-center shadow-md">
         <h2 className="text-lg font-bold text-purple-900 mb-2">
@@ -1305,10 +1279,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           WhatsApp responsável:{" "}
           <span className="text-purple-700">{getCurrentWhatsapp()}</span>
         </div>
-<<<<<<< HEAD
         {/* Bloco de rastreamento em tempo real desabilitado */}
         {/*
-        <Card className="mt-6 w-full max-w-md mx-auto bg-blue-50 border-blue-200">
+  <Card className="mt-6 w-full max-w-md mx-auto bg-blue-50 border-blue-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-blue-900">
               <Radio className="w-5 h-5 text-blue-600" /> Rastreamento em Tempo
@@ -1317,16 +1290,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             <div className="text-gray-700 text-sm mt-1">
               Ative o envio da localização do TukTuk para aparecer no mapa dos
               passageiros.
-=======
-        {/* Bloco de rastreamento em tempo real */}
-        <Card className="mt-6 w-full max-w-md mx-auto bg-blue-50 border-blue-200">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-blue-900">
-              <Radio className="w-5 h-5 text-blue-600" /> Rastreamento em Tempo Real
-            </CardTitle>
-            <div className="text-gray-700 text-sm mt-1">
-              Ative o envio da localização do TukTuk para aparecer no mapa dos passageiros.
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
             </div>
           </CardHeader>
           <CardContent>
@@ -1338,18 +1301,12 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             ) : activeConductors.length === 1 ? (
               <>
                 <div className="mb-2 text-gray-700">
-<<<<<<< HEAD
                   Motorista selecionado:{" "}
                   <b>
                     {conductors.find((c) => c.id === activeConductors[0])?.name}
                   </b>
                 </div>
                 <ToggleTrackingButton conductorId={activeConductors[0]} />
-=======
-                  Motorista selecionado: <b>{conductors.find(c => c.id === activeConductors[0])?.name}</b>
-                </div>
-                <ToggleTrackingButton driverId={activeConductors[0]} />
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
               </>
             ) : (
               <>
@@ -1357,19 +1314,13 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                   Selecione o motorista para rastreamento:
                 </div>
                 <Select
-<<<<<<< HEAD
                   value={selectedConductorId || activeConductors[0]}
                   onValueChange={setSelectedConductorId}
-=======
-                  value={selectedDriverId || activeConductors[0]}
-                  onValueChange={setSelectedDriverId}
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
                 >
                   <SelectTrigger className="mb-2">
                     <SelectValue placeholder="Escolha o motorista" />
                   </SelectTrigger>
                   <SelectContent>
-<<<<<<< HEAD
                     {conductors
                       .filter((c) => activeConductors.includes(c.id))
                       .map((c) => (
@@ -1391,29 +1342,13 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                       </b>
                     </div>
                     <ToggleTrackingButton conductorId={selectedConductorId} />
-=======
-                    {conductors.filter(c => activeConductors.includes(c.id)).map(c => (
-                      <SelectItem key={c.id} value={c.id}>
-                        {c.name} ({c.whatsapp})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {selectedDriverId && (
-                  <>
-                    <div className="mb-2 text-gray-700">
-                      Motorista selecionado: <b>{conductors.find(c => c.id === selectedDriverId)?.name}</b>
-                    </div>
-                    <ToggleTrackingButton driverId={selectedDriverId} />
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
                   </>
                 )}
               </>
             )}
           </CardContent>
         </Card>
-<<<<<<< HEAD
-        */}
+  */}
       </div>
 
       {/* Painel de Disponibilidade do TukTuk para o condutor */}
@@ -1528,11 +1463,8 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           </div>
         )}
       </div>
-=======
-      </div>
 
       {/* Disponibilidade por Horário Card */}
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
       <Card className="mb-6">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -1689,11 +1621,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CalendarIcon className="h-5 w-5" />
-<<<<<<< HEAD
             Disponibilidade
-=======
-            Calendário
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           </CardTitle>
         </CardHeader>
         <CardContent>

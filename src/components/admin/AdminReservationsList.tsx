@@ -55,7 +55,7 @@ import { checkAvailability } from "@/services/availabilityService";
 import { useNavigate } from "react-router-dom";
 
 // Função para enviar eventos para a Google Sheet
-async function enviarEventoGoogleSheet(evento: any) {
+async function enviarEventoGoogleSheet(evento: Record<string, unknown>) {
   const url =
     "https://script.google.com/macros/s/AKfycbzwLpUUq2LSSC_Lns6bQZWnAcZMB5ustr_mPXRkzaNTBZ9D50r9Occ_QCGcvKap4PTp/exec";
   try {
@@ -104,18 +104,21 @@ const AdminReservationsList = () => {
     useState<AdminReservation | null>(null);
   const navigate = useNavigate();
 
-  const tourTypes = [
-    { id: "panoramic", name: "Passeio panorâmico pela vila", basePrice: 10 },
-    {
-      id: "furnas",
-      name: "Vila Nova de Milfontes → Praia das Furnas",
-      basePrice: 15,
-    },
-    { id: "bridge", name: "Travessia da ponte", basePrice: 8 },
-    { id: "sunset", name: "Pôr do Sol Romântico", basePrice: 12 },
-    { id: "night", name: "Passeio noturno", basePrice: 14 },
-    { id: "fishermen", name: "Rota dos Pescadores", basePrice: 16 },
-  ];
+  const tourTypes = React.useMemo(
+    () => [
+      { id: "panoramic", name: "Passeio panorâmico pela vila", basePrice: 10 },
+      {
+        id: "furnas",
+        name: "Vila Nova de Milfontes → Praia das Furnas",
+        basePrice: 15,
+      },
+      { id: "bridge", name: "Travessia da ponte", basePrice: 8 },
+      { id: "sunset", name: "Pôr do Sol Romântico", basePrice: 12 },
+      { id: "night", name: "Passeio noturno", basePrice: 14 },
+      { id: "fishermen", name: "Rota dos Pescadores", basePrice: 16 },
+    ],
+    []
+  );
 
   // Função para calcular preço automaticamente
   const calculatePrice = (tourType: string, numberOfPeople: string) => {
@@ -127,16 +130,22 @@ const AdminReservationsList = () => {
   };
 
   // Função para traduzir tipos de tour para nomes amigáveis
-  const getTourDisplayName = (tourType: string) => {
-    const tour = tourTypes.find((t) => t.id === tourType);
-    return tour ? tour.name : tourType;
-  };
+  const getTourDisplayName = React.useCallback(
+    (tourType: string) => {
+      const tour = tourTypes.find((t) => t.id === tourType);
+      return tour ? tour.name : tourType;
+    },
+    [tourTypes]
+  );
 
   // Função para obter o preço base do tour
-  const getTourBasePrice = (tourType: string) => {
-    const tour = tourTypes.find((t) => t.id === tourType);
-    return tour ? tour.basePrice : 0;
-  };
+  const getTourBasePrice = React.useCallback(
+    (tourType: string) => {
+      const tour = tourTypes.find((t) => t.id === tourType);
+      return tour ? tour.basePrice : 0;
+    },
+    [tourTypes]
+  );
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -179,11 +188,7 @@ const AdminReservationsList = () => {
       const { error } = await supabase.from("reservations").insert([
         {
           customer_name: formData.name,
-<<<<<<< HEAD
           customer_email: (formData.email || "").trim(),
-=======
-          customer_email: formData.email,
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           customer_phone: formData.phone,
           reservation_date: formData.date,
           reservation_time: formData.time,
@@ -288,7 +293,7 @@ const AdminReservationsList = () => {
     });
 
     return sorted;
-  }, [reservations, searchTerm, statusFilter, dateFilter]);
+  }, [reservations, searchTerm, statusFilter, dateFilter, getTourDisplayName]);
 
   // Calcular paginação
   const totalPages = Math.ceil(
@@ -531,11 +536,7 @@ const AdminReservationsList = () => {
                 />
               </div>
               <div>
-<<<<<<< HEAD
-                <Label>Email</Label>
-=======
                 <Label>Email *</Label>
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
                 <Input
                   type="email"
                   value={formData.email}

@@ -199,11 +199,7 @@ const ReservationForm = () => {
       const { error } = await supabase.from("reservations").insert([
         {
           customer_name: formData.name,
-<<<<<<< HEAD
           customer_email: (formData.email || "").trim(),
-=======
-          customer_email: formData.email,
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           customer_phone: formData.phone,
           reservation_date: formData.date,
           reservation_time: formData.time,
@@ -302,7 +298,7 @@ const ReservationForm = () => {
     setAvailabilityInfo((prev) => ({ ...prev, isOpen: false }));
   };
 
-  const checkAvailabilityInRealTime = async () => {
+  const checkAvailabilityInRealTime = React.useCallback(async () => {
     if (!formData.date || !formData.time || !formData.numberOfPeople) {
       setAvailabilityStatus({
         isChecking: false,
@@ -339,7 +335,7 @@ const ReservationForm = () => {
         message: "Erro ao verificar disponibilidade",
       });
     }
-  };
+  }, [formData.date, formData.time, formData.numberOfPeople]);
 
   // Verificar disponibilidade quando mudar data, hora, número de pessoas OU tipo de tour
   React.useEffect(() => {
@@ -364,10 +360,11 @@ const ReservationForm = () => {
     }, 500); // Debounce de 500ms
     return () => clearTimeout(timeoutId);
   }, [
+    formData.tourType,
     formData.date,
     formData.time,
     formData.numberOfPeople,
-    formData.tourType,
+    checkAvailabilityInRealTime,
   ]);
 
   // Abrir o modal de sugestão imediatamente após a verificação de disponibilidade, se necessário
@@ -389,7 +386,13 @@ const ReservationForm = () => {
         alternativeTimes: availabilityStatus.alternativeTimes,
       });
     }
-  }, [availabilityStatus, formData.tourType]);
+  }, [
+    availabilityStatus,
+    formData.tourType,
+    formData.date,
+    formData.time,
+    formData.numberOfPeople,
+  ]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -423,21 +426,14 @@ const ReservationForm = () => {
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-blue-900 font-semibold">
-<<<<<<< HEAD
-                {t("reservation.email")}
-=======
                 {t("reservation.email")} *
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
               </Label>
               <Input
                 id="email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
-<<<<<<< HEAD
-=======
                 required
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
                 className="border-2 border-blue-100 focus:border-amber-400"
               />
             </div>

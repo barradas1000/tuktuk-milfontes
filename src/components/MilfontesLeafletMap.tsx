@@ -1,19 +1,10 @@
-<<<<<<< HEAD
 import React, { useRef, useState, useEffect } from "react";
 import ResponsiveImage from "@/components/ResponsiveImage";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
-=======
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-<<<<<<< HEAD
-=======
-import type { LatLngExpression } from "leaflet";
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 // Corrige o ícone padrão do Leaflet no React
 import iconUrl from "leaflet/dist/images/marker-icon.png";
@@ -26,7 +17,6 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-<<<<<<< HEAD
 // Componente para capturar a referência do mapa
 const MapController: React.FC<{
   mapRef: React.MutableRefObject<L.Map | null>;
@@ -40,8 +30,6 @@ const MapController: React.FC<{
   return null;
 };
 
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 const pointsOfInterest = [
   {
     name: "Praia da Franquia",
@@ -408,10 +396,7 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-<<<<<<< HEAD
   const mapRef = useRef<L.Map | null>(null);
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
   const handleExit = () => {
     if (onClose) {
@@ -419,7 +404,6 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
     } else {
       navigate("/");
     }
-<<<<<<< HEAD
     // Scroll para a seção Real Time Tracking após o mapa
     setTimeout(() => {
       const realTimeSection = document.getElementById(
@@ -427,13 +411,6 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
       );
       if (realTimeSection) {
         realTimeSection.scrollIntoView({ behavior: "smooth" });
-=======
-    // Scroll para o próximo elemento após o mapa
-    setTimeout(() => {
-      const nextSection = document.getElementById("explore-section");
-      if (nextSection) {
-        nextSection.scrollIntoView({ behavior: "smooth" });
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
       }
     }, 200);
   };
@@ -443,30 +420,20 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
       <div style={{ position: "relative", width: "100%", margin: "auto" }}>
         <div style={{ position: "relative" }}>
           <MapContainer
-<<<<<<< HEAD
             // @ts-expect-error - react-leaflet v4 type issue
             center={[37.725, -8.783]}
-=======
-            center={[37.725, -8.783] as LatLngExpression}
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
             zoom={14}
             scrollWheelZoom={true}
             style={mapStyle}
           >
-<<<<<<< HEAD
             <MapController mapRef={mapRef} />
             <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-=======
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
             {pointsOfInterest.map((poi) => (
               <Marker key={poi.name} position={poi.coords as [number, number]}>
                 <Popup>
                   <div style={{ textAlign: "center" }}>
                     <b>{poi.name}</b>
                     <br />
-<<<<<<< HEAD
                     {poi.image.startsWith("/") ? (
                       <ResponsiveImage
                         src={poi.image}
@@ -494,18 +461,6 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
                         decoding="async"
                       />
                     )}
-=======
-                    <img
-                      src={poi.image}
-                      alt={poi.name}
-                      style={{
-                        width: 200,
-                        height: "auto",
-                        borderRadius: 5,
-                        marginBottom: 5,
-                      }}
-                    />
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
                     <div
                       style={{ fontSize: 14, color: "#444", marginBottom: 4 }}
                     >
@@ -516,10 +471,6 @@ const MilfontesLeafletMap: React.FC<MilfontesLeafletMapProps> = ({
               </Marker>
             ))}
           </MapContainer>
-<<<<<<< HEAD
-
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           <button
             onClick={handleExit}
             style={{

@@ -1,12 +1,10 @@
-<<<<<<< HEAD
-import React, { useState, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-=======
-import React, { useState } from "react";
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
-import { useGeolocation } from "../hooks/useGeolocation";
-
-import { GeolocationPosition as CustomGeolocationPosition } from "../hooks/useGeolocation";
+import {
+  useGeolocation,
+  GeolocationPosition as CustomGeolocationPosition,
+  PermissionStatus,
+} from "../hooks/useGeolocation";
 
 interface LocationPermissionButtonProps {
   onLocationGranted?: (position: CustomGeolocationPosition) => void;
@@ -25,241 +23,187 @@ export const LocationPermissionButton: React.FC<
   children,
   showStatus = true,
 }) => {
-<<<<<<< HEAD
   const { t } = useTranslation();
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
-  const { position, error, permission, isLoading, isSupported, getLocation } =
-    useGeolocation();
+  const {
+    position,
+    error,
+    permission,
+    isLoading,
+    isSupported,
+    getLocation,
+    clearPosition,
+    checkPermission,
+  } = useGeolocation();
+
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [showPermissionAlert, setShowPermissionAlert] = useState(false);
-<<<<<<< HEAD
-  const lastPositionRef = useRef<CustomGeolocationPosition | null>(null);
 
-  const handleClick = () => {
-    if (!isSupported) {
-      alert(
-        `❌ ${t(
-          "locationPermission.statusMessages.unsupported"
-        )}.\n\n💡 Tente usar um navegador mais recente como Chrome, Firefox ou Safari.`
-      );
-=======
-
-  const handleClick = () => {
-    if (!isSupported) {
-      alert("Geolocalização não é suportada neste navegador");
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
-      return;
-    }
-
-    if (permission === "denied") {
-      setShowHelpModal(true);
-      setShowPermissionAlert(true);
-      onLocationDenied?.();
-      return;
-    }
-
-<<<<<<< HEAD
-    getLocation({
-      enableHighAccuracy: true,
-      timeout: 20000,
-      maximumAge: 0,
-    });
-=======
-    getLocation();
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
-  };
-
-  // Callback quando a localização é obtida
-  React.useEffect(() => {
-    if (position && onLocationGranted) {
-<<<<<<< HEAD
-      // Verificar se é uma nova posição comparando coordenadas
-      const isNewPosition =
-        !lastPositionRef.current ||
-        lastPositionRef.current.coords.latitude !== position.coords.latitude ||
-        lastPositionRef.current.coords.longitude !== position.coords.longitude;
-
-      if (isNewPosition) {
-        lastPositionRef.current = position;
-        onLocationGranted(position);
-      }
-=======
-      onLocationGranted(position);
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
-    }
+  useEffect(() => {
+    if (position && onLocationGranted) onLocationGranted(position);
   }, [position, onLocationGranted]);
 
-  // Callback quando há erro
-  React.useEffect(() => {
-    if (error && onLocationDenied) {
-      onLocationDenied();
-    }
+  useEffect(() => {
+    if (error && onLocationDenied) onLocationDenied();
   }, [error, onLocationDenied]);
 
   const getButtonText = () => {
-<<<<<<< HEAD
-    if (isLoading) return "📍 " + t("locationPermission.locating");
+    if (!isSupported)
+      return t(
+        "locationPermission.button.unsupported",
+        "Navegador sem suporte"
+      );
+    if (isLoading)
+      return t("locationPermission.button.loading", "A obter localização...");
     if (permission === "denied")
-      return "🔒 " + t("locationPermission.permissionDenied");
-    if (position) return "✅ " + t("locationPermission.located");
-    return children || "📍 " + t("locationPermission.grantAccess");
-=======
-    if (isLoading) return "📍 Localizando...";
-    if (permission === "denied") return "📍 Permissão Negada";
-    if (position) return "📍 Você está aqui!";
-    return children || "📍 Localizar-me";
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+      return t("locationPermission.button.enable", "Permitir localização");
+    if (position)
+      return t("locationPermission.button.active", "Localização ativa");
+    return t("locationPermission.button.use", "Usar minha localização");
+  };
+
+  const getStatusText = () => {
+    if (!isSupported)
+      return (
+        "❌ " +
+        t(
+          "locationPermission.statusMessages.unsupported",
+          "Geolocalização não suportada"
+        )
+      );
+    if (isLoading)
+      return (
+        "🔄 " +
+        t(
+          "locationPermission.statusMessages.obtaining",
+          "A obter localização..."
+        )
+      );
+    if (error)
+      return `❌ ${t(
+        "locationPermission.statusMessages.error",
+        "Erro:"
+      )} ${error}`;
+    if (permission === "denied")
+      return (
+        "🔒 " +
+        t("locationPermission.statusMessages.denied", "Permissão negada")
+      );
+    if (position)
+      return (
+        "✅ " +
+        t("locationPermission.statusMessages.success", "Localização obtida")
+      );
+    return (
+      "👆 " +
+      t(
+        "locationPermission.statusMessages.clickToDiscover",
+        "Clique para permitir localização"
+      )
+    );
   };
 
   const getButtonClass = () => {
     let baseClass = "location-permission-button";
-
     if (isLoading) baseClass += " loading";
     if (permission === "denied") baseClass += " denied";
     if (position) baseClass += " active";
     if (!isSupported) baseClass += " disabled";
-
     return `${baseClass} ${className}`.trim();
   };
 
-  const getStatusText = () => {
-<<<<<<< HEAD
-    if (!isSupported)
-      return "❌ " + t("locationPermission.statusMessages.unsupported");
-    if (isLoading)
-      return "🔄 " + t("locationPermission.statusMessages.obtaining");
-    if (error)
-      return `❌ ${t("locationPermission.statusMessages.error")} ${error}`;
-    if (permission === "denied")
-      return "🔒 " + t("locationPermission.statusMessages.denied");
-    if (position) return "✅ " + t("locationPermission.statusMessages.success");
-    return "👆 " + t("locationPermission.statusMessages.clickToDiscover");
-=======
-    if (!isSupported) return "Geolocalização não suportada";
-    if (isLoading) return "Obtendo localização...";
-    if (error) return error;
-    if (permission === "denied") return "Permissão negada";
-    if (position) return "Localização obtida";
-    return "Clique para localizar";
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
-  };
-
-  const detectMobileOS = () => {
-    const userAgent =
-      navigator.userAgent ||
-      navigator.vendor ||
-      (window as unknown as { opera?: string }).opera;
-
-    if (/android/i.test(userAgent)) {
-      return "android";
-    }
+  const detectMobileOS = (): "android" | "ios" | "desktop" => {
+    const vendor = (navigator as Navigator & { vendor?: string }).vendor || "";
+    const opera = (window as unknown as { opera?: string }).opera || "";
+    const ua = `${navigator.userAgent} ${vendor} ${opera}`;
+    if (/android/i.test(ua)) return "android";
     if (
-      /iPad|iPhone|iPod/.test(userAgent) &&
+      /iPad|iPhone|iPod/.test(ua) &&
       !(window as unknown as { MSStream?: unknown }).MSStream
-    ) {
+    )
       return "ios";
-    }
     return "desktop";
   };
 
-  const getHelpInstructions = () => {
+  const instructions = useMemo(() => {
+    const safeList = (key: string): string[] => {
+      const value = t(key, { returnObjects: true }) as unknown;
+      return Array.isArray(value) ? (value as string[]) : [];
+    };
     const os = detectMobileOS();
-
     if (os === "android") {
       return {
-<<<<<<< HEAD
-        title: t("locationPermission.helpInstructions.android.title"),
+        title: t(
+          "locationPermission.helpInstructions.android.title",
+          "Como ativar localização no Chrome"
+        ),
         steps: [
-          `**🔧 ${t("locationPermission.helpInstructions.android.method1")}**`,
-          ...t("locationPermission.helpInstructions.android.steps.complete", {
-            returnObjects: true,
-          }),
-          "",
-          `**⚡ ${t("locationPermission.helpInstructions.android.method2")}**`,
-          ...t("locationPermission.helpInstructions.android.steps.quick", {
-            returnObjects: true,
-          }),
-          "",
-          `**🔍 ${t("locationPermission.helpInstructions.android.method3")}**`,
-          ...t(
-            "locationPermission.helpInstructions.android.steps.alternative",
-            { returnObjects: true }
+          `**🔧 ${t(
+            "locationPermission.helpInstructions.android.method1",
+            "Pelo menu do Chrome"
+          )}**`,
+          ...safeList(
+            "locationPermission.helpInstructions.android.steps.complete"
           ),
-=======
-        title: "Como permitir localização no Android",
-        steps: [
-          "1. Toque nos três pontos (⋮) no canto superior direito do Chrome",
-          '2. Selecione "Configurações"',
-          '3. Toque em "Site settings" ou "Configurações do site"',
-          '4. Toque em "Localização"',
-          '5. Encontre este site na lista e mude para "Permitir"',
-          "6. Volte para o site e atualize a página",
           "",
-          "Alternativa mais fácil:",
-          "• Procure por um ícone de localização 📍 na barra de endereços",
-          "• Ou um ícone de cadeado 🔒 ao lado do endereço",
-          '• Toque nele e selecione "Permitir"',
+          `**⚡ ${t(
+            "locationPermission.helpInstructions.android.method2",
+            "Pelo atalho na barra de endereço"
+          )}**`,
+          ...safeList(
+            "locationPermission.helpInstructions.android.steps.quick"
+          ),
           "",
-          "Se não vir esses ícones:",
-          "• Toque na barra de endereços para ver mais opções",
-          "• Ou procure por um ícone de informação (ⓘ)",
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
-        ],
-      };
-    } else if (os === "ios") {
-      return {
-<<<<<<< HEAD
-        title: t("locationPermission.helpInstructions.ios.title"),
-        steps: [
-          "**📱 Passos no Safari:**",
-          ...t("locationPermission.helpInstructions.ios.steps", {
-            returnObjects: true,
-          }),
-          "",
-          "**⚡ Método alternativo:**",
-          ...t("locationPermission.helpInstructions.ios.alternative", {
-            returnObjects: true,
-          }),
-=======
-        title: "Como permitir localização no iPhone/iPad",
-        steps: [
-          '1. Toque no ícone "AA" na barra de endereços',
-          '2. Selecione "Configurações do site"',
-          '3. Toque em "Localização"',
-          '4. Mude para "Permitir"',
-          "5. Volte para o site e atualize a página",
-          "",
-          "Alternativa:",
-          "• Procure por um ícone de localização 📍 na barra de endereços",
-          '• Toque nele e selecione "Permitir"',
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
-        ],
-      };
-    } else {
-      return {
-<<<<<<< HEAD
-        title: t("locationPermission.helpInstructions.desktop.title"),
-        steps: [
-          "**🖱️ Passos simples:**",
-          ...t("locationPermission.helpInstructions.desktop.steps", {
-            returnObjects: true,
-          }),
-=======
-        title: "Como permitir localização no navegador",
-        steps: [
-          "1. Toque no ícone de localização na barra de endereços",
-          '2. Selecione "Permitir" quando aparecer o popup',
-          "3. Se não aparecer, verifique as configurações do navegador",
-          '4. Procure por "Permissões" ou "Configurações do site"',
-          "5. Habilite a permissão de localização para este site",
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+          `**🔍 ${t(
+            "locationPermission.helpInstructions.android.method3",
+            "Alternativa"
+          )}**`,
+          ...safeList(
+            "locationPermission.helpInstructions.android.steps.alternative"
+          ),
         ],
       };
     }
-  };
+    if (os === "ios") {
+      return {
+        title: t(
+          "locationPermission.helpInstructions.ios.title",
+          "Como ativar localização no Safari"
+        ),
+        steps: [
+          "**📱 Passos no Safari:**",
+          ...safeList("locationPermission.helpInstructions.ios.steps"),
+          "",
+          "**⚡ Método alternativo:**",
+          ...safeList("locationPermission.helpInstructions.ios.quick"),
+        ],
+      };
+    }
+    return {
+      title: t(
+        "locationPermission.helpInstructions.desktop.title",
+        "Como permitir localização no navegador"
+      ),
+      steps: [
+        "**🖱️ Passos simples:**",
+        ...safeList("locationPermission.helpInstructions.desktop.steps"),
+      ],
+    };
+  }, [t]);
 
-  const instructions = getHelpInstructions();
+  const handleClick = () => {
+    if (!isSupported) {
+      setShowHelpModal(true);
+      return;
+    }
+
+    if (permission === "denied") {
+      setShowPermissionAlert(true);
+      setShowHelpModal(true);
+      return;
+    }
+
+    getLocation();
+  };
 
   return (
     <>
@@ -270,7 +214,7 @@ export const LocationPermissionButton: React.FC<
           disabled={!isSupported || isLoading}
           title={getStatusText()}
         >
-          {getButtonText()}
+          {children ?? getButtonText()}
         </button>
 
         {showStatus && (
@@ -282,32 +226,29 @@ export const LocationPermissionButton: React.FC<
         )}
       </div>
 
-      {/* Banner de alerta de permissão */}
       {showPermissionAlert && (
         <div className="permission-alert-banner">
           <div className="permission-alert-content">
-<<<<<<< HEAD
             <div className="permission-alert-icon">🔐</div>
             <div className="permission-alert-text">
-              <strong>📍 {t("locationPermission.permissionNeeded")}</strong>
-              <p>{t("locationPermission.permissionDescription")}</p>
-=======
-            <div className="permission-alert-icon">⚠️</div>
-            <div className="permission-alert-text">
-              <strong>Permissão de localização necessária</strong>
+              <strong>
+                📍{" "}
+                {t(
+                  "locationPermission.permissionNeeded",
+                  "Permissão de localização necessária"
+                )}
+              </strong>
               <p>
-                Para mostrar sua localização no mapa, precisamos da sua
-                permissão.
+                {t(
+                  "locationPermission.permissionDescription",
+                  "Ative a localização para encontrar o tuk-tuk mais próximo."
+                )}
               </p>
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
             </div>
             <button
               className="permission-alert-close"
               onClick={() => setShowPermissionAlert(false)}
-<<<<<<< HEAD
-              title="Fechar aviso"
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+              title={t("common.close", "Fechar")}
             >
               ✕
             </button>
@@ -315,7 +256,6 @@ export const LocationPermissionButton: React.FC<
         </div>
       )}
 
-      {/* Modal de ajuda */}
       {showHelpModal && (
         <div
           className="help-modal-overlay"
@@ -338,14 +278,14 @@ export const LocationPermissionButton: React.FC<
                 </p>
               ))}
 
-              {/* Seção visual para Android */}
               {detectMobileOS() === "android" && (
                 <div className="help-visual-section">
-<<<<<<< HEAD
-                  <h4>{t("locationPermission.helpModal.lookForIcons")}</h4>
-=======
-                  <h4>📍 Onde encontrar os ícones:</h4>
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+                  <h4>
+                    {t(
+                      "locationPermission.helpModal.lookForIcons",
+                      "Procure por estes ícones"
+                    )}
+                  </h4>
                   <div className="browser-mockup">
                     <div className="browser-address-bar">
                       <span className="address-text">
@@ -370,12 +310,10 @@ export const LocationPermissionButton: React.FC<
                       </div>
                     </div>
                     <p className="visual-note">
-<<<<<<< HEAD
-                      {t("locationPermission.helpModal.visualNote")}
-=======
-                      Procure por estes ícones na barra de endereços do seu
-                      navegador
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+                      {t(
+                        "locationPermission.helpModal.visualNote",
+                        "Toque no ícone para permitir a localização."
+                      )}
                     </p>
                   </div>
                 </div>
@@ -386,11 +324,7 @@ export const LocationPermissionButton: React.FC<
                 className="help-modal-button"
                 onClick={() => setShowHelpModal(false)}
               >
-<<<<<<< HEAD
-                ✅ {t("locationPermission.helpModal.understood")}
-=======
-                Entendi
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+                ✅ {t("locationPermission.helpModal.understood", "Entendi")}
               </button>
               <a
                 href="/docs/PERMISSAO-LOCALIZACAO.md"
@@ -398,11 +332,11 @@ export const LocationPermissionButton: React.FC<
                 rel="noopener noreferrer"
                 className="help-modal-link"
               >
-<<<<<<< HEAD
-                📖 {t("locationPermission.helpModal.completeGuide")}
-=======
-                📖 Ver guia completo
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+                📖{" "}
+                {t(
+                  "locationPermission.helpModal.completeGuide",
+                  "Guia completo"
+                )}
               </a>
             </div>
           </div>
@@ -410,384 +344,44 @@ export const LocationPermissionButton: React.FC<
       )}
 
       <style>{`
-        .location-permission-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0.5rem;
-        }
-
-        .location-permission-button {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1.5rem;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          border-radius: 25px;
-          font-size: 0.9rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-          min-width: 140px;
-          justify-content: center;
-        }
-
-        .location-permission-button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .location-permission-button:active:not(:disabled) {
-          transform: translateY(0);
-        }
-
-        .location-permission-button.loading {
-          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-          animation: pulse 1.5s infinite;
-        }
-
-        .location-permission-button.denied {
-          background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-          cursor: not-allowed;
-        }
-
-        .location-permission-button.active {
-          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        }
-
-        .location-permission-button.disabled {
-          background: #ccc;
-          cursor: not-allowed;
-          box-shadow: none;
-        }
-
-        .location-permission-button:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-
-        .location-status {
-          text-align: center;
-        }
-
-        .status-text {
-          font-size: 0.75rem;
-          color: #666;
-          transition: color 0.3s ease;
-        }
-
-        .status-text.granted {
-          color: #28a745;
-        }
-
-        .status-text.denied {
-          color: #dc3545;
-        }
-
-        .status-text.prompt {
-          color: #ffc107;
-        }
-
-        /* Banner de alerta de permissão */
-        .permission-alert-banner {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-          color: white;
-          z-index: 9999;
-          padding: 1rem;
-          box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-          animation: slideDown 0.3s ease-out;
-        }
-
-        .permission-alert-content {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          max-width: 600px;
-          margin: 0 auto;
-        }
-
-        .permission-alert-icon {
-          font-size: 1.5rem;
-          flex-shrink: 0;
-        }
-
-        .permission-alert-text {
-          flex: 1;
-        }
-
-        .permission-alert-text strong {
-          display: block;
-          font-size: 1rem;
-          margin-bottom: 0.25rem;
-        }
-
-        .permission-alert-text p {
-          margin: 0;
-          font-size: 0.9rem;
-          opacity: 0.9;
-        }
-
-        .permission-alert-close {
-          background: rgba(255, 255, 255, 0.2);
-          border: none;
-          color: white;
-          font-size: 1.2rem;
-          padding: 0.5rem;
-          border-radius: 50%;
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: background-color 0.2s;
-          flex-shrink: 0;
-        }
-
-        .permission-alert-close:hover {
-          background: rgba(255, 255, 255, 0.3);
-        }
-
-        @keyframes slideDown {
-          from {
-            transform: translateY(-100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-
-        /* Modal de ajuda */
-        .help-modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: rgba(0, 0, 0, 0.7);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 10000;
-          padding: 1rem;
-        }
-
-        .help-modal {
-          background: white;
-          border-radius: 12px;
-          max-width: 90vw;
-          width: 400px;
-          max-height: 80vh;
-          overflow-y: auto;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .help-modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 1.5rem 1.5rem 0 1.5rem;
-          border-bottom: 1px solid #eee;
-        }
-
-        .help-modal-header h3 {
-          margin: 0;
-          color: #333;
-          font-size: 1.2rem;
-          font-weight: 600;
-        }
-
-        .help-modal-close {
-          background: none;
-          border: none;
-          font-size: 1.5rem;
-          color: #666;
-          cursor: pointer;
-          padding: 0.25rem;
-          border-radius: 50%;
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: background-color 0.2s;
-        }
-
-        .help-modal-close:hover {
-          background: #f0f0f0;
-        }
-
-        .help-modal-content {
-          padding: 1.5rem;
-        }
-
-        .help-step {
-          margin: 0.75rem 0;
-          color: #555;
-          font-size: 0.95rem;
-          line-height: 1.5;
-        }
-
-        .help-modal-footer {
-          padding: 0 1.5rem 1.5rem 1.5rem;
-          text-align: center;
-        }
-
-        .help-modal-button {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          border: none;
-          padding: 0.75rem 2rem;
-          border-radius: 25px;
-          font-size: 1rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .help-modal-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .help-modal-link {
-          display: block;
-          margin-top: 1rem;
-          color: #667eea;
-          text-decoration: none;
-          font-size: 0.9rem;
-          padding: 0.5rem;
-          border-radius: 8px;
-          transition: all 0.3s ease;
-          border: 1px solid #e9ecef;
-        }
-
-        .help-modal-link:hover {
-          background: #f8f9fa;
-          color: #764ba2;
-          border-color: #667eea;
-        }
-
-        /* Seção visual */
-        .help-visual-section {
-          margin-top: 1.5rem;
-          padding-top: 1.5rem;
-          border-top: 1px solid #eee;
-        }
-
-        .help-visual-section h4 {
-          margin: 0 0 1rem 0;
-          color: #333;
-          font-size: 1rem;
-          font-weight: 600;
-        }
-
-        .browser-mockup {
-          background: #f8f9fa;
-          border-radius: 8px;
-          padding: 1rem;
-          border: 1px solid #e9ecef;
-        }
-
-        .browser-address-bar {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background: white;
-          border-radius: 6px;
-          padding: 0.75rem 1rem;
-          border: 1px solid #dee2e6;
-          margin-bottom: 0.75rem;
-        }
-
-        .address-text {
-          font-size: 0.9rem;
-          color: #495057;
-          font-family: monospace;
-        }
-
-        .address-icons {
-          display: flex;
-          gap: 0.5rem;
-          align-items: center;
-        }
-
-        .icon-location,
-        .icon-lock,
-        .icon-info,
-        .icon-menu {
-          font-size: 1.2rem;
-          padding: 0.25rem;
-          border-radius: 4px;
-          background: #e9ecef;
-          cursor: pointer;
-          transition: background-color 0.2s;
-        }
-
-        .icon-location:hover,
-        .icon-lock:hover,
-        .icon-info:hover,
-        .icon-menu:hover {
-          background: #dee2e6;
-        }
-
-        .visual-note {
-          margin: 0;
-          font-size: 0.85rem;
-          color: #6c757d;
-          text-align: center;
-          font-style: italic;
-        }
-
-        @keyframes pulse {
-          0% {
-            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
-          }
-          50% {
-            box-shadow: 0 4px 25px rgba(240, 147, 251, 0.6);
-          }
-          100% {
-            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);
-          }
-        }
-
-        @media (max-width: 768px) {
-          .location-permission-button {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.85rem;
-            min-width: 120px;
-          }
-
-          .help-modal {
-            width: 95vw;
-            margin: 1rem;
-          }
-
-          .help-modal-header,
-          .help-modal-content,
-          .help-modal-footer {
-            padding-left: 1rem;
-            padding-right: 1rem;
-          }
-
-          .permission-alert-content {
-            flex-direction: column;
-            text-align: center;
-            gap: 0.75rem;
-          }
-
-          .permission-alert-text p {
-            font-size: 0.85rem;
-          }
-        }
+        .location-permission-container { display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+        .location-permission-button { display:flex; align-items:center; gap:.5rem; padding:.75rem 1.5rem; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white; border:none; border-radius:25px; font-size:.9rem; font-weight:600; cursor:pointer; transition:all .3s ease; box-shadow:0 4px 15px rgba(102,126,234,.3); min-width:140px; justify-content:center; }
+        .location-permission-button:hover:not(:disabled){ transform: translateY(-2px); box-shadow:0 6px 20px rgba(102,126,234,.4); }
+        .location-permission-button:active:not(:disabled){ transform: translateY(0); }
+        .location-permission-button.loading{ background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%); animation: pulse 1.5s infinite; }
+        .location-permission-button.denied{ background:linear-gradient(135deg,#ff6b6b 0%,#ee5a24 100%); cursor:not-allowed; }
+        .location-permission-button.active{ background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%); }
+        .location-permission-button.disabled{ background:#ccc; cursor:not-allowed; box-shadow:none; }
+        .location-permission-button:disabled{ opacity:.7; cursor:not-allowed; }
+        .location-status{text-align:center}
+        .status-text{ font-size:.75rem; color:#666; transition: color .3s ease; }
+        .status-text.granted{ color:#28a745; } .status-text.denied{ color:#dc3545; } .status-text.prompt{ color:#ffc107; }
+        .permission-alert-banner{ position:fixed; top:0; left:0; right:0; background:linear-gradient(135deg,#ff6b6b 0%,#ee5a24 100%); color:white; z-index:9999; padding:1rem; box-shadow:0 4px 15px rgba(255,107,107,.3); animation: slideDown .3s ease-out; }
+        .permission-alert-content{ display:flex; align-items:center; gap:1rem; max-width:600px; margin:0 auto; }
+        .permission-alert-icon{ font-size:1.5rem; flex-shrink:0; }
+        .permission-alert-text{ flex:1; }
+        .permission-alert-text strong{ display:block; font-size:1rem; margin-bottom:.25rem; }
+        .permission-alert-text p{ margin:0; font-size:.9rem; opacity:.9; }
+        .permission-alert-close{ background:transparent; border:0; color:white; font-size:1.25rem; cursor:pointer; }
+        .help-modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.5); display:flex; align-items:center; justify-content:center; z-index:10000; padding:1rem; }
+        .help-modal{ background:white; border-radius:12px; width:min(720px,100%); max-height:80vh; overflow:auto; box-shadow:0 10px 30px rgba(0,0,0,.2); }
+        .help-modal-header{ display:flex; justify-content:space-between; align-items:center; padding:1rem 1.25rem; border-bottom:1px solid #eee; }
+        .help-modal-close{ background:transparent; border:0; font-size:1.25rem; cursor:pointer; }
+        .help-modal-content{ padding:1rem 1.25rem; }
+        .help-step{ margin:.25rem 0; font-size:.95rem; color:#333; }
+        .help-visual-section{ margin-top:1rem; }
+        .browser-mockup{ background:#f7f7f7; border:1px solid #e5e5e5; border-radius:8px; padding:.75rem; }
+        .browser-address-bar{ display:flex; align-items:center; justify-content:space-between; background:white; border:1px solid #e5e5e5; border-radius:6px; padding:.5rem .75rem; }
+        .address-text{ font-family:monospace; color:#555; }
+        .address-icons{ display:flex; align-items:center; gap:.5rem; }
+        .help-modal-footer{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; padding:1rem 1.25rem; border-top:1px solid #eee; }
+        .help-modal-button{ background:#4facfe; color:white; border:0; border-radius:8px; padding:.5rem .75rem; cursor:pointer; }
+        .help-modal-link{ text-decoration:none; color:#764ba2; }
+        @keyframes slideDown{ from{ transform: translateY(-10px); opacity:0 } to{ transform: translateY(0); opacity:1 } }
+        @keyframes pulse{ 0%{ filter:brightness(1) } 50%{ filter:brightness(1.1) } 100%{ filter:brightness(1) } }
       `}</style>
     </>
   );
 };
+
+export default LocationPermissionButton;

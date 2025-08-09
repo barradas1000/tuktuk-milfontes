@@ -1,11 +1,7 @@
-<<<<<<< HEAD
-=======
-
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
@@ -26,9 +22,9 @@ export const AnimatedTestimonials = ({
   const [active, setActive] = useState(0);
   const { t } = useTranslation();
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     setActive((prev) => (prev + 1) % testimonials.length);
-  };
+  }, [testimonials.length]);
 
   const handlePrev = () => {
     setActive((prev) => (prev - 1 + testimonials.length) % testimonials.length);
@@ -39,20 +35,11 @@ export const AnimatedTestimonials = ({
   };
 
   useEffect(() => {
-<<<<<<< HEAD
-    if (!autoplay) return;
-    const interval = setInterval(() => {
-      setActive((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [autoplay, testimonials.length]);
-=======
     if (autoplay) {
       const interval = setInterval(handleNext, 5000);
       return () => clearInterval(interval);
     }
-  }, [autoplay]);
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
+  }, [autoplay, testimonials.length, handleNext]);
 
   const randomRotateY = () => {
     return Math.floor(Math.random() * 21) - 10;
@@ -64,14 +51,10 @@ export const AnimatedTestimonials = ({
       ...testimonial,
       quote: t(`testimonials.items.${index}.quote`, testimonial.quote),
       name: t(`testimonials.items.${index}.name`, testimonial.name),
-<<<<<<< HEAD
       designation: t(
         `testimonials.items.${index}.designation`,
         testimonial.designation
       ),
-=======
-      designation: t(`testimonials.items.${index}.designation`, testimonial.designation)
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
     }));
   };
 
@@ -121,11 +104,8 @@ export const AnimatedTestimonials = ({
                     height={500}
                     draggable={false}
                     className="h-full w-full rounded-3xl object-cover object-center"
-<<<<<<< HEAD
                     loading="lazy"
                     decoding="async"
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
                   />
                 </motion.div>
               ))}
@@ -159,7 +139,6 @@ export const AnimatedTestimonials = ({
               {translatedTestimonials[active].designation}
             </p>
             <motion.p className="mt-8 text-lg text-gray-700 dark:text-neutral-300">
-<<<<<<< HEAD
               {translatedTestimonials[active].quote
                 .split(" ")
                 .map((word, index) => (
@@ -185,31 +164,6 @@ export const AnimatedTestimonials = ({
                     {word}&nbsp;
                   </motion.span>
                 ))}
-=======
-              {translatedTestimonials[active].quote.split(" ").map((word, index) => (
-                <motion.span
-                  key={index}
-                  initial={{
-                    filter: "blur(10px)",
-                    opacity: 0,
-                    y: 5,
-                  }}
-                  animate={{
-                    filter: "blur(0px)",
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  transition={{
-                    duration: 0.2,
-                    ease: "easeInOut",
-                    delay: 0.02 * index,
-                  }}
-                  className="inline-block"
-                >
-                  {word}&nbsp;
-                </motion.span>
-              ))}
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
             </motion.p>
           </motion.div>
           <div className="flex gap-4 pt-12 md:pt-0">

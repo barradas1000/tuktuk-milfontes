@@ -132,11 +132,7 @@ const AdminDashboard = () => {
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
-<<<<<<< HEAD
               Disponibilidade
-=======
-              Calendário
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -146,7 +142,6 @@ const AdminDashboard = () => {
 
           {/* Conteúdo das abas e dashboard */}
           <div>
-<<<<<<< HEAD
             {/* Statistics Cards - ocultos na aba Disponibilidade */}
             <TabsContent value="reservations" className="mt-0">
               {stats && (
@@ -320,116 +315,14 @@ const AdminDashboard = () => {
 
             {/* Aba Disponibilidade - SEM o grid de estatísticas */}
             <TabsContent value="calendar" className="mt-0">
-=======
-            {/* Statistics Cards */}
-            {stats && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-                <Card className="border-l-4 border-l-blue-500">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Total Reservas
-                    </CardTitle>
-                    <Users className="h-4 w-4 text-blue-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-blue-600">
-                      {stats.totalReservations}
-                    </div>
-                    <p className="text-xs text-gray-600">
-                      Este mês: {stats.monthlyReservations}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-l-4 border-l-yellow-500">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Pendentes
-                    </CardTitle>
-                    <AlertCircle className="h-4 w-4 text-yellow-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-yellow-600">
-                      {stats.pendingReservations}
-                    </div>
-                    <p className="text-xs text-gray-600">
-                      Aguardam confirmação
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-l-4 border-l-green-500">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Confirmadas
-                    </CardTitle>
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-green-600">
-                      {stats.confirmedReservations}
-                    </div>
-                    <p className="text-xs text-gray-600">
-                      Hoje: {stats.todayReservations}
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-l-4 border-l-purple-500">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium">
-                      Receita
-                    </CardTitle>
-                    <Euro className="h-4 w-4 text-purple-600" />
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-2xl font-bold text-purple-600">
-                      €{stats.totalRevenue}
-                    </div>
-                    <p className="text-xs text-gray-600">
-                      Reservas confirmadas
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Show message if no stats available */}
-            {!stats && (
-              <Card className="mb-8">
-                <CardContent className="flex items-center justify-center py-8">
-                  <div className="text-center">
-                    <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                      Nenhuma reserva encontrada
-                    </h3>
-                    <p className="text-gray-500">
-                      Ainda não há reservas no sistema. As estatísticas
-                      aparecerão quando houver dados.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Main Content Tabs - sempre visível */}
-            {/* Removido: <TabsContent value="calendar"> ... </TabsContent> */}
-            <TabsContent value="reservations">
-              <AdminReservationsList />
-            </TabsContent>
-            <TabsContent value="calendar">
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
               <AdminCalendar
                 selectedDate={selectedDate}
                 onDateSelect={setSelectedDate}
               />
             </TabsContent>
-<<<<<<< HEAD
-=======
             <TabsContent value="analytics">
               <AdminReports />
             </TabsContent>
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
           </div>
         </Tabs>
       </div>

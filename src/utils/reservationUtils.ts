@@ -15,7 +15,6 @@ export const getReservationsByDate = (
 };
 
 export const generateDynamicTimeSlots = (
-<<<<<<< HEAD
   startHour = 9,
   endHour = 22,
   intervalMinutes = 15
@@ -42,21 +41,6 @@ export const generateDynamicTimeSlots = (
       currentHour++;
     }
   }
-
-=======
-  startHour = 8,
-  endHour = 23,
-  intervalMinutes = 30
-): string[] => {
-  const slots: string[] = [];
-  for (let hour = startHour; hour <= endHour; hour++) {
-    for (let min = 0; min < 60; min += intervalMinutes) {
-      const h = hour.toString().padStart(2, "0");
-      const m = min.toString().padStart(2, "0");
-      slots.push(`${h}:${m}`);
-    }
-  }
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   return slots;
 };
 
@@ -104,16 +88,12 @@ export interface AvailabilitySlot {
 
 export const getAvailabilityWithBlocks = (
   reservations: AdminReservation[],
-<<<<<<< HEAD
   blockedPeriods: {
     date: string;
     startTime?: string;
     endTime?: string;
     reason?: string;
   }[],
-=======
-  blockedPeriods: { date: string; startTime?: string; reason?: string }[],
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   date: string
 ): AvailabilitySlot[] => {
   const timeSlots = generateDynamicTimeSlots();
@@ -143,11 +123,7 @@ export const getAvailabilityWithBlocks = (
       };
     }
 
-<<<<<<< HEAD
     // Verifica bloqueio manual do admin para horário específico
-=======
-    // Verifica bloqueio manual do admin
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
     const adminBlock = blockedPeriods.find(
       (b) => b.date === date && b.startTime === time
     );
@@ -161,8 +137,6 @@ export const getAvailabilityWithBlocks = (
         reason: adminBlock.reason,
       };
     }
-
-<<<<<<< HEAD
     // Verifica se o dia inteiro está bloqueado
     const dayBlock = blockedPeriods.find(
       (b) => b.date === date && !b.startTime && !b.endTime
@@ -177,9 +151,6 @@ export const getAvailabilityWithBlocks = (
         reason: dayBlock.reason || "Dia bloqueado pelo administrador",
       };
     }
-
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
     // Disponível ou indisponível por lotação
     if (reserved < 4) {
       return {

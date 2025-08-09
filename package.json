@@ -9,8 +9,8 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-  "vercel-build": "npm run optimize:images && vite build",
-  "optimize:images": "node scripts/optimize-images.mjs public"
+    "vercel-build": "npm run optimize:images && vite build",
+    "optimize:images": "node scripts/optimize-images.mjs public"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.8",

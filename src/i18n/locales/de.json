@@ -5,7 +5,7 @@
     "description": "Erkunden Sie Vila Nova de Milfontes und Umgebung in einem einzigartigen Tuk-Tuk Erlebnis. Atemberaubende Landschaften, Geschichte und garantierter Spaß!",
     "descriptionHighlight": "Buchen Sie Ihr Abenteuer jetzt!",
     "reserveNow": "Jetzt Buchen",
-    "rating": "4.9/5 ⭐ (200+ Bewertungen)"
+    "rating": "4.9/5 ✰ (200+ Bewertungen)"
   },
   "benefits": {
     "title": "Warum Unsere",
@@ -27,67 +27,110 @@
   "pricing": {
     "title": "Transparente",
     "titleHighlight": "Preise",
-    "subtitle": "Faire und klare Preise, keine Überraschungen. Garantierter Spaß für die ganze Familie!",
-    "upTo2People": "Bis zu 2 Personen",
-    "additionalPeople": "Zusätzliche Personen",
-    "seeDetailedPrices": "Detaillierte Preise Anzeigen",
-    "detailedPricesTitle": "Vollständige Preistabelle",
-    "howPricesWork": "Wie Die Preise Funktionieren",
-    "basePrice": "Grundpreis",
-    "basePriceDesc": "Festpreis bis zu 2 Personen pro Tuk-Tuk",
-    "additionalPeopleDesc": "€3.50 für jede zusätzliche Person (maximal 4 Personen pro Tuk-Tuk)",
-    "priceExamples": "Preisbeispiele:",
-    "person": "Person",
-    "people": "Personen",
-    "makeReservation": "Reservierung Machen"
+    "subtitle": "Faire und klare Preise, keine Überraschungen. Garantierter Spaß für die ganze Familie!"
   },
-  "explore": {
-    "title": "Erkunden Sie",
-    "titleHighlight": "Milfontes",
-    "subtitle": "Wie Nie Zuvor",
-    "description": "Entdecken Sie die bestgehüteten Geheimnisse von Vila Nova de Milfontes und der Vicentinischen Küste aus einer einzigartigen Perspektive",
-    "panoramicView": "Einzigartiger Panoramablick",
-    "panoramicViewDesc": "Genießen Sie die besten Aussichten der Alentejo-Küste",
-    "historicHeritage": "Historisches Erbe",
-    "historicHeritageDesc": "Erfahren Sie mehr über die reiche Geschichte dieses Fischerdorfs"
+  "tracking": {
+    "title": "TukTuk in Echtzeit",
+    "subtitle": "Verfolgen Sie die Position unseres TukTuks in Vila Nova de Milfontes",
+    "currentLocation": "Aktuelle Position",
+    "howItWorks": "Wie es funktioniert",
+    "contact": "Kontakt",
+    "backToMainSite": "Zurück zur Hauptseite",
+    "loading": "TukTuk-Position wird geladen...",
+    "pleaseWait": "Bitte warten",
+    "mapCentering": "Karte zentrieren",
+    "makeReservation": "Machen Sie Hier Ihre Reservierung!",
+    "reservationDialog": "Reservierungsformular",
+    "tuktukAvailable": "TukTuk jetzt verfügbar!",
+    "tuktukBusy": "TukTuk Derzeit Besetzt",
+    "readyForAdventure": "Bereit, Sie auf ein Abenteuer mitzunehmen",
+    "busyUntil": "bis",
+    "availableAgainAt": "Wird wieder verfügbar sein um",
+    "instructions": {
+      "locateMe": "Klicken Sie auf \"Mich lokalisieren\", um Ihre Position auf der Karte zu sehen",
+      "tuktukIcon": "Das TukTuk-Symbol zeigt die aktuelle Position in Echtzeit",
+      "statusIndicator": "Der Status zeigt an, ob das TukTuk verfügbar oder besetzt ist",
+      "distanceCalculation": "Entfernung und geschätzte Zeit werden automatisch berechnet",
+      "makeReservation": "Verwenden Sie \"Machen Sie Hier Ihre Reservierung!\", um den Service zu buchen",
+      "centerMap": "\"Karte zentrieren\" passt die Ansicht für bessere Visualisierung an",
+      "offlineNote": "Wenn Sie das TukTuk nicht sehen, könnte es offline sein"
+    },
+    "contactInfo": {
+      "phone": "Telefon: 963 496 320",
+      "whatsapp": "WhatsApp: Auf der Hauptseite verfügbar",
+      "email": "Email: diogo.carias@outlook.pt"
+    }
   },
-  "availability": {
-    "title": "Echtzeit-",
-    "titleHighlight": "Verfügbarkeit",
-    "subtitle": "Überprüfen Sie verfügbare Zeiten und buchen Sie Ihren perfekten Moment",
-    "availabilityToday": "Verfügbarkeit Heute",
-    "availableSlots": "Verfügbare Zeitfenster für Buchungen",
-    "available": "Verfügbar",
-    "occupied": "Besetzt",
-    "reserveSpecificTime": "Um eine bestimmte Zeit zu buchen, verwenden Sie das Reservierungsformular",
-    "morning": "Vormittag (09:30-15:00)",
-    "afternoon": "Nachmittag (15:30-21:30)",
-    "places": "Plätze",
-    "autoUpdated": "Daten automatisch aktualisiert",
-    "lastUpdate": "Letzte Aktualisierung",
-    "noSlotsAvailable": "Keine Slots verfügbar für {{period}}",
-    "allSlotsBooked": "Alle Slots für {{period}} sind bereits gebucht oder blockiert",
-    "contactUs": "Prüfen Sie andere Tage oder kontaktieren Sie uns"
+  "locationPermission": {
+    "grantAccess": "Mich lokalisieren",
+    "locating": "Lokalisierung...",
+    "permissionDenied": "Berechtigung Verweigert",
+    "located": "Lokalisiert!",
+    "permissionNeeded": "Standortberechtigung erforderlich",
+    "permissionDescription": "Um **Ihre Position** auf der Karte anzuzeigen und die **Entfernung zum TukTuk** zu berechnen, benötigen wir Ihre Standortberechtigung.",
+    "clickForHelp": "Klicken Sie für Hilfe",
+    "helpInstructions": {
+      "android": {
+        "title": "Standort auf Android zulassen",
+        "steps": [
+          "Tippen Sie oben rechts in Chrome auf die **drei Punkte** (⋮)",
+          "Wählen Sie **\"Einstellungen\"**",
+          "Tippen Sie auf **\"Website-Einstellungen\"**",
+          "Tippen Sie auf **\"Standort\"**",
+          "Suchen Sie diese Seite in der Liste und ändern Sie auf **\"Zulassen\"**",
+          "Gehen Sie zurück zur Seite und **aktualisieren** Sie sie"
+        ]
+      },
+      "ios": {
+        "title": "Standort auf iPhone/iPad zulassen",
+        "steps": [
+          "Tippen Sie auf das **\"AA\"**-Symbol in der Adressleiste",
+          "Wählen Sie **\"Website Einstellungen\"**",
+          "Tippen Sie auf **\"Standort\"**",
+          "Ändern Sie auf **\"Zulassen\"**",
+          "Gehen Sie zurück zur Seite und **aktualisieren** Sie sie"
+        ]
+      },
+      "desktop": {
+        "title": "Standort im Browser zulassen",
+        "steps": [
+          "Suchen Sie das **📍**-Symbol in der Adressleiste",
+          "Klicken Sie darauf und wählen Sie **\"Zulassen\"**",
+          "Falls es nicht erscheint, prüfen Sie die **Browser-Einstellungen**",
+          "Suchen Sie nach **\"Berechtigungen\"** oder **\"Website-Einstellungen\"**",
+          "**Aktivieren** Sie die Standortberechtigung für diese Seite"
+        ]
+      }
+    },
+    "statusMessages": {
+      "unsupported": "Geolokalisierung wird in diesem Browser nicht unterstützt",
+      "obtaining": "Ihr Standort wird ermittelt...",
+      "error": "Fehler:",
+      "denied": "Berechtigung verweigert - Klicken Sie für Hilfe",
+      "success": "Standort erfolgreich ermittelt!",
+      "clickToDiscover": "Klicken Sie, um Ihren Standort zu sehen"
+    },
+    "helpModal": {
+      "understood": "Verstanden, danke!",
+      "completeGuide": "Komplette Anleitung anzeigen",
+      "lookForIcons": "Wo die Symbole zu finden sind:",
+      "visualNote": "**🔍 Suchen Sie diese Symbole** in der Adressleiste Ihres Browsers"
+    }
   },
-  "testimonials": {
-    "title": "Was unsere",
-    "titleHighlight": "Kunden sagen",
-    "rating": "5.0 (200+ Bewertungen)"
+  "distanceCalculator": {
+    "waitingLocation": "Warten auf Standort...",
+    "distance": "Entfernung:",
+    "estimatedTime": "Geschätzte Zeit:",
+    "averageSpeed": "Durchschnittsgeschwindigkeit: {{speed}} km/h",
+    "meters": "Meter",
+    "kilometers": "km",
+    "minutes": "Min",
+    "hours": "Std"
   },
-  "faq": {
-    "title": "Häufig gestellte",
-    "titleHighlight": "Fragen",
-    "subtitle": "Wir klären Ihre Hauptfragen zu unseren Tuk-Tuk Touren",
-    "q1": "Wie viele Personen passen in ein Tuk-Tuk?",
-    "a1": "Das Tuk-Tuk kann 4 Personen plus den Fahrer befördern.",
-    "q2": "Funktionieren die Touren bei Regen?",
-    "a2": "Unsere Tuk-Tuks haben Abdeckungen, aber bei starkem Regen können wir kostenlos umplanen.",
-    "q3": "Ist eine Vorabreservierung notwendig?",
-    "a3": "Wir empfehlen, mindestens 24 Stunden im Voraus zu buchen, besonders in der Hochsaison.",
-    "q4": "Gibt es Gruppenrabatte?",
-    "a4": "Ja, wir bieten spezielle Rabatte für Gruppen. Kontaktieren Sie uns für weitere Informationen.",
-    "q5": "Sind Tuk-Tuks sicher für Kinder?",
-    "a5": "Ja, alle unsere Tuk-Tuks sind mit Sicherheitsgurten ausgestattet und völlig sicher für Kinder."
+  "realTimeTracking": {
+    "title": "🗺️ Verfolgen Sie unseren TukTuk in Echtzeit!",
+    "description": "Sehen Sie, wo sich unser TukTuk gerade befindet und verfolgen Sie seine Position in Echtzeit",
+    "buttonText": "📍 TukTuk in Echtzeit anzeigen"
   },
   "cta": {
     "title": "Bereit für das",
@@ -248,64 +291,5 @@
   "aerialViewMilfontes": {
     "title": "Luftaufnahme von Milfontes",
     "description": "Luftaufnahme an einem Winternachmittag über Vila Nova de Milfontes, Alentejo - Portugal."
-<<<<<<< HEAD
-  },
-  "tracking": {
-    "title": "TukTuk in Echtzeit",
-    "subtitle": "Verfolgen Sie die Position unseres TukTuks in Vila Nova de Milfontes",
-    "currentLocation": "Aktuelle Position",
-    "howItWorks": "Wie es funktioniert",
-    "contact": "Kontakt",
-    "backToMainSite": "Zurück zur Hauptseite",
-    "loading": "TukTuk-Position wird geladen...",
-    "pleaseWait": "Bitte warten",
-    "mapCentering": "Karte zentrieren",
-    "makeReservation": "Machen Sie Hier Ihre Reservierung!",
-    "reservationDialog": "Reservierungsformular",
-    "tuktukAvailable": "TukTuk jetzt verfügbar!",
-    "tuktukBusy": "TukTuk Derzeit Besetzt",
-    "readyForAdventure": "Bereit, Sie auf ein Abenteuer mitzunehmen",
-    "busyUntil": "bis",
-    "availableAgainAt": "Wird wieder verfügbar sein um",
-    "instructions": {
-      "locateMe": "Klicken Sie auf \"Mich lokalisieren\", um Ihre Position auf der Karte zu sehen",
-      "tuktukIcon": "Das TukTuk-Symbol zeigt die aktuelle Position in Echtzeit",
-      "statusIndicator": "Der Status zeigt an, ob das TukTuk verfügbar oder besetzt ist",
-      "distanceCalculation": "Entfernung und geschätzte Zeit werden automatisch berechnet",
-      "makeReservation": "Verwenden Sie \"Machen Sie Hier Ihre Reservierung!\", um den Service zu buchen",
-      "centerMap": "\"Karte zentrieren\" passt die Ansicht für bessere Visualisierung an",
-      "offlineNote": "Wenn Sie das TukTuk nicht sehen, könnte es offline sein"
-    },
-    "contactInfo": {
-      "phone": "Telefon: 963 496 320",
-      "whatsapp": "WhatsApp: Auf der Hauptseite verfügbar",
-      "email": "Email: diogo.carias@outlook.pt"
-    }
-  },
-  "locationPermission": {
-    "grantAccess": "Mich lokalisieren",
-    "locating": "Lokalisierung...",
-    "permissionDenied": "Berechtigung Verweigert",
-    "located": "Lokalisiert!",
-    "permissionNeeded": "Standortberechtigung erforderlich",
-    "permissionDescription": "Um **Ihre Position** auf der Karte anzuzeigen und die **Entfernung zum TukTuk** zu berechnen, benötigen wir Ihre Standortberechtigung.",
-    "clickForHelp": "Klicken Sie für Hilfe"
-  },
-  "distanceCalculator": {
-    "waitingLocation": "Warten auf Standort...",
-    "distance": "Entfernung:",
-    "estimatedTime": "Geschätzte Zeit:",
-    "averageSpeed": "Durchschnittsgeschwindigkeit: {{speed}} km/h",
-    "meters": "Meter",
-    "kilometers": "km",
-    "minutes": "Min",
-    "hours": "Std"
-  },
-  "realTimeTracking": {
-    "title": "🛺 Verfolgen Sie unseren TukTuk in Echtzeit!",
-    "description": "Sehen Sie, wo sich unser TukTuk gerade befindet und verfolgen Sie seine Position in Echtzeit",
-    "buttonText": "📍 TukTuk in Echtzeit anzeigen"
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   }
 }

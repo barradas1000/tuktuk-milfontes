@@ -303,7 +303,6 @@
   "aerialViewMilfontes": {
     "title": "Aerial View of Milfontes",
     "description": "Aerial view on a winter afternoon over Vila Nova de Milfontes, Alentejo - Portugal."
-<<<<<<< HEAD
   },
   "tracking": {
     "title": "TukTuk in Real Time",
@@ -363,7 +362,7 @@
           "quick": [
             "Look for the **📍** icon in the address bar",
             "Or the **🔒** icon next to the address",
-            "Tap it and select **\"Allow\"\""
+            "Tap it and select **\"Allow\"**"
           ],
           "alternative": [
             "Tap the **address bar** to see more options",
@@ -382,7 +381,7 @@
         ],
         "alternative": [
           "Look for the **📍** icon in the address bar",
-          "Tap it and select **\"Allow\"\""
+          "Tap it and select **\"Allow\"**"
         ]
       },
       "desktop": {
@@ -422,10 +421,8 @@
     "hours": "h"
   },
   "realTimeTracking": {
-    "title": "🛺 Track our TukTuk in real time!",
+    "title": "🗺️ Track our TukTuk in real time!",
     "description": "See where our TukTuk is right now and follow its location in real time",
     "buttonText": "📍 View TukTuk in Real Time"
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   }
 }

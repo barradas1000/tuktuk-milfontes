@@ -5,7 +5,7 @@
     "description": "Verken Vila Nova de Milfontes en omgeving in een unieke tuk-tuk ervaring. Prachtige landschappen, geschiedenis en gegarandeerd plezier!",
     "descriptionHighlight": "Boek nu uw avontuur!",
     "reserveNow": "Nu Boeken",
-    "rating": "4.9/5 ⭐ (200+ beoordelingen)"
+    "rating": "4.9/5 ✰ (200+ beoordelingen)"
   },
   "benefits": {
     "title": "Waarom Kiezen voor",
@@ -72,39 +72,7 @@
   "testimonials": {
     "title": "Wat onze",
     "titleHighlight": "klanten zeggen",
-    "rating": "5.0 (200+ beoordelingen)",
-    "items": {
-      "0": {
-        "quote": "Beste ervaring van de reis! Mijn kinderen vonden het geweldig om de geheime stranden te ontdekken. De gids was fantastisch!",
-        "name": "Ana Silva",
-        "designation": "Lissabon"
-      },
-      "1": {
-        "quote": "Geweldige tour! De tuk-tuk is super comfortabel en de uitzichten zijn adembenemend. Ik beveel het 100% aan!",
-        "name": "João Santos",
-        "designation": "Porto"
-      },
-      "2": {
-        "quote": "Professionele en zeer leuke service. De kinderen stopten niet met glimlachen tijdens de hele tour!",
-        "name": "Maria Costa",
-        "designation": "Coimbra"
-      },
-      "3": {
-        "quote": "We ontdekten ongelooflijke plekken die we nooit alleen zouden hebben gevonden. Een onvergetelijke ervaring!",
-        "name": "Unieke Ervaring",
-        "designation": "Milfontes"
-      },
-      "4": {
-        "quote": "De tuk-tuks zijn modern en veilig. Het hele gezin had een geweldige tijd tijdens de tour!",
-        "name": "Gelukkig Gezin",
-        "designation": "Avontuur"
-      },
-      "5": {
-        "quote": "Zelfs bij speciale evenementen is de service onberispelijk. Plezier en vreugde op elk moment!",
-        "name": "Gegarandeerd Plezier",
-        "designation": "Carnaval"
-      }
-    }
+    "rating": "5.0 (200+ beoordelingen)"
   },
   "faq": {
     "title": "Veelgestelde",
@@ -170,7 +138,7 @@
     },
     "fishermen": {
       "title": "Vissers Route",
-      "description": "Leer over lokale visserstraditieses",
+      "description": "Leer over lokale visserstradities",
       "duration": "45 min",
       "price": "€10"
     }
@@ -230,6 +198,7 @@
       "pickup_reminder": "Hallo {{name}}, we herinneren u eraan dat uw tour gepland staat voor morgen, {{reservation_date}}, om {{reservation_time}}. Ontmoet ons in het centrum van Milfontes, naast de openbare tuin, 10 minuten voor de geplande tijd."
     },
     "simpleContactMessage": "Hallo, ik wil graag een reservering maken!",
+    "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}",
     "timeUnavailableWithSuggestion": "De gekozen tijd is al bezet door een andere tour. We stellen het volgende beschikbare tijdstip voor: {{next_available_time}}. Wilt u voor dit nieuwe tijdstip reserveren?",
     "acceptSuggestion": "Suggestie accepteren",
     "chooseAnotherTime": "Kies een andere tijd"
@@ -280,8 +249,6 @@
     "title": "Luchtfoto van Milfontes",
     "description": "Luchtfoto op een wintermiddag boven Vila Nova de Milfontes, Alentejo - Portugal."
   },
-<<<<<<< HEAD
-  "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}",
   "tracking": {
     "title": "TukTuk in Real-time",
     "subtitle": "Volg de locatie van onze TukTuk in Vila Nova de Milfontes",
@@ -325,28 +292,14 @@
     "helpInstructions": {
       "android": {
         "title": "Hoe locatie toestaan op Android",
-        "method1": "Volledige methode:",
-        "method2": "Snelle methode (makkelijker):",
-        "method3": "Als je de pictogrammen niet kunt vinden:",
-        "steps": {
-          "complete": [
-            "Tik op de **drie punten** (⋮) in de rechterbovenhoek van Chrome",
-            "Selecteer **\"Instellingen\"**",
-            "Tik op **\"Site-instellingen\"**",
-            "Tik op **\"Locatie\"**",
-            "Vind deze site in de lijst en verander naar **\"Toestaan\"**",
-            "Ga terug naar de site en **ververs de pagina**"
-          ],
-          "quick": [
-            "Zoek naar het **📍** pictogram in de adresbalk",
-            "Of het **🔒** pictogram naast het adres",
-            "Tik erop en selecteer **\"Toestaan\"\""
-          ],
-          "alternative": [
-            "Tik op de **adresbalk** om meer opties te zien",
-            "Zoek naar het **informatie** pictogram (ⓘ)"
-          ]
-        }
+        "steps": [
+          "Tik op de **drie punten** (⋮) in de rechterbovenhoek van Chrome",
+          "Selecteer **\"Instellingen\"**",
+          "Tik op **\"Site-instellingen\"**",
+          "Tik op **\"Locatie\"**",
+          "Vind deze site in de lijst en verander naar **\"Toestaan\"**",
+          "Ga terug naar de site en **ververs de pagina**"
+        ]
       },
       "ios": {
         "title": "Hoe locatie toestaan op iPhone/iPad",
@@ -356,10 +309,6 @@
           "Tik op **\"Locatie\"**",
           "Verander naar **\"Toestaan\"**",
           "Ga terug naar de site en **ververs de pagina**"
-        ],
-        "alternative": [
-          "Zoek naar het **📍** pictogram in de adresbalk",
-          "Tik erop en selecteer **\"Toestaan\"\""
         ]
       },
       "desktop": {
@@ -399,11 +348,8 @@
     "hours": "uur"
   },
   "realTimeTracking": {
-    "title": "🛺 Volg onze TukTuk in real-time!",
+    "title": "🗺️ Volg onze TukTuk in real-time!",
     "description": "Zie waar onze TukTuk nu is en volg zijn locatie in real-time",
     "buttonText": "📍 TukTuk in Real-time Bekijken"
   }
-=======
-  "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}"
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 }

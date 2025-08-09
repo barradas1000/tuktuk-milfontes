@@ -17,7 +17,6 @@ import {
   calculateStatistics,
   getAvailabilityForDate,
 } from "@/utils/reservationUtils";
-<<<<<<< HEAD
 // Importar novas funções da grid avançada
 import {
   generateDayAvailability,
@@ -26,8 +25,6 @@ import {
   type DayAvailability,
   type TimeSlot,
 } from "@/services/availabilityService";
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
 
 export const useAdminReservations = () => {
   const { toast } = useToast();
@@ -56,11 +53,6 @@ export const useAdminReservations = () => {
         console.log("Returning mock reservations for admin");
         return mockReservations;
       }
-<<<<<<< HEAD
-
-=======
-      
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
       try {
         return await fetchReservationsFromSupabase();
       } catch (error) {
@@ -82,11 +74,6 @@ export const useAdminReservations = () => {
         console.log("Mock update reservation:", { id, status });
         return { id, status };
       }
-<<<<<<< HEAD
-
-=======
-      
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
       return await updateReservationInSupabase(id, status);
     },
     onSuccess: (data, variables) => {
@@ -96,11 +83,12 @@ export const useAdminReservations = () => {
         description: `Status alterado para: ${variables.status}`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error("Error updating reservation:", error);
       toast({
         title: "Erro ao atualizar reserva",
-        description: error.message || "Tente novamente mais tarde",
+        description:
+          error instanceof Error ? error.message : "Tente novamente mais tarde",
         variant: "destructive",
       });
     },
@@ -135,11 +123,12 @@ export const useAdminReservations = () => {
         description: `Valor manual atualizado para €${variables.manualPayment}`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error("Error updating manual payment:", error);
       toast({
         title: "Erro ao atualizar pagamento",
-        description: error.message || "Tente novamente mais tarde",
+        description:
+          error instanceof Error ? error.message : "Tente novamente mais tarde",
         variant: "destructive",
       });
     },
@@ -157,8 +146,15 @@ export const useAdminReservations = () => {
 
   // Get availability for date - fixed the parameter order
   const getAvailabilityForDateWrapper = (date: string): AvailabilitySlot[] => {
-    const dateReservations = getReservationsByDate(date);
-    return getAvailabilityForDate(reservations, date);
+    const slots = getAvailabilityForDate(reservations, date);
+    // Mapear para o tipo esperado em types/adminReservations
+    return slots.map((s) => ({
+      date: s.date,
+      time: s.time,
+      available: s.status === "available",
+      capacity: s.capacity,
+      reserved: s.reserved,
+    }));
   };
 
   return {
@@ -177,12 +173,9 @@ export const useAdminReservations = () => {
     getAvailabilityForDate: getAvailabilityForDateWrapper,
     isUsingMockData,
     isSupabaseConfigured: !isUsingMockData, // For compatibility
-<<<<<<< HEAD
     // Novas funções da grid avançada
     generateDayAvailability,
     generateWeeklyAvailability,
     canScheduleTour,
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   };
 };

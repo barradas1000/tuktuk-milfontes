@@ -304,7 +304,6 @@
   "aerialViewMilfontes": {
     "title": "Vista Aérea de Milfontes",
     "description": "Vista aérea numa tarde de Inverno sobre Vila Nova de Milfontes, Alentejo - Portugal."
-<<<<<<< HEAD
   },
   "tracking": {
     "title": "TukTuk em Tempo Real",
@@ -426,7 +425,5 @@
     "title": "🛺 Acompanhe o nosso TukTuk em tempo real!",
     "description": "Veja onde está o nosso TukTuk neste momento e acompanhe a sua localização em tempo real",
     "buttonText": "📍 Ver TukTuk em Tempo Real"
-=======
->>>>>>> c8a33077bab7f709cdfa791e69ccd28f2ae30363
   }
 }
