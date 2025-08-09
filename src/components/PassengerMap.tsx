@@ -81,9 +81,19 @@ function MapController({
 }) {
   const map = useMap();
   useEffect(() => {
-    if (!userInteracted && conductorLocation) {
+    const valid =
+      !!conductorLocation &&
+      typeof conductorLocation.lat === "number" &&
+      typeof conductorLocation.lng === "number" &&
+      !isNaN(conductorLocation.lat) &&
+      !isNaN(conductorLocation.lng) &&
+      conductorLocation.lat >= -90 &&
+      conductorLocation.lat <= 90 &&
+      conductorLocation.lng >= -180 &&
+      conductorLocation.lng <= 180;
+    if (!userInteracted && valid) {
       map.setView(
-        [conductorLocation.lat, conductorLocation.lng],
+        [conductorLocation!.lat, conductorLocation!.lng],
         map.getZoom()
       );
     }
@@ -135,6 +145,7 @@ const PassengerMap: React.FC = () => {
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const draggable = useDraggable({ top: 16, right: 16 });
+  const userWatchIdRef = useRef<number | null>(null);
 
   // Função para validar coordenadas
   const isValidCoordinate = (
@@ -160,12 +171,38 @@ const PassengerMap: React.FC = () => {
     if (isValidCoordinate(lat, lng)) {
       setUserPosition({ lat, lng });
       setShowUserLocation(true);
+      // Iniciar atualização em tempo real da posição do utilizador
+      if (userWatchIdRef.current == null && navigator.geolocation) {
+        const id = navigator.geolocation.watchPosition(
+          (pos) => {
+            const ulat = pos.coords.latitude;
+            const ulng = pos.coords.longitude;
+            if (isValidCoordinate(ulat, ulng)) {
+              setUserPosition({ lat: ulat, lng: ulng });
+            }
+          },
+          (err) => {
+            console.warn("Geolocation watch error:", err);
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 1000,
+            timeout: 10000,
+          }
+        );
+        userWatchIdRef.current = id;
+      }
     }
   }, []);
 
   const handleLocationDenied = useCallback(() => {
     setShowUserLocation(false);
     setUserPosition(null);
+    // Parar watch se existir
+    if (userWatchIdRef.current) {
+      navigator.geolocation.clearWatch(userWatchIdRef.current);
+      userWatchIdRef.current = null;
+    }
   }, []);
 
   const handleMapReady = useCallback((map: L.Map) => {
@@ -221,6 +258,14 @@ const PassengerMap: React.FC = () => {
 
   // Carregar dados e subscrições
   useEffect(() => {
+    const envOk =
+      !!import.meta.env.VITE_SUPABASE_URL &&
+      !!import.meta.env.VITE_SUPABASE_ANON_KEY;
+    if (!envOk) {
+      // Ambiente sem Supabase: renderizar em modo seguro, sem subscrições
+      setLoading(false);
+      return;
+    }
     let conductorChannel: ReturnType<typeof supabase.channel> | null = null;
     let activeChannel: ReturnType<typeof supabase.channel> | null = null;
 
@@ -354,13 +399,34 @@ const PassengerMap: React.FC = () => {
     };
 
     load();
-    subscribe();
+    try {
+      subscribe();
+    } catch (e) {
+      console.warn("Realtime subscribe failed:", e);
+    }
 
     return () => {
       if (conductorChannel) supabase.removeChannel(conductorChannel);
       if (activeChannel) supabase.removeChannel(activeChannel);
     };
   }, []);
+
+  // Limpeza do watch ao desmontar ou quando a localização do utilizador for ocultada
+  useEffect(() => {
+    return () => {
+      if (userWatchIdRef.current) {
+        navigator.geolocation.clearWatch(userWatchIdRef.current);
+        userWatchIdRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!showUserLocation && userWatchIdRef.current) {
+      navigator.geolocation.clearWatch(userWatchIdRef.current);
+      userWatchIdRef.current = null;
+    }
+  }, [showUserLocation]);
 
   // Detecta interação manual do usuário com o mapa
   useEffect(() => {

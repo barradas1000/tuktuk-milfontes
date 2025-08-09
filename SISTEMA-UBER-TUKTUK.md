@@ -1,179 +1,198 @@
-# Sistema estilo Uber para 1 TukTuk
+# Sistema estilo Uber – Estado atual do Tracking (/tracking)
 
-## 📌 Objetivo
+Este documento descreve a implementação atual do sistema de tracking visível na página `/tracking`, incluindo componentes, integrações, comportamento em tempo real, dependências e pontos críticos para manutenção/rollback.
 
-Desenvolver uma aplicação web em React que:
+## Visão geral
 
-- Mostre um único TukTuk em tempo real no mapa (OpenStreetMap + Leaflet).
-- Use Supabase como backend (autenticação + banco + API em tempo real).
-- Tenha 2 perfis: Usuário passageiro e Condutor (Admin).
-- O Condutor controla se sua localização está ativa ou inativa com um botão LIGA/DESLIGA.
+- Único TukTuk exposto ao público. Quando online, é mostrado em um mapa OpenStreetMap via react-leaflet.
+- Estado e posição vêm do Supabase: tabelas `conductors` (posição e ativação) e `active_conductors` (disponibilidade/ocupação).
+- Página de passageiro (`/tracking`) consome em tempo real via Supabase Realtime e renderiza o mapa, status e ações.
+- Admin controla o rastreio no painel via botão Ligar/Desligar que ativa o envio contínuo de geolocalização para o Supabase.
 
----
+## Rotas e páginas
 
-## ⚙️ Funcionalidades
+- `src/App.tsx`
+  - Rota: `<Route path="/tracking" element={<PassengerView />} />`
+- `src/pages/PassengerView.tsx`
+  - Page-shell com título, cards informativos e o componente principal `PassengerMap`.
 
-### 1. Mapa (Frontend)
+## Componentes da página /tracking
 
-- Exibir OpenStreetMap com react-leaflet.
-- Mostrar localização atual do TukTuk (pegando coordenadas do Supabase em tempo real).
-- Para o passageiro: ponto fixo do TukTuk se ele estiver ativo.
-- Para o condutor: botão para publicar/pausar envio da sua localização.
+1. `src/components/PassengerMap.tsx`
 
-### 2. Backend (Supabase)
+   - Mapa: `MapContainer`, `TileLayer` (OSM), marcador do TukTuk com ícone customizado, e marcador do utilizador opcional.
+   - Estado em tempo real:
+     - Lê `conductors` ativos (is_active = true) para posição/nome.
+     - Enriquecimento com `active_conductors` para status: `available` ou `busy` e `occupied_until`.
+     - Subscrições:
+       - Canal 1: `postgres_changes` UPDATE em `conductors` para alterações de posição/ativação.
+       - Canal 2: `postgres_changes` para `active_conductors` (qualquer evento) para alterações de disponibilidade/occupied_until.
+   - UX complementares:
+     - Card arrastável com `DistanceCalculator` quando há posição do utilizador e do TukTuk; caso contrário, `LocationPermissionButton` para pedir permissão.
+     - Botão “Centrar mapa” (redefine userInteracted para recenter automático no TukTuk).
+     - Botão “Fazer reserva” abre `ReservationForm` em `Dialog`.
+     - Banner de estado do TukTuk: Disponível/Indisponível e quando volta (se `occupied_until` no futuro).
+     - `LocationDebug` no modo DEV.
+   - Salvaguardas:
+     - Validação estrita de coordenadas antes de renderizar marcadores.
+     - Vista inicial: Milfontes `[37.725, -8.783]`, zoom 14.
 
-- **Tabela `drivers`**
-  - `id` (UUID)
-  - `name` (string)
-  - `is_active` (boolean)
-  - `latitude` (float)
-  - `longitude` (float)
-  - `updated_at` (timestamp)
-- **Autenticação Supabase Auth**
-  - Condutor faz login como Admin.
-  - Passageiro faz login anônimo ou apenas leitura.
-- **Regras RLS (Row Level Security)**
-  - Condutor só atualiza sua própria linha.
-  - Passageiros só podem ler a localização do driver.
-- **Realtime (Supabase Realtime)**
-  - Frontend escuta atualizações da tabela drivers para atualizar o mapa em tempo real.
+2. `src/components/ToggleTrackingButton.tsx`
 
-### 3. Botão LIGA/DESLIGA (Admin)
+   - Uso no Admin (ex.: `AdminCalendar.tsx`) para Ligar/Desligar o tracking de um `conductorId`.
+   - Ligar:
+     - Marca `conductors.is_active = true` e inicia `navigator.geolocation.watchPosition`.
+     - A cada update, faz `update` de `latitude`, `longitude`, `updated_at` na linha do condutor.
+   - Desligar:
+     - Para o watch e faz `update { is_active: false }`.
+   - UI: estado de carregamento, rótulos e feedback “enviando localização”.
 
-- Admin tem interface com:
-  - Botão LIGAR rastreamento: ativa `is_active = true` e começa a enviar localização periodicamente usando `navigator.geolocation`.
-  - Botão DESLIGAR rastreamento: atualiza `is_active = false` e para envio de localização.
-- Quando `is_active = false`:
-  - Passageiro vê o TukTuk offline (pode exibir null ou ícone cinza).
+3. `src/components/UserLocationMarker.tsx`
 
-### 4. Fluxo de localização
+   - Adiciona/remover dinamicamente um `L.marker` com ícone próprio para a posição do utilizador, com popup (coords e precisão).
 
-- Condutor faz login.
-- Aperta LIGAR.
-- App inicia `navigator.geolocation.watchPosition()`.
-- Atualiza Supabase com nova latitude e longitude a cada X segundos.
-- Passageiro conectado ao mapa recebe updates via Supabase Realtime.
+4. `src/components/LocationPermissionButton.tsx`
 
----
+   - Abstrai a gestão de permissões de geolocalização com `useGeolocation`.
+   - Mostra botão/estado e guia de ajuda para Android/iOS/Desktop quando a permissão é negada/indisponível.
 
-## 🗂️ Sugestão de estrutura
+5. `src/components/DistanceCalculator.tsx`
 
-```
-/src
-  /components
-    DriverMap.tsx
-    PassengerMap.tsx
-    ToggleTrackingButton.tsx
-  /pages
-    Admin.tsx
-    Home.tsx
-  /supabase
-    client.ts
-```
+   - Calcula distância e tempo estimado entre utilizador e TukTuk (`utils/locationUtils`).
+   - Realça quando o TukTuk está a ≤ 100 m e pode disparar Notification API (se permitido).
 
----
+6. Outros relacionados
+   - `src/components/MilfontesLeafletMap.tsx`: mapa informativo usado na landing (Index) e não no tracking, mas compartilha fixes de ícones/OSM.
+   - `src/components/admin/AdminCalendar.tsx`: usa `ToggleTrackingButton` para o condutor selecionado.
 
-## 🧩 Exemplos de trechos importantes
+## Backend (Supabase) – Tabelas relevantes
 
-### Exemplo de envio de localização (Admin)
+- `public.conductors`
 
-```js
-import { supabase } from "../supabase";
+  - Campos utilizados: `id: uuid`, `is_active: boolean`, `latitude: float8`, `longitude: float8`, `name: text`, `updated_at: timestamptz`.
+  - Semântica: quando `is_active = true`, o TukTuk é elegível para aparecer no mapa de passageiros. Posição atualizada via Admin.
 
-let watchId;
+- `public.active_conductors`
 
-function startTracking(driverId) {
-  watchId = navigator.geolocation.watchPosition(async (pos) => {
-    const { latitude, longitude } = pos.coords;
-    await supabase
-      .from("drivers")
-      .update({
-        latitude,
-        longitude,
-        updated_at: new Date(),
-      })
-      .eq("id", driverId);
-  });
-}
+  - Campos utilizados: `conductor_id: uuid`, `is_available: boolean`, `occupied_until: timestamptz | null`.
+  - Semântica: estado operacional para UX (banner verde/vermelho e "disponível novamente às"). Não controla o envio de posição.
 
-function stopTracking() {
-  navigator.geolocation.clearWatch(watchId);
-}
-```
+- Realtime
 
-### Exemplo do botão Liga/Desliga
+  - Canais criados com `supabase.channel(name).on('postgres_changes', ...)` para ambas as tabelas.
+  - A página `/tracking` reage e atualiza o UI sem refresh.
 
-```jsx
-<button onClick={() => {
-  startTracking(driverId);
-  supabase.from('drivers').update({ is_active: true }).eq('id', driverId);
-}}>LIGAR</button>
+- Auth e RLS (expectativas)
+  - O Admin deve ter permissão de UPDATE na linha do seu `conductor`.
+  - Leitura pública dos campos mínimos necessários para `/tracking` (ou via key pública + RLS read-only). Garanta que dados sensíveis não são expostos.
 
-<button onClick={() => {
-  stopTracking();
-  supabase.from('drivers').update({ is_active: false }).eq('id', driverId);
-}}>DESLIGAR</button>
-```
+## Fluxos principais
 
-### Exemplo de mapa consumindo localização
+- Passageiro (/tracking)
 
-```jsx
-import { useEffect, useState } from "react";
-import { supabase } from "../supabase";
+  - Entra na página → carrega condutores ativos e subscreve realtime.
+  - Pode conceder localização → aparece marcador do utilizador e o card de distância.
+  - Vê estado Disponível/Ocupado e horário de retorno, se definido.
+  - Pode recentrar o mapa no TukTuk.
 
-function PassengerMap() {
-  const [location, setLocation] = useState(null);
+- Admin
+  - No painel, clica Ligar → `conductors.is_active = true` + inicia watchPosition e updates de `latitude/longitude`.
+  - Clica Desligar → para watch e `is_active = false`.
 
-  useEffect(() => {
-    const channel = supabase
-      .channel("drivers")
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "drivers" },
-        (payload) => {
-          setLocation({
-            lat: payload.new.latitude,
-            lng: payload.new.longitude,
-            isActive: payload.new.is_active,
-          });
-        }
-      )
-      .subscribe();
+## Dependências e integrações
 
-    // Carregar inicial
-    const fetchDriver = async () => {
-      const { data } = await supabase.from("drivers").select("*").single();
-      setLocation({
-        lat: data.latitude,
-        lng: data.longitude,
-        isActive: data.is_active,
-      });
-    };
+- Mapas: `react-leaflet` v4 e `leaflet` (CSS importado em componentes de mapa).
+- UI: shadcn/ui (Dialog, Button, Card), Tailwind.
+- Tradução: i18next (chaves `tracking.*`, `locationPermission.*`).
+- Supabase JS: client em `src/lib/supabase` (URL/anon key via `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`).
 
-    fetchDriver();
+## Pontos críticos e práticas de segurança
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+- Variáveis de ambiente
 
-  return (
-    <MapContainer center={[0, 0]} zoom={13} style={{ height: "400px" }}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-      {location?.isActive && (
-        <Marker position={[location.lat, location.lng]}>
-          <Popup>TukTuk disponível</Popup>
-        </Marker>
-      )}
-    </MapContainer>
-  );
-}
-```
+  - Necessário: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` no ambiente de build (local e Vercel). Sem eles, `/tracking` entra em modo seguro (lista vazia e sem subscrições).
 
----
+- Ícones do Leaflet
 
-## ✅ Resultado final
+  - Corrigidos manualmente importando `marker-icon.png` e `marker-shadow.png` e configurando `L.Marker.prototype.options.icon` em mapas. Não remover esses imports.
 
-- 1 TukTuk ativo ou não no mapa.
-- Motorista controla se está visível.
-- Passageiro vê em tempo real a posição se o motorista estiver online.
+- Validação de coordenadas
+
+  - O UI só renderiza marcadores quando `lat/lng` são números válidos e dentro de [-90..90], [-180..180]. Previna dados inválidos no Supabase.
+
+- Realtime
+
+  - Os nomes dos canais são livres; se alterados, atualize em `PassengerMap.tsx`.
+  - Certifique RLS para não permitir UPDATE por usuários anónimos.
+
+- Permissões de geolocalização
+
+  - `LocationPermissionButton` e `useGeolocation` exibem ajuda quando negado. Em iOS/Android, instruções específicas. Não remova sem substituir UX equivalente.
+
+- Notificações
+
+  - `DistanceCalculator` pode usar Notification API. Use com cautela e sob permissão do utilizador.
+
+- Unificação de termos
+  - O projeto usa `conductors`/`active_conductors` (não `drivers`). Manter consistência em schema, código e docs.
+
+## Rollback e checkpoints (como voltar a este estado)
+
+- Código fonte
+
+  - Branch: `main` no repositório barradas1000/tuktuk-milfontes.
+  - Arquivos chaves deste tracking:
+    - `src/pages/PassengerView.tsx`
+    - `src/components/PassengerMap.tsx`
+    - `src/components/ToggleTrackingButton.tsx`
+    - `src/components/UserLocationMarker.tsx`
+    - `src/components/LocationPermissionButton.tsx`
+    - `src/components/DistanceCalculator.tsx`
+    - `src/utils/locationUtils.ts`
+    - `src/lib/supabase.ts`
+  - Build: Vite com `manualChunks` e `chunkSizeWarningLimit` configurados em `vite.config.ts`.
+
+- Base de dados Supabase
+
+  - Tabelas mínimas: `conductors`, `active_conductors` com colunas listadas acima.
+  - Realtime ativo para ambas. Confirmar em Database → Replication → WALRUS/Realtime.
+  - Policies RLS: leitura pública segura para `/tracking`; updates restritos ao Admin.
+
+- Ambiente
+
+  - Vercel: projeto ligado ao repo, variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` definidas.
+  - Local: `.env.local` com as mesmas chaves.
+
+- Teste rápido de sanidade
+  - Admin: clique em Ligar no painel; ver se posição começa a atualizar no Supabase.
+  - Passageiro: abrir `/tracking`, ver TukTuk no mapa; conceder localização e ver card de distância.
+  - Alterar `active_conductors.is_available` e `occupied_until` para testar banners de estado.
+
+## Possíveis problemas e mitigação
+
+- TukTuk não aparece no mapa
+
+  - Verifique `conductors.is_active = true` e `latitude/longitude` válidos.
+  - Confirmar variáveis de ambiente e conectividade Supabase no cliente.
+
+- Realtime não atualiza
+
+  - Checar permissões RLS; confirmar que o projeto tem Realtime ativo nas tabelas.
+  - Revisar canais/filters em `PassengerMap.tsx`.
+
+- Permissão de localização negada
+
+  - UX orienta a reativação nas definições; não bloqueia o mapa, apenas oculta o marcador do utilizador e o card de distância.
+
+- Bundle grande/lento
+
+  - Vite com `manualChunks` para `react`, `leaflet`, `@supabase`, `i18n` e limite de aviso ajustado. Evite imports dinâmicos desnecessários.
+
+- Dados inválidos no Supabase
+  - Há validações no UI, mas recomende-se constraints/checks no DB (por exemplo, range de coordenadas) e sanitização nos updates.
+
+## Anexos e referências
+
+- OSM/Leaflet: tiles `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`.
+- Ícone do TukTuk: `src/assets/tuktuk-icon.png`.
+- Posições iniciais (fallback) usadas: `[37.725, -8.783]` (Vila Nova de Milfontes).
