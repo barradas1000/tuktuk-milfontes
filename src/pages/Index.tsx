@@ -159,40 +159,37 @@ const Index = () => {
       {/* Hero Section */}
       <section
         id="hero"
-        className="relative h-screen-safe max-h-[95vh] flex flex-col justify-center items-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white overflow-y-auto"
+        className="relative min-h-screen w-screen flex flex-col justify-center items-center text-white overflow-y-auto"
+        style={{
+          backgroundImage: "url('https://tuktuk-milfontes.vercel.app/lovable-uploads/c772d42e-6be5-4512-b5cd-e797cb242fe4.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          minHeight: '100vh',
+          width: '100vw',
+        }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-800/60 to-transparent"></div>
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage:
-              "url('https://tuktuk-milfontes.vercel.app/lovable-uploads/c772d42e-6be5-4512-b5cd-e797cb242fe4.png')",
-          }}
-        ></div>
-
-        <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
+        {/* Removido o gradiente sobre a imagem para máxima visibilidade */}
+        <div className="relative z-10 text-center px-4 max-w-6xl mx-auto w-full flex flex-col items-center">
+          {/* Logo dentro da secção hero */}
+          <div className="w-24 h-24 md:w-32 md:h-32 mb-2 flex justify-center items-center mx-auto">
+            <img
+              alt="TukTuk Milfontes Logo"
+              className="w-full h-full object-contain rounded-full border-4 border-amber-400 shadow-xl bg-white/90 backdrop-blur-sm p-1"
+              src="https://tuktuk-milfontes.vercel.app/lovable-uploads/cf00ebfe-2e98-4eb0-bc91-d80954178a9f.png"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
           <div className="animate-fade-in">
-            {/* Logo Section */}
-            <div className="mb-4 sm:mb-8 flex justify-center">
-              <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full border-4 border-amber-400 shadow-2xl bg-white/90 backdrop-blur-sm p-2 hover:scale-105 transition-transform duration-300">
-                <img
-                  alt="TukTuk Milfontes Logo"
-                  className="w-full h-full object-contain rounded-full"
-                  src="https://tuktuk-milfontes.vercel.app/lovable-uploads/cf00ebfe-2e98-4eb0-bc91-d80954178a9f.png"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            </div>
-
-            <h1 className="font-bold text-2xl sm:text-3xl md:text-6xl lg:text-8xl text-white mb-4 sm:mb-6 leading-tight">
+            <h1 className="font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-3 sm:mb-5 leading-tight">
               {t("hero.title")}
               <br />
-              <span className="text-amber-400">{t("hero.subtitle")}</span>
-              <span className="text-6xl md:text-8xl ml-4">🛺✨</span>
+              <span className="text-amber-400 text-xl sm:text-2xl md:text-3xl lg:text-4xl">{t("hero.subtitle")}</span>
+              <span className="text-4xl md:text-6xl ml-2 align-middle">🛺✨</span>
             </h1>
 
-            <p className="text-lg md:text-2xl lg:text-3xl text-blue-100 mb-4 sm:mb-8 font-medium max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl lg:text-2xl text-blue-100 mb-5 sm:mb-10 font-medium max-w-3xl mx-auto leading-relaxed">
               {t("hero.description")}
               <span className="text-amber-300 font-semibold">
                 {" "}
