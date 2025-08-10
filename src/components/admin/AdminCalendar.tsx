@@ -14,7 +14,58 @@ import {
   Lock,
   Phone,
   Radio,
+  MapPin,
+  Loader2,
 } from "lucide-react";
+
+// Hook para gerir status de localização de todos os condutores ativos
+function useAllConductorsLocationStatus(conductors, activeConductors) {
+  const [statusMap, setStatusMap] = React.useState({});
+  React.useEffect(() => {
+    const watchers = {};
+    conductors.forEach((c) => {
+      if (activeConductors.includes(c.id)) {
+        setStatusMap((prev) => ({
+          ...prev,
+          [c.id]: { status: "yellow", error: null },
+        }));
+        if (navigator.geolocation) {
+          const watchId = navigator.geolocation.watchPosition(
+            () =>
+              setStatusMap((prev) => ({
+                ...prev,
+                [c.id]: { status: "green", error: null },
+              })),
+            () =>
+              setStatusMap((prev) => ({
+                ...prev,
+                [c.id]: { status: "red", error: "Erro ao obter localização" },
+              })),
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+          );
+          watchers[c.id] = watchId;
+        } else {
+          setStatusMap((prev) => ({
+            ...prev,
+            [c.id]: { status: "red", error: "Geolocalização não suportada" },
+          }));
+        }
+      } else {
+        setStatusMap((prev) => ({
+          ...prev,
+          [c.id]: { status: "red", error: null },
+        }));
+      }
+    });
+    return () => {
+      Object.values(watchers).forEach((watchId) => {
+        if (typeof watchId === "number")
+          navigator.geolocation.clearWatch(watchId);
+      });
+    };
+  }, [conductors, activeConductors]);
+  return statusMap;
+}
 
 // --- UI Components ---
 import { Calendar } from "@/components/ui/calendar"; // Seu componente de calendário UI
@@ -1235,44 +1286,73 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           Condutores Ativos
         </h2>
         <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-          {conductors.map((c) => (
-            <div
-              key={c.id}
-              className="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border border-gray-200"
-            >
-              <span className="font-semibold text-gray-800 min-w-[90px]">
-                {c.name}
-                <span className="ml-2 text-xs text-gray-500">
-                  ({c.whatsapp})
-                </span>
-              </span>
-              <Switch
-                checked={activeConductors.includes(c.id)}
-                onCheckedChange={(checked) => {
-                  const newActiveConductors = checked
-                    ? [...activeConductors, c.id]
-                    : activeConductors.filter((id) => id !== c.id);
-
-                  setActiveConductors(newActiveConductors);
-
-                  // Salvar no Supabase
-                  updateActiveConductors(newActiveConductors).catch((error) => {
-                    console.error("Error updating active conductors:", error);
-                  });
-                }}
-                id={`switch-${c.id}`}
-              />
-              <span
-                className={
-                  activeConductors.includes(c.id)
-                    ? "text-green-600 font-semibold"
-                    : "text-gray-400"
-                }
-              >
-                {activeConductors.includes(c.id) ? "Ativo" : "Inativo"}
-              </span>
-            </div>
-          ))}
+          {(() => {
+            const locationStatus = useAllConductorsLocationStatus(
+              conductors,
+              activeConductors
+            );
+            return conductors.map((c) => {
+              const isActive = activeConductors.includes(c.id);
+              const status = locationStatus[c.id]?.status || "red";
+              const error = locationStatus[c.id]?.error || null;
+              return (
+                <div
+                  key={c.id}
+                  className="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border border-gray-200"
+                >
+                  <span className="font-semibold text-gray-800 min-w-[90px] flex items-center gap-2">
+                    {c.name}
+                    {/* Ícone de status de localização */}
+                    {status === "green" && (
+                      <span title="Localização ativa">
+                        <MapPin className="w-5 h-5 text-green-500" />
+                      </span>
+                    )}
+                    {status === "yellow" && (
+                      <span title="A tentar obter localização">
+                        <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />
+                      </span>
+                    )}
+                    {status === "red" && (
+                      <span title={error || "Sem localização"}>
+                        <MapPin className="w-5 h-5 text-red-500" />
+                      </span>
+                    )}
+                    <span className="ml-2 text-xs text-gray-500">
+                      ({c.whatsapp})
+                    </span>
+                  </span>
+                  <Switch
+                    checked={isActive}
+                    onCheckedChange={(checked) => {
+                      const newActiveConductors = checked
+                        ? [...activeConductors, c.id]
+                        : activeConductors.filter((id) => id !== c.id);
+                      setActiveConductors(newActiveConductors);
+                      updateActiveConductors(newActiveConductors).catch(
+                        (error) => {
+                          console.error(
+                            "Error updating active conductors:",
+                            error
+                          );
+                        }
+                      );
+                    }}
+                    id={`switch-${c.id}`}
+                  />
+                  <span
+                    className={
+                      isActive
+                        ? "text-green-600 font-semibold"
+                        : "text-gray-400"
+                    }
+                  >
+                    {isActive ? "Ativo" : "Inativo"}
+                  </span>
+                </div>
+              );
+            });
+          })()}
         </div>
         {/* Exibir o WhatsApp responsável atual */}
         <div className="mt-4 text-base text-purple-900 font-semibold">
