@@ -9,8 +9,9 @@ import ToggleTrackingButton from "../components/ToggleTrackingButton";
 
 const DriverDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  const [driverId, setDriverId] = useState<string | null>(null);
+  type MinimalUser = { id: string; email: string | null } | null;
+  const [user, setUser] = useState<MinimalUser>(null);
+  const [conductorId, setConductorId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,23 +26,27 @@ const DriverDashboard: React.FC = () => {
         return;
       }
 
-      setUser(user);
+      setUser({ id: user.id, email: user.email ?? null });
 
-      // Buscar ou criar registo do condutor
+      // Buscar ou criar registo do condutor (tabela 'conductors')
       try {
-        const { data: existingDriver, error: fetchError } = await supabase
-          .from("drivers")
+        const { data: existingConductor, error: fetchError } = await supabase
+          .from("conductors")
           .select("*")
           .eq("id", user.id)
-          .single();
+          .maybeSingle();
 
-        if (fetchError && fetchError.code === "PGRST116") {
+        if (fetchError) {
+          console.error("Erro ao obter condutor:", fetchError);
+        }
+
+        if (!existingConductor) {
           // Condutor não existe, criar novo registo
-          const { data: newDriver, error: insertError } = await supabase
-            .from("drivers")
+          const { data: newConductor, error: insertError } = await supabase
+            .from("conductors")
             .insert({
               id: user.id,
-              name: user.email?.split("@")[0] || "Condutor",
+              name: user.email ? user.email.split("@")[0] : "Condutor",
               is_active: false,
               latitude: 37.725,
               longitude: -8.783,
@@ -54,9 +59,9 @@ const DriverDashboard: React.FC = () => {
             return;
           }
 
-          setDriverId(newDriver.id);
-        } else if (existingDriver) {
-          setDriverId(existingDriver.id);
+          setConductorId(newConductor.id);
+        } else {
+          setConductorId(existingConductor.id);
         }
       } catch (error) {
         console.error("Erro ao verificar condutor:", error);
@@ -133,8 +138,8 @@ const DriverDashboard: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {driverId ? (
-                  <ToggleTrackingButton driverId={driverId} />
+                {conductorId ? (
+                  <ToggleTrackingButton conductorId={conductorId} />
                 ) : (
                   <div className="text-center text-gray-500">
                     Carregando controlos...

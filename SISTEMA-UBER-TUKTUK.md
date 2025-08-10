@@ -9,6 +9,41 @@ Este documento descreve a implementação atual do sistema de tracking visível 
 - Página de passageiro (`/tracking`) consome em tempo real via Supabase Realtime e renderiza o mapa, status e ações.
 - Admin controla o rastreio no painel via botão Ligar/Desligar que ativa o envio contínuo de geolocalização para o Supabase.
 
+## Snapshot do Passageiro (estado funcional atual)
+
+Objetivo: congelar a configuração que já funciona no terreno para o marcador do passageiro se mover em tempo real sem refresh.
+
+- Origem dos dados: geolocalização do próprio dispositivo (browser), via `navigator.geolocation.watchPosition`.
+- Atualização do UI: estado local do React (ex.: `passengerPosition`) atualiza o `Marker` no mapa a cada leitura.
+- Sem dependência de Supabase para o marcador do passageiro (funciona offline, exceto o mapa/tile).
+- Requisitos: HTTPS em telemóvel; permissão de localização concedida.
+
+Ficheiros essenciais (lado Passageiro):
+- `src/components/PassengerMap.tsx` — inicia `watchPosition`, guarda `{ lat, lng }` em estado e move o marcador; render do mapa e controlos.
+- `src/components/UserLocationMarker.tsx` — gestão do `Marker` (ícone, popup) para a posição do utilizador.
+- `src/components/LocationPermissionButton.tsx` — pedido/gestão de permissões de localização com UX de ajuda.
+- `src/utils/locationUtils.ts` — utilitários (ex.: cálculo de distância) usados por componentes do tracking.
+
+Configuração recomendada do `watchPosition` (conceito):
+- `enableHighAccuracy: true`, `maximumAge: ~2000ms`, `timeout: ~10000ms`.
+- Cleanup no unmount com `navigator.geolocation.clearWatch`.
+
+Pontos críticos de prevenção (não alterar):
+- Não substituir `watchPosition` por `getCurrentPosition` para o passageiro.
+- Não mover a posição do passageiro para Supabase/Realtime; manter local ao dispositivo.
+- Não remover o cleanup (`clearWatch`) no unmount do componente.
+- Não aplicar throttling agressivo que cause saltos grandes no marcador.
+- Não remover o fluxo de permissões/ajuda (`LocationPermissionButton`) sem equivalente.
+
+Teste rápido:
+- Abrir `/tracking` em produção (HTTPS) num telemóvel; permitir localização; andar alguns metros — o marcador deve mover sem refresh.
+
+Rollback rápido (apenas lado Passageiro):
+- Restaurar o `PassengerMap.tsx` para o último estado bom:
+  - `git restore --source=HEAD -- src/components/PassengerMap.tsx`
+- Opcional: criar tag de checkpoint após validar no terreno:
+  - `git tag passenger-ok-<AAAAmmdd-HHmm>` e `git push origin passenger-ok-<AAAAmmdd-HHmm>`
+
 ## Rotas e páginas
 
 - `src/App.tsx`
