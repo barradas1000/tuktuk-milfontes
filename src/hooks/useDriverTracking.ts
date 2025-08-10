@@ -26,7 +26,7 @@ export function useDriverTracking(
 ) {
   const {
     minIntervalMs = 3000,
-    minDeltaMeters = 8,
+    minDeltaMeters = 2,
     highAccuracy = true,
   } = opts;
 

@@ -391,6 +391,10 @@ const PassengerMap: React.FC = () => {
           "postgres_changes",
           { event: "UPDATE", schema: "public", table: "conductors" },
           async (payload: RealtimePostgresChangesPayload<ConductorRow>) => {
+            console.log(
+              "[PassengerMap] Realtime UPDATE on conductors:",
+              payload
+            );
             if (!payload.new || typeof payload.new !== "object") return;
             const newData = payload.new as ConductorRow;
             if (!newData?.is_active) {
@@ -431,6 +435,10 @@ const PassengerMap: React.FC = () => {
           async (
             payload: RealtimePostgresChangesPayload<ActiveConductorRow>
           ) => {
+            console.log(
+              "[PassengerMap] Realtime event on active_conductors:",
+              payload
+            );
             if (!payload.new || typeof payload.new !== "object") return;
             const newData = payload.new as ActiveConductorRow;
             if (!newData?.conductor_id) return;
@@ -516,7 +524,7 @@ const PassengerMap: React.FC = () => {
 
   return (
     <>
-  <div className="relative w-full max-h-[55vh] sm:max-h-[65vh] md:max-h-[75vh] lg:max-h-[78vh] h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[78vh] rounded-lg overflow-hidden shadow-lg">
+      <div className="relative w-full max-h-[55vh] sm:max-h-[65vh] md:max-h-[75vh] lg:max-h-[78vh] h-[55vh] sm:h-[65vh] md:h-[75vh] lg:h-[78vh] rounded-lg overflow-hidden shadow-lg">
         <MapContainer style={{ height: "100%", width: "100%" }}>
           <MapReady onReady={handleMapReady} />
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
