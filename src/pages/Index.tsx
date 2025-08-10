@@ -152,14 +152,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="h-screen-safe bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Language Selector */}
       <LanguageSelector />
 
       {/* Hero Section */}
       <section
         id="hero"
-        className="relative min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white"
+        className="relative h-screen-safe flex flex-col justify-center items-center bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 text-white"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-blue-800/60 to-transparent"></div>
         <div

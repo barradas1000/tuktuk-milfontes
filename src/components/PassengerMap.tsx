@@ -516,7 +516,7 @@ const PassengerMap: React.FC = () => {
 
   return (
     <>
-      <div className="relative w-full h-[65vh] sm:h-[70vh] md:h-[75vh] lg:h-[78vh] rounded-lg overflow-hidden shadow-lg">
+      <div className="relative w-full h-screen-safe sm:h-[70vh] md:h-[75vh] lg:h-[78vh] rounded-lg overflow-hidden shadow-lg">
         <MapContainer style={{ height: "100%", width: "100%" }}>
           <MapReady onReady={handleMapReady} />
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
