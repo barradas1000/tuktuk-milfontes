@@ -139,6 +139,11 @@ const PassengerMap: React.FC = () => {
   const [activeConductors, setActiveConductors] = useState<ConductorLocation[]>(
     []
   );
+
+  // Debug: log sempre que activeConductors muda
+  useEffect(() => {
+    console.log("[DEBUG] activeConductors atualizado:", activeConductors);
+  }, [activeConductors]);
   const [userInteracted, setUserInteracted] = useState(false);
   const [showUserLocation, setShowUserLocation] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -397,31 +402,69 @@ const PassengerMap: React.FC = () => {
             );
             if (!payload.new || typeof payload.new !== "object") return;
             const newData = payload.new as ConductorRow;
+            console.log(
+              "[DEBUG] Dados recebidos do Supabase (conductors):",
+              newData
+            );
             if (!newData?.is_active) {
-              setActiveConductors((prev) =>
-                prev.filter((c) => c.id !== newData.id)
-              );
+              setActiveConductors((prev) => {
+                const filtered = prev.filter((c) => c.id !== newData.id);
+                console.log(
+                  "[DEBUG] Removendo condutor inativo. Novo array:",
+                  filtered
+                );
+                return filtered;
+              });
               return;
             }
             const lat = newData.latitude ?? 37.725;
             const lng = newData.longitude ?? -8.783;
-            if (!isValidCoordinate(lat ?? undefined, lng ?? undefined)) return;
             const statusData = await fetchConductorStatusFromActiveTable(
               newData.id
             );
             setActiveConductors((prev) => {
               const others = prev.filter((c) => c.id !== newData.id);
-              return [
-                ...others,
-                {
-                  id: newData.id,
-                  lat: lat as number,
-                  lng: lng as number,
-                  name: newData.name ?? "TukTuk",
-                  status: statusData.status,
-                  occupiedUntil: statusData.occupiedUntil,
-                },
-              ];
+              let novoArray;
+              if (!isValidCoordinate(lat ?? undefined, lng ?? undefined)) {
+                console.warn(
+                  "[DEBUG] Coordenadas inválidas recebidas:",
+                  lat,
+                  lng
+                );
+                // Adiciona o condutor ativo sem posição
+                novoArray = [
+                  ...others,
+                  {
+                    id: newData.id,
+                    lat: null,
+                    lng: null,
+                    name: newData.name ?? "TukTuk",
+                    status: statusData.status,
+                    occupiedUntil: statusData.occupiedUntil,
+                  },
+                ];
+                console.log(
+                  "[DEBUG] Novo array de condutores após update (sem posição):",
+                  novoArray
+                );
+              } else {
+                novoArray = [
+                  ...others,
+                  {
+                    id: newData.id,
+                    lat: lat as number,
+                    lng: lng as number,
+                    name: newData.name ?? "TukTuk",
+                    status: statusData.status,
+                    occupiedUntil: statusData.occupiedUntil,
+                  },
+                ];
+                console.log(
+                  "[DEBUG] Novo array de condutores após update:",
+                  novoArray
+                );
+              }
+              return novoArray;
             });
           }
         )
@@ -536,6 +579,13 @@ const PassengerMap: React.FC = () => {
               activeConductors[0].lng
             ) && (
               <TukTukMarker
+                key={
+                  activeConductors[0].id +
+                  "-" +
+                  activeConductors[0].lat +
+                  "-" +
+                  activeConductors[0].lng
+                }
                 position={[activeConductors[0].lat, activeConductors[0].lng]}
               >
                 <Popup>

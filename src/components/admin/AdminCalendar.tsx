@@ -1139,13 +1139,13 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     loadDataForDate();
   }, [calendarDate]);
 
-  // --- Efeitos para carregar dados do Supabase ---
+  // --- Efeitos para carregar dados do Supabase e subscrever realtime ---
   useEffect(() => {
+    let conductorsChannel: any = null;
     const loadBlockedPeriods = async () => {
       try {
         setBlockedPeriodsLoading(true);
         const data = await fetchBlockedPeriods();
-        console.log("Blocked periods loaded:", data);
         setBlockedPeriods(data);
       } catch (error) {
         console.error("Error loading blocked periods:", error);
@@ -1159,8 +1159,6 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
         setConductorsLoading(true);
         const activeIds = await fetchActiveConductors();
         setActiveConductors(activeIds);
-
-        // Carregar dados dos condutores
         const conductorsData = await fetchConductors();
         if (conductorsData.length > 0) {
           setConductors(conductorsData);
@@ -1175,6 +1173,42 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
 
     loadBlockedPeriods();
     loadActiveConductors();
+
+    // Subscrição realtime para updates na tabela conductors
+    if (window?.supabase) {
+      // Se já existe supabase global, usar
+      conductorsChannel = window.supabase
+        .channel("conductors_realtime")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "conductors" },
+          async (payload) => {
+            // Sempre que qualquer condutor muda is_active, recarrega lista
+            const activeIds = await fetchActiveConductors();
+            setActiveConductors(activeIds);
+          }
+        )
+        .subscribe();
+    } else if (typeof supabase !== "undefined") {
+      // fallback: usar import local
+      conductorsChannel = supabase
+        .channel("conductors_realtime")
+        .on(
+          "postgres_changes",
+          { event: "UPDATE", schema: "public", table: "conductors" },
+          async (payload) => {
+            const activeIds = await fetchActiveConductors();
+            setActiveConductors(activeIds);
+          }
+        )
+        .subscribe();
+    }
+
+    return () => {
+      if (conductorsChannel && typeof supabase !== "undefined") {
+        supabase.removeChannel(conductorsChannel);
+      }
+    };
   }, []);
 
   // Gerar os próximos 10 dias para o slider
