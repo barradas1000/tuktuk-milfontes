@@ -129,13 +129,21 @@ const ToggleTrackingButton: React.FC<ToggleTrackingButtonProps> = ({
       );
 
       // 2. Atualizar/inserir na tabela active_conductors
+      if (!conductorId) {
+        console.error("[ToggleTrackingButton] conductorId está vazio no upsert de active_conductors!");
+        return;
+      }
       const { error: activeError } = await supabase
         .from("active_conductors")
         .upsert({
           conductor_id: conductorId,
           is_available: true,
+          is_active: true,
           updated_at: timestamp,
-        });
+          // Se quiser guardar localização, descomente as linhas abaixo e defina as variáveis latitude/longitude
+          // current_latitude: latitude,
+          // current_longitude: longitude,
+        }, { onConflict: 'conductor_id' });
 
       if (activeError) {
         console.error("Erro ao atualizar active_conductors:", activeError);

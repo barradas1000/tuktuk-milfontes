@@ -81,9 +81,8 @@ export const fetchTuktukStatus = async (
   try {
     const { data, error } = await supabase
       .from("active_conductors")
-      .select("is_available, occupied_until") // ✅ Corrigir: usar is_available em vez de status
+      .select("is_available, occupied_until")
       .eq("conductor_id", conductorId)
-      .eq("is_active", true)
       .single();
 
     if (error) {

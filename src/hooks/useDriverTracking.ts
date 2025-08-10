@@ -50,11 +50,19 @@ export function useDriverTracking(
     // Se desligar ou não tiver id, parar qualquer watch ativo
     if (!enabled || !conductorId) {
       if (watchIdRef.current !== null && navigator?.geolocation?.clearWatch) {
+        console.log(
+          `[useDriverTracking] Limpando watchPosition (ID: ${watchIdRef.current}). Causa: Tracking desativado ou ID do condutor ausente.`
+        );
         navigator.geolocation.clearWatch(watchIdRef.current);
         watchIdRef.current = null;
       }
       return;
     }
+
+    console.log(
+      "[useDriverTracking] Tentando iniciar watchPosition...",
+      { enabled, conductorId }
+    );
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
       setError("Geolocalização não suportada neste dispositivo/navegador.");
       return;
@@ -68,40 +76,39 @@ export function useDriverTracking(
 
     const onSuccess = async (pos: GeolocationPosition) => {
       const now = Date.now();
-      const last = lastPosRef.current;
-      if (now - lastSentRef.current < minIntervalMs) return;
-
-      if (last) {
-        const d = distMeters(
-          last.coords.latitude,
-          last.coords.longitude,
-          pos.coords.latitude,
-          pos.coords.longitude
-        );
-        if (d < minDeltaMeters) return; // ignora jitter
-      }
-
-      lastPosRef.current = pos;
-      lastSentRef.current = now;
-
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
 
-      // Atualiza a linha do condutor (ajuste nomes das colunas conforme seu schema)
+      // Sempre envia update, mesmo sem movimento mínimo
+      lastPosRef.current = pos;
+      lastSentRef.current = now;
+
+      console.log(
+        `[useDriverTracking] Enviando localização para o Supabase:`,
+        { latitude: lat, longitude: lng, conductorId }
+      );
+
       const { error: updErr } = await supabase
         .from("conductors")
         .update({
           latitude: lat,
           longitude: lng,
           is_active: true,
-          updated_at: new Date().toISOString(),
-          last_seen: new Date().toISOString(),
+          updated_at: new Date(now).toISOString(),
+          last_seen: new Date(now).toISOString(),
         })
         .eq("id", conductorId);
 
       if (updErr) {
+        console.error(
+          "[useDriverTracking] Erro ao atualizar Supabase:",
+          updErr
+        );
         setError(updErr.message);
       } else {
+        console.log(
+          "[useDriverTracking] Supabase atualizado com sucesso!"
+        );
         setError(null);
         setLastUpdateAt(now);
       }
