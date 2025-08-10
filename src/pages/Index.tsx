@@ -185,7 +185,7 @@ const Index = () => {
               </div>
             </div>
 
-            <h1 className="font-bold text-4xl md:text-7xl lg:text-8xl text-white mb-4 sm:mb-6 leading-tight">
+            <h1 className="font-bold text-2xl sm:text-3xl md:text-6xl lg:text-8xl text-white mb-4 sm:mb-6 leading-tight">
               {t("hero.title")}
               <br />
               <span className="text-amber-400">{t("hero.subtitle")}</span>
