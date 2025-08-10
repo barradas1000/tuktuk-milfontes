@@ -19,16 +19,19 @@ Objetivo: congelar a configuração que já funciona no terreno para o marcador 
 - Requisitos: HTTPS em telemóvel; permissão de localização concedida.
 
 Ficheiros essenciais (lado Passageiro):
+
 - `src/components/PassengerMap.tsx` — inicia `watchPosition`, guarda `{ lat, lng }` em estado e move o marcador; render do mapa e controlos.
 - `src/components/UserLocationMarker.tsx` — gestão do `Marker` (ícone, popup) para a posição do utilizador.
 - `src/components/LocationPermissionButton.tsx` — pedido/gestão de permissões de localização com UX de ajuda.
 - `src/utils/locationUtils.ts` — utilitários (ex.: cálculo de distância) usados por componentes do tracking.
 
 Configuração recomendada do `watchPosition` (conceito):
+
 - `enableHighAccuracy: true`, `maximumAge: ~2000ms`, `timeout: ~10000ms`.
 - Cleanup no unmount com `navigator.geolocation.clearWatch`.
 
 Pontos críticos de prevenção (não alterar):
+
 - Não substituir `watchPosition` por `getCurrentPosition` para o passageiro.
 - Não mover a posição do passageiro para Supabase/Realtime; manter local ao dispositivo.
 - Não remover o cleanup (`clearWatch`) no unmount do componente.
@@ -36,9 +39,11 @@ Pontos críticos de prevenção (não alterar):
 - Não remover o fluxo de permissões/ajuda (`LocationPermissionButton`) sem equivalente.
 
 Teste rápido:
+
 - Abrir `/tracking` em produção (HTTPS) num telemóvel; permitir localização; andar alguns metros — o marcador deve mover sem refresh.
 
 Rollback rápido (apenas lado Passageiro):
+
 - Restaurar o `PassengerMap.tsx` para o último estado bom:
   - `git restore --source=HEAD -- src/components/PassengerMap.tsx`
 - Opcional: criar tag de checkpoint após validar no terreno:

@@ -99,7 +99,26 @@
 
   body {
     @apply bg-background text-foreground;
+    min-height: 100dvh;
+    overflow-x: hidden;
   }
+}
+
+/* Mobile-friendly viewport height utility */
+:root {
+  --vh: 1vh;
+}
+
+@media (max-width: 768px) {
+  .h-screen-safe {
+    height: calc(var(--vh) * 100);
+  }
+}
+
+/* Imagens fluidas e iframes responsivos por defeito */
+img, svg, video, canvas, audio, iframe, embed, object {
+  max-width: 100%;
+  height: auto;
 }
 
 /* Garantir que o Dialog apareça sobre o mapa Leaflet */

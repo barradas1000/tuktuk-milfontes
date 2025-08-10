@@ -2,7 +2,7 @@
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, shrink-to-fit=no" />
     <title>tuktuk-milfontes</title>
     <meta
       name="description"
@@ -74,6 +74,16 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      // Fix 100vh em mobile: atualiza --vh com a altura real útil
+      const setVh = () => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+      };
+      setVh();
+      window.addEventListener('resize', setVh);
+      window.addEventListener('orientationchange', setVh);
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
