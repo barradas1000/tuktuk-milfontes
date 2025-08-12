@@ -122,6 +122,18 @@ import {
   generateDynamicTimeSlots,
 } from "@/utils/reservationUtils";
 import ToggleTrackingButton from "../ToggleTrackingButton";
+// Helper to force refresh activeConductors after toggle
+function useSyncActiveConductors(fetchActiveConductors, setActiveConductors) {
+  useEffect(() => {
+    function handleStatusChanged() {
+      fetchActiveConductors().then(setActiveConductors);
+    }
+    window.addEventListener("conductorStatusChanged", handleStatusChanged);
+    return () => {
+      window.removeEventListener("conductorStatusChanged", handleStatusChanged);
+    };
+  }, [fetchActiveConductors, setActiveConductors]);
+}
 
 // --- Helper Functions (pode ser movido para um arquivo separado, ex: utils/time.ts ou utils/format.ts) ---
 // Gera todos os horários de meia em meia hora das 08:00 às 23:00
@@ -238,6 +250,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
 
   // --- Estados para seleção de condutores ---
   const [activeConductors, setActiveConductors] = useState<string[]>([]);
+
+  // Keep activeConductors in sync when any ToggleTrackingButton fires a status change
+  useSyncActiveConductors(fetchActiveConductors, setActiveConductors);
   const [conductorsLoading, setConductorsLoading] = useState(true);
   const [conductors, setConductors] =
     useState<{ id: string; name: string; whatsapp?: string }[]>(
@@ -251,7 +266,10 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   );
 
   // Estado de status de localização dos condutores ativos
-  const locationStatus = useAllConductorsLocationStatus(conductors, activeConductors);
+  const locationStatus = useAllConductorsLocationStatus(
+    conductors,
+    activeConductors
+  );
   const [occupiedMinutes, setOccupiedMinutes] = useState(30);
   const [occupiedUntil, setOccupiedUntil] = useState<Date | null>(null);
 
@@ -1350,61 +1368,61 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
               const error = locationStatus[c.id]?.error || null;
               return (
                 <div
-                      key={c.id}
-                      className="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border border-gray-200"
-                    >
-                      <span className="font-semibold text-gray-800 min-w-[90px] flex items-center gap-2">
-                        {c.name}
-                        {/* Ícone de status de localização */}
-                        {status === "green" && (
-                          <span title="Localização ativa">
-                            <MapPin className="w-5 h-5 text-green-500" />
-                          </span>
-                        )}
-                        {status === "yellow" && (
-                          <span title="A tentar obter localização">
-                            <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />
-                          </span>
-                        )}
-                        {status === "red" && (
-                          <span title={error || "Sem localização"}>
-                            <MapPin className="w-5 h-5 text-red-500" />
-                          </span>
-                        )}
-                        <span className="ml-2 text-xs text-gray-500">
-                          ({c.whatsapp})
-                        </span>
+                  key={c.id}
+                  className="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border border-gray-200"
+                >
+                  <span className="font-semibold text-gray-800 min-w-[90px] flex items-center gap-2">
+                    {c.name}
+                    {/* Ícone de status de localização */}
+                    {status === "green" && (
+                      <span title="Localização ativa">
+                        <MapPin className="w-5 h-5 text-green-500" />
                       </span>
-                      <Switch
-                        checked={isActive}
-                        onCheckedChange={(checked) => {
-                          const newActiveConductors = checked
-                            ? [...activeConductors, c.id]
-                            : activeConductors.filter((id) => id !== c.id);
-                          setActiveConductors(newActiveConductors);
-                          updateActiveConductors(newActiveConductors).catch(
-                            (error) => {
-                              console.error(
-                                "Error updating active conductors:",
-                                error
-                              );
-                            }
+                    )}
+                    {status === "yellow" && (
+                      <span title="A tentar obter localização">
+                        <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />
+                      </span>
+                    )}
+                    {status === "red" && (
+                      <span title={error || "Sem localização"}>
+                        <MapPin className="w-5 h-5 text-red-500" />
+                      </span>
+                    )}
+                    <span className="ml-2 text-xs text-gray-500">
+                      ({c.whatsapp})
+                    </span>
+                  </span>
+                  <Switch
+                    checked={isActive}
+                    onCheckedChange={(checked) => {
+                      const newActiveConductors = checked
+                        ? [...activeConductors, c.id]
+                        : activeConductors.filter((id) => id !== c.id);
+                      setActiveConductors(newActiveConductors);
+                      updateActiveConductors(newActiveConductors).catch(
+                        (error) => {
+                          console.error(
+                            "Error updating active conductors:",
+                            error
                           );
-                        }}
-                        id={`switch-${c.id}`}
-                      />
-                      <span
-                        className={
-                          isActive
-                            ? "text-green-600 font-semibold"
-                            : "text-gray-400"
                         }
-                      >
-                        {isActive ? "Ativo" : "Inativo"}
-                      </span>
-                    </div>
-                  );
-                })}
+                      );
+                    }}
+                    id={`switch-${c.id}`}
+                  />
+                  <span
+                    className={
+                      isActive
+                        ? "text-green-600 font-semibold"
+                        : "text-gray-400"
+                    }
+                  >
+                    {isActive ? "Ativo" : "Inativo"}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           {/* Mensagem visual de localização em tempo real */}

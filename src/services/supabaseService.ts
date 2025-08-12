@@ -216,16 +216,47 @@ export const updateActiveConductors = async (
 
     // 2. Ativar condutores selecionados
     if (conductorIds.length > 0) {
+      // Garantir que status seja sempre um valor válido do enum
+      const VALID_STATUS = ["available", "busy"];
+      const statusValue = "available"; // Valor padrão seguro
+      if (!VALID_STATUS.includes(statusValue)) {
+        throw new Error(
+          `Status inválido para active_conductors: ${statusValue}`
+        );
+      }
       // Criar registros na tabela active_conductors
+
+      const DEFAULT_LAT = 37.725;
+      const DEFAULT_LNG = -8.783;
       const activeRecords = conductorIds.map((id) => ({
         conductor_id: id,
         is_active: true,
         is_available: true,
-        status: "available",
+        status: statusValue,
         session_start: new Date().toISOString(),
+        current_latitude: DEFAULT_LAT,
+        current_longitude: DEFAULT_LNG,
       }));
 
-      await supabase.from("active_conductors").insert(activeRecords);
+      // Log para depuração
+      console.log(
+        "[DEBUG][updateActiveConductors] Payload enviado para insert:",
+        JSON.stringify(activeRecords, null, 2)
+      );
+
+      const { error, data } = await supabase
+        .from("active_conductors")
+        .upsert(activeRecords, { onConflict: "conductor_id" });
+      if (error) {
+        console.error(
+          "[DEBUG][updateActiveConductors] Erro Supabase:",
+          error.message,
+          error.details,
+          error.hint
+        );
+        throw error;
+      }
+      return data;
     }
   } catch (error) {
     console.error("Error updating active sessions:", error);

@@ -396,157 +396,90 @@ const PassengerMap: React.FC = () => {
       }
     };
 
-    const subscribe = () => {
-      // Subscrição correta: apenas active_conductors
-      activeChannel = supabase
-        .channel("active_conductors_status")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "active_conductors" },
-          async (
-            payload: RealtimePostgresChangesPayload<ActiveConductorRow>
-          ) => {
-            console.log(
-              "[PassengerMap] Realtime event on active_conductors:",
-              payload
-            );
-            if (!payload.new || typeof payload.new !== "object") return;
-            const newData = payload.new as ActiveConductorRow;
-            if (!newData?.conductor_id) return;
-            setActiveConductors((prev) => {
-              const others = prev.filter((c) => c.id !== newData.conductor_id);
-              // Atualiza status e localização
-              const lat =
-                typeof newData.current_latitude === "number"
-                  ? newData.current_latitude
-                  : null;
-              const lng =
-                typeof newData.current_longitude === "number"
-                  ? newData.current_longitude
-                  : null;
-              const status: ConductorStatus = newData.is_available
-                ? "available"
-                : "busy";
-              const occupiedUntil = newData.occupied_until ?? null;
-              // Se não for válido, não adiciona
-              if (
-                lat === null ||
-                lng === null ||
-                !isValidCoordinate(lat, lng)
-              ) {
-                return others;
-              }
-              return [
-                ...others,
-                {
-                  id: newData.conductor_id,
-                  lat,
-                  lng,
-                  name: "TukTuk",
-                  status,
-                  occupiedUntil,
-                },
-              ];
-            });
+    // Subscrição realtime única e correta
+    activeChannel = supabase
+      .channel("active_conductors_realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "active_conductors" },
+        (payload) => {
+          console.log(
+            "[PassengerMap] Realtime event on active_conductors:",
+            payload
+          );
+
+          // Lida com a remoção de um condutor (quando a linha é apagada)
+          if (payload.eventType === "DELETE") {
+            const oldId = payload.old.conductor_id;
+            if (oldId) {
+              setActiveConductors((prev) => prev.filter((c) => c.id !== oldId));
+            }
+            return;
           }
-        )
-        .subscribe();
 
-      const subscribe = () => {
-      // Canal único que escuta todas as alterações em active_conductors
-      activeChannel = supabase
-        .channel("active_conductors_realtime")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "active_conductors" },
-          (payload) => {
-            console.log(
-              "[PassengerMap] Realtime event on active_conductors:",
-              payload
-            );
+          // Lida com INSERT e UPDATE
+          if (payload.new && typeof payload.new === "object") {
+            type ActiveConductorPayload = {
+              conductor_id: string;
+              is_active?: boolean;
+              is_available?: boolean;
+              occupied_until?: string | null;
+              current_latitude?: number | null;
+              current_longitude?: number | null;
+            };
 
-            // Lida com a remoção de um condutor (quando a linha é apagada)
-            if (payload.eventType === "DELETE") {
-              const oldId = payload.old.conductor_id;
-              if (oldId) {
-                setActiveConductors((prev) =>
-                  prev.filter((c) => c.id !== oldId)
-                );
-              }
+            const newData = payload.new as ActiveConductorPayload;
+
+            // Se o condutor ficar inativo, remove-o do mapa
+            if (newData.is_active === false) {
+              setActiveConductors((prev) =>
+                prev.filter((c) => c.id !== newData.conductor_id)
+              );
               return;
             }
 
-            // Lida com INSERT e UPDATE
-            if (payload.new && typeof payload.new === "object") {
-              type ActiveConductorPayload = {
-                conductor_id: string;
-                is_active?: boolean;
-                is_available?: boolean;
-                occupied_until?: string | null;
-                current_latitude?: number | null;
-                current_longitude?: number | null;
-              };
+            const lat = newData.current_latitude;
+            const lng = newData.current_longitude;
 
-              const newData = payload.new as ActiveConductorPayload;
-
-              // Se o condutor ficar inativo, remove-o do mapa
-              if (newData.is_active === false) {
-                setActiveConductors((prev) =>
-                  prev.filter((c) => c.id !== newData.conductor_id)
-                );
-                return;
-              }
-
-              const lat = newData.current_latitude;
-              const lng = newData.current_longitude;
-
-              // Se as coordenadas forem inválidas, não o adicione/atualize no mapa
-              if (!isValidCoordinate(lat, lng)) {
-                // Remove do mapa se já existia mas perdeu as coordenadas
-                setActiveConductors((prev) =>
-                  prev.filter((c) => c.id !== newData.conductor_id)
-                );
-                return;
-              }
-
-              const updatedConductor: ConductorLocation = {
-                id: newData.conductor_id,
-                lat: lat as number,
-                lng: lng as number,
-                name: "TukTuk", // O nome é estático, pode ser melhorado com um JOIN no load inicial
-                status: newData.is_available ? "available" : "busy",
-                occupiedUntil: newData.occupied_until ?? null,
-              };
-
-              // Atualiza ou adiciona o condutor na lista
-              setActiveConductors((prev) => {
-                const existingIdx = prev.findIndex(
-                  (c) => c.id === newData.conductor_id
-                );
-                if (existingIdx > -1) {
-                  const newState = [...prev];
-                  newState[existingIdx] = updatedConductor;
-                  return newState;
-                } else {
-                  return [...prev, updatedConductor];
-                }
-              });
+            // Se as coordenadas forem inválidas, não o adicione/atualize no mapa
+            if (!isValidCoordinate(lat, lng)) {
+              // Remove do mapa se já existia mas perdeu as coordenadas
+              setActiveConductors((prev) =>
+                prev.filter((c) => c.id !== newData.conductor_id)
+              );
+              return;
             }
+
+            const updatedConductor: ConductorLocation = {
+              id: newData.conductor_id,
+              lat: lat as number,
+              lng: lng as number,
+              name: "TukTuk", // O nome é estático, pode ser melhorado com um JOIN no load inicial
+              status: newData.is_available ? "available" : "busy",
+              occupiedUntil: newData.occupied_until ?? null,
+            };
+
+            // Atualiza ou adiciona o condutor na lista
+            setActiveConductors((prev) => {
+              const existingIdx = prev.findIndex(
+                (c) => c.id === newData.conductor_id
+              );
+              if (existingIdx > -1) {
+                const newState = [...prev];
+                newState[existingIdx] = updatedConductor;
+                return newState;
+              } else {
+                return [...prev, updatedConductor];
+              }
+            });
           }
-        )
-        .subscribe();
-    };
-    };
+        }
+      )
+      .subscribe();
 
     load();
-    try {
-      subscribe();
-    } catch (e) {
-      console.warn("Realtime subscribe failed:", e);
-    }
 
     return () => {
-      
       if (activeChannel) supabase.removeChannel(activeChannel);
       window.removeEventListener(
         "conductorStatusChanged",
