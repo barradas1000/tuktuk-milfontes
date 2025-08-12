@@ -451,7 +451,12 @@ const ReservationForm = () => {
                 onChange={(e) => handleInputChange("phone", e.target.value)}
                 required
                 className="border-2 border-blue-100 focus:border-amber-400"
+                placeholder="Ex: +351912345678"
               />
+              <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-1 rounded">
+                Inclua o indicativo do país (ex: +351 para Portugal) para
+                WhatsApp.
+              </span>
             </div>
 
             <div className="space-y-2">
