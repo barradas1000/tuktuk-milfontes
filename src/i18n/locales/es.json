@@ -2,13 +2,13 @@
   "hero": {
     "title": "Descubre Milfontes con Estilo",
     "subtitle": "Aventuras en Tuk-Tuk por la Costa Vicentina",
-    "description": "Explora Vila Nova de Milfontes y alrededores en una experiencia única en tuk-tuk. ¡Paisajes impresionantes, historia y diversión garantizada!",
-    "descriptionHighlight": "¡Reserve su aventura ahora!",
+    "description": "Explora Vila Nova de Milfontes y sus alrededores en una experiencia única en tuk-tuk. ¡Paisajes impresionantes, historia y diversión garantizada!",
+    "descriptionHighlight": "¡Reserva tu aventura ahora!",
     "reserveNow": "Reservar Ahora",
     "rating": "4.9/5 ⭐ (200+ reseñas)"
   },
   "benefits": {
-    "title": "¿Por qué Elegir",
+    "title": "Por Qué Elegir",
     "titleHighlight": "Nuestros Tuk-Tuks?",
     "subtitle": "Comodidad, diversión y experiencias únicas garantizadas para toda la familia",
     "exclusiveRoutes": {
@@ -25,6 +25,9 @@
     }
   },
   "pricing": {
+    "whatsappMessages": {
+      "phoneHint": "⚠️ Por favor, incluye el código de país internacional (por ejemplo, +34 para España, +351 para Portugal) en el número de WhatsApp para garantizar que la confirmación se envíe correctamente."
+    },
     "title": "Precios",
     "titleHighlight": "Transparentes",
     "subtitle": "Precios justos y claros, sin sorpresas. ¡Diversión garantizada para toda la familia!",
@@ -34,7 +37,7 @@
     "detailedPricesTitle": "Tabla de Precios Completa",
     "howPricesWork": "Cómo Funcionan los Precios",
     "basePrice": "Precio Base",
-    "basePriceDesc": "Precio fijo hasta 2 personas por tuk-tuk",
+    "basePriceDesc": "Precio fijo para hasta 2 personas por tuk-tuk",
     "additionalPeopleDesc": "€3.50 por cada persona adicional (máximo 4 personas por tuk-tuk)",
     "priceExamples": "Ejemplos de Precios:",
     "person": "persona",
@@ -47,57 +50,57 @@
     "subtitle": "Como Nunca Antes",
     "description": "Descubre los secretos mejor guardados de Vila Nova de Milfontes y la Costa Vicentina desde una perspectiva única",
     "panoramicView": "Vista Panorámica Única",
-    "panoramicViewDesc": "Disfruta de las mejores vistas de la costa alentejana",
+    "panoramicViewDesc": "Disfruta de las mejores vistas de la costa de Alentejo",
     "historicHeritage": "Patrimonio Histórico",
     "historicHeritageDesc": "Conoce la rica historia de este pueblo pesquero"
   },
   "availability": {
-    "title": "Disponibilidad en",
-    "titleHighlight": "Tiempo Real",
+    "title": "Disponibilidad",
+    "titleHighlight": "en Tiempo Real",
     "subtitle": "Consulta los horarios disponibles y reserva tu momento perfecto",
     "availabilityToday": "Disponibilidad Hoy",
-    "availableSlots": "Horarios disponibles para reserva",
+    "availableSlots": "Franjas horarias disponibles para reservas",
     "available": "Disponible",
     "occupied": "Ocupado",
-    "reserveSpecificTime": "Para reservar un horario específico, usa el formulario de reserva",
+    "reserveSpecificTime": "Para reservar una hora específica, utiliza el formulario de reserva",
     "morning": "Mañana (09:30-15:00)",
     "afternoon": "Tarde (15:30-21:30)",
-    "places": "lugares",
+    "places": "plazas",
     "autoUpdated": "Datos actualizados automáticamente",
     "lastUpdate": "Última actualización",
-    "noSlotsAvailable": "No hay horarios disponibles para {{period}}",
-    "allSlotsBooked": "Todos los horarios para {{period}} ya están reservados o bloqueados",
+    "noSlotsAvailable": "No hay franjas disponibles para {{period}}",
+    "allSlotsBooked": "Todas las franjas para {{period}} ya están reservadas o bloqueadas",
     "contactUs": "Consulta otros días o contáctanos"
   },
   "testimonials": {
-    "title": "Lo que dicen nuestros",
-    "titleHighlight": "clientes",
+    "title": "Lo que nuestros",
+    "titleHighlight": "clientes dicen",
     "rating": "5.0 (200+ reseñas)",
     "items": {
       "0": {
-        "quote": "¡La mejor experiencia del viaje! Mis hijos adoraron conocer las playas secretas. ¡El guía fue fantástico!",
+        "quote": "¡Diogo Caria es un guía fantástico! Fue una gran experiencia, me encantó descubrir lugares que no conocía en Milfontes.",
         "name": "Ana Silva",
         "designation": "Lisboa"
       },
       "1": {
-        "quote": "¡Paseo increíble! El tuk-tuk es súper cómodo y las vistas son impresionantes. ¡Recomiendo 100%!",
-        "name": "João Santos",
-        "designation": "Porto"
+        "quote": "¡Tour increíble! El tuk-tuk es súper cómodo y las vistas son impresionantes. ¡100% recomendado!",
+        "name": "Luisa Almeida",
+        "designation": "Oporto"
       },
       "2": {
-        "quote": "Servicio profesional y muy divertido. ¡Los niños no pararon de sonreír durante todo el paseo!",
-        "name": "Maria Costa",
-        "designation": "Coimbra"
+        "quote": "Garantizamos un servicio profesional y divertido. ¡Tours inolvidables!",
+        "name": "Sónia Santos",
+        "designation": "Tuktuk-milfontes"
       },
       "3": {
-        "quote": "Descubrimos lugares increíbles que nunca habríamos encontrado solos. ¡Una experiencia inolvidable!",
+        "quote": "Descubrimos lugares increíbles que nunca habríamos encontrado por nuestra cuenta. ¡Una experiencia inolvidable!",
         "name": "Experiencia Única",
         "designation": "Milfontes"
       },
       "4": {
-        "quote": "Los tuk-tuks son modernos y seguros. ¡Toda la familia se divirtió mucho durante el paseo!",
-        "name": "Familia Feliz",
-        "designation": "Aventura"
+        "quote": "Los tuk-tuks son modernos y seguros. ¡Toda la familia disfrutó muchísimo del tour!",
+        "name": "Comodidad Garantizada",
+        "designation": ""
       },
       "5": {
         "quote": "Incluso en eventos especiales, el servicio es impecable. ¡Diversión y alegría en cada momento!",
@@ -111,30 +114,53 @@
     "titleHighlight": "Frecuentes",
     "subtitle": "Aclaramos tus principales dudas sobre nuestros tours en tuk-tuk",
     "q1": "¿Cuántas personas caben en un tuk-tuk?",
-    "a1": "El tuk-tuk tiene capacidad para 4 personas más el conductor.",
-    "q2": "¿Los tours funcionan con lluvia?",
+    "a1": "El tuk-tuk puede llevar hasta 4 personas más el conductor.",
+    "q2": "¿Los tours operan bajo la lluvia?",
     "a2": "Nuestros tuk-tuks tienen cobertura, pero en caso de lluvia fuerte, podemos reprogramar sin costo.",
-    "q3": "¿Es necesario reservar con anticipación?",
-    "a3": "Recomendamos reservar con al menos 24 horas de anticipación, especialmente en temporada alta.",
+    "q3": "¿Es necesario reservar con antelación?",
+    "a3": "Recomendamos reservar al menos 24 horas antes, especialmente en temporada alta.",
     "q4": "¿Hay descuentos para grupos?",
     "a4": "Sí, ofrecemos descuentos especiales para grupos. Contáctanos para más información.",
-    "q5": "¿Los tuk-tuks son seguros para niños?",
+    "q5": "¿Son los tuk-tuks seguros para niños?",
     "a5": "Sí, todos nuestros tuk-tuks están equipados con cinturones de seguridad y son perfectamente seguros para niños."
   },
   "cta": {
-    "title": "¿Listo para la",
+    "title": "Listo para la",
     "titleHighlight": "Aventura?",
     "description": "¡Reserva tu tour en tuk-tuk ahora y descubre Milfontes de una manera única e inolvidable!",
     "reserveNow": "Reservar Ahora",
-    "talkToUs": "Hablar con Nosotros",
+    "talkToUs": "Habla con Nosotros",
     "phone": "968 784 043",
-    "schedule": "Todos los días 9h-20h"
+    "schedule": "Todos los días de 9 a 20 h"
   },
   "footer": {
     "copyright": "© 2024 TukTuk Milfontes. Todos los derechos reservados.",
     "insurance": "Seguro incluido",
     "photos": "Fotos incluidas",
-    "localGuides": "Guías locales"
+    "localGuides": "Guías locales",
+    "contactTitle": "Información de Contacto",
+    "quickLinks": "Enlaces Rápidos",
+    "linkHome": "Inicio",
+    "linkAbout": "Sobre Nosotros",
+    "linkServices": "Servicios",
+    "linkBooking": "Reservas",
+    "linkFAQ": "Preguntas Frecuentes / Ayuda",
+    "linkSitemap": "Mapa del sitio",
+    "policies": "Políticas y Términos",
+    "terms": "Términos y Condiciones",
+    "privacy": "Política de Privacidad",
+    "cancellation": "Política de Cancelación",
+    "legalInfo": "Información Legal",
+    "licenseInfo": "Licenciado por Turismo de Portugal",
+    "followUs": "Síguenos",
+    "newsletter": "Suscríbete a nuestro boletín",
+    "newsletterPlaceholder": "Tu correo electrónico",
+    "subscribe": "Suscribirse",
+    "paymentInfo": "Métodos de Pago",
+    "paymentSecurity": "Pagos 100% seguros (SSL)",
+    "credits": "Créditos y Atribuciones",
+    "attributions": "Imágenes e íconos de fuentes públicas y autores referenciados.",
+    "support": "Soporte al Cliente"
   },
   "tours": {
     "title": "Nuestros Tours",
@@ -146,7 +172,7 @@
     },
     "furnas": {
       "title": "Vila Nova de Milfontes → Playa de Furnas",
-      "description": "Viaje a la famosa Playa de Furnas con paradas fotográficas",
+      "description": "Viaje a la famosa Playa de Furnas con paradas para fotos",
       "duration": "1h 30min",
       "price": "€14"
     },
@@ -158,7 +184,7 @@
     },
     "sunset": {
       "title": "Atardecer Romántico",
-      "description": "Disfruta del atardecer más hermoso de la costa",
+      "description": "Disfruta del atardecer más hermoso en la costa",
       "duration": "2h",
       "price": "€25"
     },
@@ -179,10 +205,13 @@
     "title": "Contáctanos",
     "phone": "Teléfono",
     "whatsapp": "WhatsApp",
-    "email": "Email"
+    "email": "Correo electrónico"
   },
   "map": {
-    "title": "Ubicación",
+    "title": "Ubicación y",
+    "titleHighlight": "Puntos de Interés",
+    "subtitle": "Encuéntranos en el corazón de Vila Nova de Milfontes y descubre las principales atracciones turísticas",
+    "mapTitle": "Ubicación",
     "description": "Encuéntranos en el corazón de Vila Nova de Milfontes",
     "pointsOfInterest": "Puntos de Interés",
     "historicCenter": "Centro Histórico",
@@ -191,87 +220,89 @@
     "nearbyBeaches": "Playas Cercanas",
     "lighthouse": "Portinho do Canal",
     "furnasBeach": "Playa de Furnas",
-    "viewpoints": "Miradores Panorámicos",
+    "viewpoints": "Puntos de Vista Panorámicos",
     "openInGoogleMaps": "Abrir en Google Maps",
-    "clickToSee": "Haz clic para ver en el mapa",
-    "exitMap": "Salir del mapa"
+    "clickToSee": "Clic para ver en el mapa",
+    "exitMap": "Cerrar mapa"
   },
   "reservation": {
-    "title": "Solicitud de reserva:",
-    "subtitle": "Completa los datos y confirma vía WhatsApp",
+    "title": "Solicitud de Reserva:",
+    "subtitle": "Completa los detalles y confirma a través de WhatsApp",
     "name": "Nombre Completo",
-    "email": "Email",
+    "email": "Correo Electrónico",
     "phone": "Teléfono",
     "date": "Fecha Deseada",
     "time": "Hora Deseada",
     "tourType": "Tipo de Tour",
     "numberOfPeople": "Número de Personas",
     "message": "Mensaje Adicional",
-    "messagePlaceholder": "Cualquier información adicional o solicitud especial...",
-    "selectTour": "Selecciona tipo de tour",
+    "messagePlaceholder": "Cualquier información adicional o solicitudes especiales...",
+    "selectTour": "Seleccionar tipo de tour",
     "people1": "1 persona",
     "people2": "2 personas",
     "people3": "3 personas",
     "people4": "4 personas",
+    "phoneHint": "⚠️ Por favor, incluye el código de país internacional (por ejemplo, +34 para España, +351 para Portugal) en el número de WhatsApp para garantizar que la confirmación se envíe correctamente.",
     "confirmWhatsApp": "Confirmar vía WhatsApp",
     "reservationSent": "¡Reserva enviada!",
     "reservationDescription": "Serás redirigido a WhatsApp para confirmar tu reserva.",
     "required": "requerido",
     "whatsappMessages": {
-      "pending": "Hola {{name}}, hemos recibido su solicitud de reserva para el tour '{{tour_type}}' el día {{reservation_date}} a las {{reservation_time}}. Para confirmar, es necesario realizar el pago de €{{total_price}}. Puede hacer la transferencia al IBAN PT50 1234 5678 9012 3456 7890 1 o pagar en efectivo en el lugar. Después del pago, su reserva será confirmada automáticamente.",
-      "confirmed": "Hola {{name}}, ¡su reserva para el tour '{{tour_type}}' está confirmada para el día {{reservation_date}} a las {{reservation_time}}! Encuéntrenos en el centro de Milfontes, junto al jardín público. Cualquier duda, estamos a su disposición.",
-      "cancelled": "Hola {{name}}, lamentamos informar que su reserva para el tour '{{tour_type}}' del día {{reservation_date}} a las {{reservation_time}} ha sido cancelada. Si necesita reprogramar o tiene alguna pregunta, por favor contáctenos.",
-      "completed": "Hola {{name}}, ¡gracias por realizar el tour con nosotros! Esperamos que haya tenido una experiencia fantástica en Milfontes. Recomiéndenos a sus amigos y familiares. ¡Hasta la próxima!",
-      "payment_reminder": "Hola {{name}}, recordamos que su reserva para el día {{reservation_date}} a las {{reservation_time}} aún no está confirmada. Para garantizar su lugar, realice el pago de €{{total_price}} lo antes posible.",
-      "weather_update": "Hola {{name}}, debido a las condiciones meteorológicas previstas para {{reservation_date}}, es posible que tengamos que reprogramar su tour. Nos pondremos en contacto más cerca de la fecha para confirmar.",
-      "pickup_reminder": "Hola {{name}}, recordamos que su tour está programado para mañana, {{reservation_date}}, a las {{reservation_time}}. Encuéntrenos en el centro de Milfontes, junto al jardín público, 10 minutos antes de la hora programada."
+      "pending": "Hola {{name}}, hemos recibido tu solicitud de reserva. Para confirmar, se requiere un pago de €{{total_price}}. Puedes realizar una transferencia al IBAN PT50 1234 5678 9012 3456 7890 1 o pagar en efectivo en el lugar. Una vez realizado el pago, tu reserva será confirmada automáticamente.",
+      "confirmed": "Hola {{name}}, tu reserva para el tour '{{tour_type}}' está confirmada para el {{reservation_date}} a las {{reservation_time}}. Encuéntranos en el centro de Milfontes, junto al jardín público. Si tienes alguna pregunta, estamos a tu disposición.",
+      "cancelled": "Hola {{name}}, lamentamos informarte que tu reserva para el tour '{{tour_type}}' el {{reservation_date}} a las {{reservation_time}} ha sido cancelada. Si necesitas reprogramar o tienes alguna pregunta, contáctanos.",
+      "completed": "Hola {{name}}, ¡gracias por hacer el tour con nosotros! Esperamos que hayas tenido una experiencia fantástica en Milfontes. Recomiéndanos a tus amigos y familiares. ¡Hasta la próxima!",
+      "payment_reminder": "Hola {{name}}, te recordamos que tu reserva para el {{reservation_date}} a las {{reservation_time}} aún no está confirmada. Para asegurar tu plaza, realiza el pago de €{{total_price}} lo antes posible.",
+      "weather_update": "Hola {{name}}, debido a las condiciones climáticas previstas para el {{reservation_date}}, es posible que debamos reprogramar tu tour. Nos pondremos en contacto contigo más cerca de la fecha para confirmar.",
+      "pickup_reminder": "Hola {{name}}, te recordamos que tu tour está programado para mañana, {{reservation_date}}, a las {{reservation_time}}. Encuéntranos en el centro de Milfontes, junto al jardín público, 10 minutos antes de la hora programada.",
+      "nextAvailableTimeSuggestion": "Para el tour seleccionado, la próxima hora disponible es: {{next_available_time}}. ¿Te gustaría reservar para este horario?"
     },
-    "simpleContactMessage": "¡Hola! Me gustaría hacer una reserva!",
-    "clientReservationMessage": "¡Hola! Me gustaría reservar el tour '{{tour_type}}' para el {{reservation_date}} a las {{reservation_time}} para {{number_of_people}} personas.\nNombre: {{name}}\nEmail: {{email}}\nTeléfono: {{phone}}\nMensaje: {{message}}\nSolicitud realizada el: {{created_at}}",
-    "timeUnavailableWithSuggestion": "La hora seleccionada ya está ocupada por otro tour. Sugerimos el próximo horario disponible: {{next_available_time}}. ¿Le gustaría reservar para este nuevo horario?",
+    "simpleContactMessage": "¡Hola, me gustaría hacer una reserva!",
+    "clientReservationMessage": "Hola, me gustaría reservar el tour '{{tour_type}}' para el {{reservation_date}} a las {{reservation_time}} para {{number_of_people}} personas.\nNombre: {{name}}\nCorreo: {{email}}\nTeléfono: {{phone}}\nMensaje: {{message}}\nSolicitud realizada el: {{created_at}}",
+    "timeUnavailableWithSuggestion": "La hora seleccionada ya está reservada para otro tour. Te sugerimos la próxima hora disponible: {{next_available_time}}. ¿Te gustaría reservar para este nuevo horario?",
     "acceptSuggestion": "Aceptar sugerencia",
     "chooseAnotherTime": "Elegir otra hora"
   },
   "mapDescriptions": {
-    "praiaDaFranquia": "Cerca del pueblo e ideal para familias, es conocida por sus aguas tranquilas y el paisaje del estuario del Mira.",
-    "praiaDoFarol": "Ubicada cerca del faro y del centro, esta playa es popular por su accesibilidad y vistas a la desembocadura del río.",
+    "praiaDaFranquia": "Cerca del pueblo e ideal para familias, conocida por sus aguas tranquilas y el paisaje del estuario del Mira.",
+    "praiaDoFarol": "Ubicada cerca del faro y el centro, popular por su accesibilidad y vistas a la desembocadura del río.",
     "praiaDoMalhao": "Una playa más salvaje y extensa, buscada por surfistas y amantes de la naturaleza por sus olas y dunas.",
     "praiaDasFurnas": "Conocida por sus formaciones rocosas y cuevas, ofrece un entorno único para tomar el sol y explorar.",
-    "praiaDoPatacho": "Una playa de ambiente más tranquilo y aislado, perfecta para quienes buscan tranquilidad y contacto con la naturaleza.",
-    "praiaDoCarreiroDasFazendas": "Caracterizada por sus acantilados y acceso más desafiante, es un lugar de gran belleza natural y serenidad.",
-    "praiaDoPortoDasBarcas": "Una pequeña ensenada con un puerto pesquero tradicional, ideal para observar la vida pesquera local.",
-    "praiaDosAivados": "Una playa amplia y con olas, muy popular entre los surfistas y bodyboarders por su mar agitado.",
+    "praiaDoPatacho": "Una playa más tranquila y apartada, perfecta para quienes buscan paz y contacto con la naturaleza.",
+    "praiaDoCarreiroDasFazendas": "Caracterizada por sus acantilados y un acceso más desafiante, un lugar de gran belleza natural y serenidad.",
+    "praiaDoPortoDasBarcas": "Una pequeña cala con un puerto pesquero tradicional, ideal para observar la vida pesquera local.",
+    "praiaDosAivados": "Una playa vasta y con olas, muy popular entre surfistas y bodyboarders por su mar agitado.",
     "forteDeSaoClemente": "Una fortificación histórica que protegía la desembocadura del río Mira, ofreciendo vistas panorámicas sobre la costa.",
-    "farolDeMilfontes": "Un hito icónico que guía a los navegantes, proporcionando un punto de referencia visual del pueblo.",
-    "igrejaDeNossaSenhoraDaGraca": "Un templo religioso con arquitectura tradicional local, que refleja la herencia cultural de la región.",
+    "farolDeMilfontes": "Un hito icónico que guía a los marineros, proporcionando un punto de referencia visual para el pueblo.",
+    "igrejaDeNossaSenhoraDaGraca": "Un templo religioso con arquitectura local tradicional, que refleja el patrimonio cultural de la región.",
     "estatuaDoArcanjo": "Un monumento que destaca en el paisaje del pueblo, añadiendo un toque artístico y simbólico.",
-    "jardimPublico": "Una zona de ocio y convivencia en el centro del pueblo, ideal para paseos y momentos de relajación.",
-    "parqueNatural": "Una vasta área protegida que abarca la región, preservando su biodiversidad y paisajes costeros salvajes.",
-    "parqueInfantil": "Un espacio de recreo dedicado a los niños, con equipos para juegos y diversión.",
-    "jardimParagem": "Una pequeña zona ajardinada que proporciona un lugar agradable para esperar el transporte público.",
-    "estuarioDoRioMira": "Un lugar de gran belleza natural e importancia ecológica, perfecto para la observación de aves y paseos junto al río.",
-    "restauranteAChoupana": "Restaurante frente al mar, especializado en parrilladas, siempre con pescado fresco.",
+    "jardimPublico": "Un área de ocio y socialización en el centro del pueblo, ideal para paseos y relajación.",
+    "parqueNatural": "Una vasta área protegida que cubre la región, preservando su biodiversidad y paisajes costeros salvajes.",
+    "parqueInfantil": "Un parque infantil dedicado a los niños, con equipos para jugar y divertirse.",
+    "jardimParagem": "Un pequeño jardín que ofrece un lugar agradable para esperar el transporte público.",
+    "estuarioDoRioMira": "Un lugar de gran belleza natural e importancia ecológica, perfecto para observar aves y pasear junto al río.",
+    "restauranteAChoupana": "Restaurante frente al mar, especializado en platos a la parrilla, siempre con pescado fresco.",
     "tascaDoCelso": "Un restaurante acogedor y popular, famoso por su comida casera y ambiente familiar.",
-    "aManjedoura": "Para llevar · Cena en el lugar · Con terraza.",
-    "restauranteRitual": "Restaurante y Tapas-Bar donde la tranquilidad del Alentejo litoral se fusiona con un ambiente refinado y cosmopolita, impregnado de historias y viajes por todo el mundo.",
-    "patioAlentejano": "Un restaurante con un agradable patio, que sirve platos tradicionales alentejanos en un ambiente relajado.",
-    "restauranteHSBeach": "Un restaurante con vistas al mar, que sirve una variedad de platos, incluido marisco fresco.",
-    "mercadoMilfontes": "Un mercado tradicional donde se pueden encontrar productos frescos locales y artesanía.",
-    "mercadoBrunheiras": "Otro mercado local que ofrece una variedad de frutas, verduras y otros productos de la región.",
-    "milsuper": "Un supermercado que ofrece una amplia gama de productos para las necesidades diarias.",
+    "aManjedoura": "Comida para llevar · Comer en el lugar · Con terraza.",
+    "restauranteRitual": "Restaurante y Bar de Tapas con un ambiente refinado y cosmopolita.",
+    "patioAlentejano": "Un restaurante con una agradable terraza, que sirve platos tradicionales del Alentejo en un entorno relajado.",
+    "restauranteHSBeach": "Un restaurante con vistas al mar, que ofrece una variedad de platos, incluidos mariscos frescos.",
+    "mercadoMilfontes": "Un mercado tradicional donde puedes encontrar productos frescos locales y artesanías.",
+    "mercadoBrunheiras": "Otro mercado local que ofrece una variedad de frutas, verduras y otros productos regionales.",
+    "milsuper": "Un supermercado que ofrece una amplia gama de productos para necesidades diarias.",
     "meuSuper": "Un supermercado de conveniencia, ideal para compras rápidas y esenciales.",
     "amanhecer": "Un establecimiento especializado en frutas y verduras frescas, con una selección variada.",
-    "supermercadoSPAR": "Un supermercado que ofrece una gama completa de productos alimenticios y de abarrotes.",
+    "supermercadoSPAR": "Un supermercado que ofrece una gama completa de alimentos y productos de supermercado.",
     "campifrias": "Camping cerca del mercado y la plaza de pescado.",
     "jardimParagemDosAutocarros": "Parada de autobús junto al jardín.",
-    "frutasECompanhiaAmanhecer": "Tienda local con frutas frescas, verduras y productos esenciales diarios.",
+    "frutasECompanhiaAmanhecer": "Tienda local con frutas frescas, verduras y necesidades diarias.",
     "campingMilfontes": "Camping con excelentes instalaciones, cerca del centro de Milfontes y de la naturaleza.",
-    "restauranteOasis": "Restaurante con vista al mar en Milfontes.",
-    "portinhoDoCanal": "Puerto pesquero tradicional y zona de ocio.",
+    "restauranteOasis": "Restaurante con vistas panorámicas a Milfontes.",
+    "portinhoDoCanal": "Puerto pesquero tradicional y área de ocio.",
     "ponteSobreORioMira": "Puente sobre el río Mira en Milfontes.",
     "estaturaDoArcanjo": "Un grito artístico y ecológico, hecho de hierro reciclado, que nos desafía a pensar y actuar por el planeta.",
     "spotsDeSurfEKayak": "Alquiler de kayaks y canoas.",
-    "restauranteHSMilfontesBeach": "Hotel y restaurante con vistas a la desembocadura del río Mira.",
+    "restauranteHSMilfontesBeach": "Hotel y restaurante con vistas a la desembocadura del Mira.",
     "mercadoDeVilaNovaDeMilfontes": "Mercado de pescado y frutas."
   },
   "aerialViewMilfontes": {
@@ -282,48 +313,48 @@
     "title": "TukTuk en Tiempo Real",
     "subtitle": "Sigue la ubicación de nuestro TukTuk en Vila Nova de Milfontes",
     "currentLocation": "Ubicación Actual",
-    "howItWorks": "Cómo funciona",
+    "howItWorks": "Cómo Funciona",
     "contact": "Contacto",
     "backToMainSite": "Volver al sitio principal",
-    "loading": "Cargando ubicación del TukTuk...",
-    "pleaseWait": "Por favor espere",
+    "loading": "Cargando la ubicación del TukTuk...",
+    "pleaseWait": "Por favor, espera...",
     "mapCentering": "Centrar mapa",
-    "makeReservation": "¡Haga Su Reserva Aquí!",
+    "makeReservation": "¡Haz tu Reserva Aquí!",
     "reservationDialog": "Formulario de Reserva",
     "tuktukAvailable": "¡TukTuk disponible ahora!",
     "tuktukBusy": "TukTuk Actualmente Ocupado",
     "readyForAdventure": "Listo para llevarte en una aventura",
-    "busyUntil": "hasta las",
+    "busyUntil": "hasta",
     "availableAgainAt": "Estará disponible nuevamente a las",
     "instructions": {
-      "locateMe": "Haz clic en \"Localizarme\" para ver tu posición en el mapa",
-      "tuktukIcon": "El icono del TukTuk muestra la ubicación actual en tiempo real",
+      "locateMe": "Haz clic en \"Localízame\" para ver tu posición en el mapa",
+      "tuktukIcon": "El ícono del TukTuk muestra la ubicación actual en tiempo real",
       "statusIndicator": "El estado indica si el TukTuk está disponible u ocupado",
-      "distanceCalculation": "La distancia y tiempo estimado se calculan automáticamente",
-      "makeReservation": "Usa \"¡Haga Su Reserva Aquí!\" para reservar el servicio",
-      "centerMap": "\"Centrar mapa\" ajusta la vista para mejor visualización",
-      "offlineNote": "Si no ves el TukTuk, puede estar desconectado"
+      "distanceCalculation": "La distancia y el tiempo estimado se calculan automáticamente",
+      "makeReservation": "Usa \"¡Haz tu Reserva Aquí!\" para reservar el servicio",
+      "centerMap": "\"Centrar mapa\" ajusta la vista para una mejor visualización",
+      "offlineNote": "Si no ves el TukTuk, puede estar fuera de línea"
     },
     "contactInfo": {
       "phone": "Teléfono: 963 496 320",
       "whatsapp": "WhatsApp: Disponible en el sitio principal",
-      "email": "Email: diogo.carias@outlook.pt"
+      "email": "Correo: diogo.carias@outlook.pt"
     }
   },
   "locationPermission": {
-    "grantAccess": "Localizarme",
+    "grantAccess": "Localízame",
     "locating": "Localizando...",
     "permissionDenied": "Permiso Denegado",
     "located": "¡Localizado!",
-    "permissionNeeded": "Permiso de ubicación necesario",
-    "permissionDescription": "Para **mostrar tu ubicación** en el mapa y calcular la **distancia hasta el TukTuk**, necesitamos tu permiso de ubicación.",
-    "clickForHelp": "Haz clic para ayuda",
+    "permissionNeeded": "Se requiere permiso de ubicación",
+    "permissionDescription": "Para **mostrar tu ubicación** en el mapa y calcular la **distancia al TukTuk**, necesitamos tu permiso de ubicación.",
+    "clickForHelp": "Clic para ayuda",
     "helpInstructions": {
       "android": {
-        "title": "Cómo permitir ubicación en Android",
+        "title": "Cómo permitir la ubicación en Android",
         "method1": "Método completo:",
         "method2": "Método rápido (más fácil):",
-        "method3": "Si no encuentras los iconos:",
+        "method3": "Si no encuentras los íconos:",
         "steps": {
           "complete": [
             "Toca los **tres puntos** (⋮) en la esquina superior derecha de Chrome",
@@ -331,38 +362,38 @@
             "Toca **\"Configuración del sitio\"**",
             "Toca **\"Ubicación\"**",
             "Encuentra este sitio en la lista y cambia a **\"Permitir\"**",
-            "Vuelve al sitio y **actualiza la página**"
+            "Regresa al sitio y **actualiza la página**"
           ],
           "quick": [
-            "Busca el icono **📍** en la barra de direcciones",
-            "O el icono **🔒** al lado de la dirección",
-            "Tócalo y selecciona **\"Permitir\"\""
+            "Busca el ícono **📍** en la barra de direcciones",
+            "O el ícono **🔒** junto a la dirección",
+            "Tócalo y selecciona **\"Permitir\"**"
           ],
           "alternative": [
             "Toca la **barra de direcciones** para ver más opciones",
-            "Busca el icono de **información** (ⓘ)"
+            "Busca el ícono de **información** (ⓘ)"
           ]
         }
       },
       "ios": {
-        "title": "Cómo permitir ubicación en iPhone/iPad",
+        "title": "Cómo permitir la ubicación en iPhone/iPad",
         "steps": [
-          "Toca el icono **\"AA\"** en la barra de direcciones",
+          "Toca el ícono **\"AA\"** en la barra de direcciones",
           "Selecciona **\"Configuración del sitio web\"**",
           "Toca **\"Ubicación\"**",
           "Cambia a **\"Permitir\"**",
-          "Vuelve al sitio y **actualiza la página**"
+          "Regresa al sitio y **actualiza la página**"
         ],
         "alternative": [
-          "Busca el icono **📍** en la barra de direcciones",
-          "Tócalo y selecciona **\"Permitir\"\""
+          "Busca el ícono **📍** en la barra de direcciones",
+          "Tócalo y selecciona **\"Permitir\"**"
         ]
       },
       "desktop": {
-        "title": "Cómo permitir ubicación en el navegador",
+        "title": "Cómo permitir la ubicación en el navegador",
         "steps": [
-          "Busca el icono **📍** en la barra de direcciones",
-          "Haz clic en él y selecciona **\"Permitir\"** cuando aparezca el popup",
+          "Busca el ícono **📍** en la barra de direcciones",
+          "Haz clic en él y selecciona **\"Permitir\"** cuando aparezca la ventana emergente",
           "Si no aparece, verifica la **configuración del navegador**",
           "Busca **\"Permisos\"** o **\"Configuración del sitio\"**",
           "**Habilita** el permiso de ubicación para este sitio"
@@ -370,25 +401,25 @@
       }
     },
     "statusMessages": {
-      "unsupported": "Geolocalización no soportada en este navegador",
+      "unsupported": "La geolocalización no es compatible con este navegador",
       "obtaining": "Obteniendo tu ubicación...",
       "error": "Error:",
-      "denied": "Permiso denegado - Haz clic para ayuda",
+      "denied": "Permiso denegado - Clic para ayuda",
       "success": "¡Ubicación obtenida con éxito!",
-      "clickToDiscover": "Haz clic para descubrir tu ubicación"
+      "clickToDiscover": "Clic para descubrir tu ubicación"
     },
     "helpModal": {
-      "understood": "¡Entendido, gracias!",
+      "understood": "Entendido, ¡gracias!",
       "completeGuide": "Ver guía completa",
-      "lookForIcons": "Dónde encontrar los iconos:",
-      "visualNote": "**🔍 Busca estos iconos** en la barra de direcciones de tu navegador"
+      "lookForIcons": "Dónde encontrar los íconos:",
+      "visualNote": "**🔍 Busca estos íconos** en la barra de direcciones de tu navegador"
     }
   },
   "distanceCalculator": {
-    "waitingLocation": "Esperando ubicación...",
+    "waitingLocation": "Esperando la ubicación...",
     "distance": "Distancia:",
     "estimatedTime": "Tiempo estimado:",
-    "averageSpeed": "Velocidad media: {{speed}} km/h",
+    "averageSpeed": "Velocidad promedio: {{speed}} km/h",
     "meters": "metros",
     "kilometers": "km",
     "minutes": "min",
@@ -396,7 +427,7 @@
   },
   "realTimeTracking": {
     "title": "🛺 ¡Sigue nuestro TukTuk en tiempo real!",
-    "description": "Ve dónde está nuestro TukTuk ahora mismo y sigue su ubicación en tiempo real",
+    "description": "Mira dónde está nuestro TukTuk ahora mismo y sigue su ubicación en tiempo real",
     "buttonText": "📍 Ver TukTuk en Tiempo Real"
   }
 }

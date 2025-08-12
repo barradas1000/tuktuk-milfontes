@@ -25,7 +25,9 @@
     }
   },
   "pricing": {
-    "title": "Preços",
+    "whatsappMessages": {
+      "phoneHint": "⚠️ Por favor, inclua o indicativo internacional do seu país (ex: +351 para Portugal) no número de WhatsApp para garantir o correto envio da confirmação."
+    },
     "titleHighlight": "Transparentes",
     "subtitle": "Preços justos e claros, sem surpresas. Diversão garantida para toda a família!",
     "upTo2People": "Até 2 pessoas",
@@ -110,12 +112,12 @@
     "title": "Perguntas",
     "titleHighlight": "Frequentes",
     "subtitle": "Esclarecemos as suas principais dúvidas sobre os nossos passeios de tuk-tuk",
-    "q1": "Quantas pessoas cabem num tuk-tuk?",
+    "q1": "Quantas pessoas Venham num tuk-tuk?",
     "a1": "O tuk-tuk tem capacidade até 4 pessoas, mais o condutor",
     "q2": "Os passeios funcionam com chuva?",
     "a2": "Os nossos tuk-tuks têm cobertura, mas em caso de chuva forte, podemos reagendar sem custos.",
     "q3": "É necessário reservar com antecedência?",
-    "a3": "Recomendamos reservar com pelo menos 24 horas de antecedência, especialmente na época alta.",
+    "a3": "Recomendamos reinformações.",
     "q4": "Há descontos para grupos?",
     "a4": "Sim, oferecemos descontos especiais para grupos. Contacte-nos para mais informações.",
     "q5": "Os tuk-tuks são seguros para crianças?",
@@ -239,8 +241,9 @@
     "people2": "2 pessoas",
     "people3": "3 pessoas",
     "people4": "4 pessoas",
+    "phoneHint": "⚠️ Por favor, inclua o indicativo internacional do seu país (ex: +351 para Portugal) no número de WhatsApp para garantir o correto envio da confirmação.",
     "confirmWhatsApp": "Confirmar via WhatsApp",
-    "reservationSent": "Reserva enviada!",
+    "reservation(sent": "Reserva enviada!",
     "reservationDescription": "Será redirecionado para o WhatsApp para confirmar a sua reserva.",
     "required": "obrigatório",
     "whatsappMessages": {
@@ -363,7 +366,7 @@
           "quick": [
             "Procure pelo ícone **📍** na barra de endereços",
             "Ou pelo ícone **🔒** ao lado do endereço",
-            "Toque nele e selecione **\"Permitir\"\""
+            "Toque nele e selecione **\"Permitir\""
           ],
           "alternative": [
             "Toque na **barra de endereços** para ver mais opções",
@@ -382,7 +385,7 @@
         ],
         "alternative": [
           "Procure pelo ícone **📍** na barra de endereços",
-          "Toque nele e selecione **\"Permitir\"\""
+          "Toque nele e selecione **\"Permitir\""
         ]
       },
       "desktop": {
@@ -406,7 +409,7 @@
     },
     "helpModal": {
       "understood": "Entendi, obrigado!",
-      "completeGuide": "Ver guia completo",
+      "completeGuide": "Ver guia completa",
       "lookForIcons": "Onde encontrar os ícones:",
       "visualNote": "**🔍 Procure por estes ícones** na barra de endereços do seu navegador"
     }

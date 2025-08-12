@@ -454,8 +454,7 @@ const ReservationForm = () => {
                 placeholder="Ex: +351912345678"
               />
               <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-1 rounded">
-                Inclua o indicativo do país (ex: +351 para Portugal) para
-                WhatsApp.
+                {t("reservation.phoneHint")}
               </span>
             </div>
 

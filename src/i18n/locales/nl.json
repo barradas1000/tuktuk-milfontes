@@ -25,6 +25,9 @@
     }
   },
   "pricing": {
+    "whatsappMessages": {
+      "phoneHint": "⚠️ Voeg de internationale landcode toe (bijv. +31 voor Nederland, +351 voor Portugal) aan het WhatsApp-nummer om te zorgen dat de bevestiging correct wordt verzonden."
+    },
     "title": "Transparante",
     "titleHighlight": "Prijzen",
     "subtitle": "Eerlijke en duidelijke prijzen, geen verrassingen. Gegarandeerd plezier voor het hele gezin!",
@@ -34,7 +37,7 @@
     "detailedPricesTitle": "Volledige Prijstabel",
     "howPricesWork": "Hoe De Prijzen Werken",
     "basePrice": "Basisprijs",
-    "basePriceDesc": "vaste prijs tot 2 personen per tuk-tuk",
+    "basePriceDesc": "Vaste prijs tot 2 personen per tuk-tuk",
     "additionalPeopleDesc": "€3.50 voor elke extra persoon (maximum 4 personen per tuk-tuk)",
     "priceExamples": "Prijsvoorbeelden:",
     "person": "persoon",
@@ -72,7 +75,39 @@
   "testimonials": {
     "title": "Wat onze",
     "titleHighlight": "klanten zeggen",
-    "rating": "5.0 (200+ beoordelingen)"
+    "rating": "5.0 (200+ beoordelingen)",
+    "items": {
+      "0": {
+        "quote": "Diogo Caria is een fantastische gids!\nHet was een geweldige ervaring, ik vond het geweldig om plaatsen in Milfontes te ontdekken die ik niet kende",
+        "name": "Ana Silva",
+        "designation": "Lissabon"
+      },
+      "1": {
+        "quote": "Geweldige tour! De tuk-tuk is super comfortabel en de uitzichten zijn adembenemend. 100% aanbevolen!",
+        "name": "Luisa Almeida",
+        "designation": "Porto"
+      },
+      "2": {
+        "quote": "Wij garanderen een professionele en leuke service. Onvergetelijke tours!",
+        "name": "Sónia Santos",
+        "designation": "Tuktuk-milfontes"
+      },
+      "3": {
+        "quote": "We ontdekten ongelooflijke plekken die we alleen nooit zouden hebben gevonden. Een onvergetelijke ervaring!",
+        "name": "Unieke Ervaring",
+        "designation": "Milfontes"
+      },
+      "4": {
+        "quote": "De tuk-tuks zijn modern en veilig. Het hele gezin heeft enorm genoten van de tour!",
+        "name": "Gegarandeerd Comfort",
+        "designation": ""
+      },
+      "5": {
+        "quote": "Zelfs bij speciale evenementen is de service onberispelijk. Plezier en vreugde op elk moment!",
+        "name": "Gegarandeerd Plezier",
+        "designation": "Carnaval"
+      }
+    }
   },
   "faq": {
     "title": "Veelgestelde",
@@ -102,7 +137,30 @@
     "copyright": "© 2024 TukTuk Milfontes. Alle rechten voorbehouden.",
     "insurance": "Verzekering inbegrepen",
     "photos": "Foto's inbegrepen",
-    "localGuides": "Lokale gidsen"
+    "localGuides": "Lokale gidsen",
+    "contactTitle": "Contactinformatie",
+    "quickLinks": "Snelle Links",
+    "linkHome": "Home",
+    "linkAbout": "Over Ons",
+    "linkServices": "Diensten",
+    "linkBooking": "Reserveringen",
+    "linkFAQ": "FAQ / Hulp",
+    "linkSitemap": "Sitemap",
+    "policies": "Beleid en Voorwaarden",
+    "terms": "Voorwaarden",
+    "privacy": "Privacybeleid",
+    "cancellation": "Annuleringsbeleid",
+    "legalInfo": "Juridische Informatie",
+    "licenseInfo": "Gelicentieerd door Turismo de Portugal",
+    "followUs": "Volg Ons",
+    "newsletter": "Abonneer op onze nieuwsbrief",
+    "newsletterPlaceholder": "Uw e-mail",
+    "subscribe": "Abonneren",
+    "paymentInfo": "Betaalmethoden",
+    "paymentSecurity": "100% veilige betalingen (SSL)",
+    "credits": "Credits en Toeschrijvingen",
+    "attributions": "Afbeeldingen en pictogrammen van openbare bronnen en genoemde auteurs.",
+    "support": "Klantondersteuning"
   },
   "tours": {
     "title": "Onze Tours",
@@ -184,18 +242,20 @@
     "people2": "2 personen",
     "people3": "3 personen",
     "people4": "4 personen",
+    "phoneHint": "⚠️ Voeg de internationale landcode toe (bijv. +31 voor Nederland, +351 voor Portugal) aan het WhatsApp-nummer om te zorgen dat de bevestiging correct wordt verzonden.",
     "confirmWhatsApp": "Bevestigen via WhatsApp",
     "reservationSent": "Reservering verzonden!",
     "reservationDescription": "U wordt doorgestuurd naar WhatsApp om uw reservering te bevestigen.",
     "required": "vereist",
     "whatsappMessages": {
-      "pending": "Hallo {{name}}, we hebben uw reserveringsaanvraag ontvangen voor de tour '{{tour_type}}' op {{reservation_date}} om {{reservation_time}}. Voor bevestiging is betaling van €{{total_price}} vereist. U kunt een overboeking maken naar IBAN PT50 1234 5678 9012 3456 7890 1 of contant betalen ter plaatse. Na betaling wordt uw reservering automatisch bevestigd.",
-      "confirmed": "Hallo {{name}}, uw reservering voor de tour '{{tour_type}}' is bevestigd voor {{reservation_date}} om {{reservation_time}}! Ontmoet ons in het centrum van Milfontes, naast de openbare tuin. Eventuele vragen, we staan tot uw beschikking.",
+      "pending": "Hallo {{name}}, we hebben uw reserveringsaanvraag ontvangen. Voor bevestiging is betaling van €{{total_price}} vereist. U kunt een overboeking maken naar IBAN PT50 1234 5678 9012 3456 7890 1 of contant betalen ter plaatse. Na betaling wordt uw reservering automatisch bevestigd.",
+      "confirmed": "Hallo {{name}}, uw reservering voor de tour '{{tour_type}}' is bevestigd voor {{reservation_date}} om {{reservation_time}}. Ontmoet ons in het centrum van Milfontes, naast de openbare tuin. Eventuele vragen, we staan tot uw beschikking.",
       "cancelled": "Hallo {{name}}, we moeten u helaas informeren dat uw reservering voor de tour '{{tour_type}}' op {{reservation_date}} om {{reservation_time}} is geannuleerd. Als u opnieuw wilt boeken of vragen heeft, neem dan contact met ons op.",
       "completed": "Hallo {{name}}, bedankt dat u de tour met ons heeft gedaan! We hopen dat u een fantastische ervaring heeft gehad in Milfontes. Beveel ons aan bij uw vrienden en familie. Tot de volgende keer!",
       "payment_reminder": "Hallo {{name}}, we herinneren u eraan dat uw reservering voor {{reservation_date}} om {{reservation_time}} nog niet is bevestigd. Om uw plek te garanderen, voer de betaling van €{{total_price}} zo spoedig mogelijk uit.",
       "weather_update": "Hallo {{name}}, vanwege de weersomstandigheden die voor {{reservation_date}} worden voorspeld, moeten we mogelijk uw tour opnieuw inplannen. We nemen contact met u op dichter bij de datum om te bevestigen.",
-      "pickup_reminder": "Hallo {{name}}, we herinneren u eraan dat uw tour gepland staat voor morgen, {{reservation_date}}, om {{reservation_time}}. Ontmoet ons in het centrum van Milfontes, naast de openbare tuin, 10 minuten voor de geplande tijd."
+      "pickup_reminder": "Hallo {{name}}, we herinneren u eraan dat uw tour gepland staat voor morgen, {{reservation_date}}, om {{reservation_time}}. Ontmoet ons in het centrum van Milfontes, naast de openbare tuin, 10 minuten voor de geplande tijdSTL3.1.1.1 time.",
+      "nextAvailableTimeSuggestion": "Voor de gekozen tour is het eerstvolgende beschikbare tijdstip: {{next_available_time}}. Wilt u voor dit tijdstip reserveren?"
     },
     "simpleContactMessage": "Hallo, ik wil graag een reservering maken!",
     "clientReservationMessage": "Hallo, ik wil graag de tour '{{tour_type}}' reserveren voor {{reservation_date}} om {{reservation_time}} voor {{number_of_people}} personen.\nNaam: {{name}}\nEmail: {{email}}\nTelefoon: {{phone}}\nBericht: {{message}}\nAanvraag gedaan op: {{created_at}}",
@@ -224,7 +284,7 @@
     "restauranteAChoupana": "Restaurant aan zee, gespecialiseerd in gegrilde gerechten, altijd met verse vis.",
     "tascaDoCelso": "Een gezellig en populair restaurant, beroemd om het huisgemaakte eten en de familiesfeer.",
     "aManjedoura": "Afhalen · Dineren ter plaatse · Met terras.",
-    "restauranteRitual": "Restaurant en Tapas-Bar waar de rust van de Alentejo-kust samenkomt met een verfijnde en kosmopolitische sfeer, vol verhalen en reizen van over de hele wereld.",
+    "restauranteRitual": "Restaurant en Tapas-Bar met een verfijnde en kosmopolitische sfeer.",
     "patioAlentejano": "Een restaurant met een aangenaam terras, waar traditionele Alentejaanse gerechten worden geserveerd in een ontspannen sfeer.",
     "restauranteHSBeach": "Een restaurant met uitzicht op zee, dat een verscheidenheid aan gerechten serveert, waaronder verse zeevruchten.",
     "mercadoMilfontes": "Een traditionele markt waar je lokale verse producten en handwerk kunt vinden.",
@@ -237,7 +297,7 @@
     "jardimParagemDosAutocarros": "Bushalte naast de tuin.",
     "frutasECompanhiaAmanhecer": "Lokale winkel met vers fruit, groenten en dagelijkse benodigdheden.",
     "campingMilfontes": "Camping met uitstekende faciliteiten, dicht bij het centrum van Milfontes en de natuur.",
-    "restauranteOasis": "Restaurant met uitzicht op zee in Milfontes.",
+    "restauranteOasis": "Restaurant met panoramisch uitzicht op Milfontes.",
     "portinhoDoCanal": "Traditionele vissershaven en recreatiegebied.",
     "ponteSobreORioMira": "Brug over de Mira-rivier in Milfontes.",
     "estaturaDoArcanjo": "Een artistieke en ecologische kreet, gemaakt van gerecycled ijzer, die ons uitdaagt om na te denken en te handelen voor de planeet.",
@@ -292,14 +352,28 @@
     "helpInstructions": {
       "android": {
         "title": "Hoe locatie toestaan op Android",
-        "steps": [
-          "Tik op de **drie punten** (⋮) in de rechterbovenhoek van Chrome",
-          "Selecteer **\"Instellingen\"**",
-          "Tik op **\"Site-instellingen\"**",
-          "Tik op **\"Locatie\"**",
-          "Vind deze site in de lijst en verander naar **\"Toestaan\"**",
-          "Ga terug naar de site en **ververs de pagina**"
-        ]
+        "method1": "Volledige methode:",
+        "method2": "Snelle methode (eenvoudiger):",
+        "method3": "Als je de pictogrammen niet vindt:",
+        "steps": {
+          "complete": [
+            "Tik op de **drie punten** (⋮) in de rechterbovenhoek van Chrome",
+            "Selecteer **\"Instellingen\"**",
+            "Tik op **\"Site-instellingen\"**",
+            "Tik op **\"Locatie\"**",
+            "Vind deze site in de lijst en verander naar **\"Toestaan\"**",
+            "Ga terug naar de site en **ververs de pagina**"
+          ],
+          "quick": [
+            "Zoek naar het **📍** pictogram in de adresbalk",
+            "Of naar het **🔒** pictogram naast het adres",
+            "Tik erop en selecteer **\"Toestaan\""
+          ],
+          "alternative": [
+            "Tik op de **adresbalk** om meer opties te zien",
+            "Zoek naar het **informatie** pictogram (ⓘ)"
+          ]
+        }
       },
       "ios": {
         "title": "Hoe locatie toestaan op iPhone/iPad",
@@ -309,6 +383,10 @@
           "Tik op **\"Locatie\"**",
           "Verander naar **\"Toestaan\"**",
           "Ga terug naar de site en **ververs de pagina**"
+        ],
+        "alternative": [
+          "Zoek naar het **📍** pictogram in de adresbalk",
+          "Tik erop en selecteer **\"Toestaan\""
         ]
       },
       "desktop": {
@@ -333,7 +411,7 @@
     "helpModal": {
       "understood": "Begrepen, bedankt!",
       "completeGuide": "Bekijk volledige gids",
-      "lookForIcons": "Waar de pictogrammen te vinden:",
+      "lookForIcons": "Onde encontrar os ícones:",
       "visualNote": "**🔍 Zoek naar deze pictogrammen** in de adresbalk van uw browser"
     }
   },
@@ -348,7 +426,7 @@
     "hours": "uur"
   },
   "realTimeTracking": {
-    "title": "🗺️ Volg onze TukTuk in real-time!",
+    "title": "🛺 Volg onze TukTuk in real-time!",
     "description": "Zie waar onze TukTuk nu is en volg zijn locatie in real-time",
     "buttonText": "📍 TukTuk in Real-time Bekijken"
   }
