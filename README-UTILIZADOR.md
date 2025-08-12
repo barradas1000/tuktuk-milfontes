@@ -12,7 +12,9 @@ Este documento explica o funcionamento do sistema TukTuk Milfontes do ponto de v
 
 - **Administrador:**
   - O acesso ao backoffice requer uma conta de administrador.
-  - Para criar uma conta de admin, contacte a equipa de gestão do TukTuk Milfontes, que irá fornecer as credenciais de acesso (email e password) ou criar a conta para si.
+  - **Apenas emails autorizados podem criar conta de admin.** Existe uma whitelist de emails em `src/constants/allowedAdmins.ts`.
+  - Se tentar registrar um email não autorizado, o sistema bloqueia o cadastro e exibe uma mensagem de erro.
+  - Para adicionar um novo admin, é necessário incluir o email na whitelist e/ou contactar a equipa de gestão do TukTuk Milfontes.
   - Após receber as credenciais, aceda ao painel administrativo através do link:
     - **Backoffice/Admin:** [https://tuktuk-milfontes.vercel.app/admin](https://tuktuk-milfontes.vercel.app/admin)
   - Introduza o seu email e password para iniciar sessão.

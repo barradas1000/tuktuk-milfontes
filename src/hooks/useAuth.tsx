@@ -28,7 +28,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -97,7 +96,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       };
     }
     console.log("Attempting sign up for:", email);
-    const redirectUrl = `${window.location.origin}/login`;
+    // Redirecionamento fixo para produção
+    const redirectUrl = "https://tuktuk-milfontes.vercel.app/login";
 
     const { error } = await supabase.auth.signUp({
       email,

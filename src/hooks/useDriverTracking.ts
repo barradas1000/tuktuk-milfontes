@@ -59,10 +59,10 @@ export function useDriverTracking(
       return;
     }
 
-    console.log(
-      "[useDriverTracking] Tentando iniciar watchPosition...",
-      { enabled, conductorId }
-    );
+    console.log("[useDriverTracking] Tentando iniciar watchPosition...", {
+      enabled,
+      conductorId,
+    });
     if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
       setError("Geolocalização não suportada neste dispositivo/navegador.");
       return;
@@ -79,36 +79,49 @@ export function useDriverTracking(
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
 
-      // Sempre envia update, mesmo sem movimento mínimo
+      // Throttling: só envia se mudou o suficiente ou passou tempo mínimo
+      if (lastPosRef.current) {
+        const prev = lastPosRef.current.coords;
+        const delta = distMeters(prev.latitude, prev.longitude, lat, lng);
+        if (
+          delta < minDeltaMeters &&
+          now - lastSentRef.current < minIntervalMs
+        ) {
+          // Ignora update
+          return;
+        }
+      }
+
       lastPosRef.current = pos;
       lastSentRef.current = now;
 
       console.log(
-        `[useDriverTracking] Enviando localização para o Supabase:`,
-        { latitude: lat, longitude: lng, conductorId }
-      );
-
-      const { error: updErr } = await supabase
-        .from("conductors")
-        .update({
+        `[useDriverTracking] Enviando localização para active_conductors:`,
+        {
           latitude: lat,
           longitude: lng,
+          conductorId,
+        }
+      );
+
+      const { error: updErr } = await supabase.from("active_conductors").upsert(
+        {
+          conductor_id: conductorId,
+          current_latitude: lat,
+          current_longitude: lng,
           is_active: true,
+          is_available: true, // Ajuste conforme lógica de disponibilidade
+          status: "available",
           updated_at: new Date(now).toISOString(),
           last_seen: new Date(now).toISOString(),
-        })
-        .eq("id", conductorId);
+        },
+        { onConflict: "conductor_id" }
+      );
 
       if (updErr) {
-        console.error(
-          "[useDriverTracking] Erro ao atualizar Supabase:",
-          updErr
-        );
+        console.error("[useDriverTracking] Erro ao upsert Supabase:", updErr);
         setError(updErr.message);
       } else {
-        console.log(
-          "[useDriverTracking] Supabase atualizado com sucesso!"
-        );
         setError(null);
         setLastUpdateAt(now);
       }

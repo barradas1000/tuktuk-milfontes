@@ -176,24 +176,21 @@ export type Database = {
           id: string
           conductor_id: string
           is_active: boolean
-          activated_at: string | null
-          deactivated_at: string | null
+          session_start: string | null
           created_at: string | null
         }
         Insert: {
           id?: string
           conductor_id: string
           is_active?: boolean
-          activated_at?: string | null
-          deactivated_at?: string | null
+          session_start?: string | null
           created_at?: string | null
         }
         Update: {
           id?: string
           conductor_id?: string
           is_active?: boolean
-          activated_at?: string | null
-          deactivated_at?: string | null
+          session_start?: string | null
           created_at?: string | null
         }
         Relationships: [

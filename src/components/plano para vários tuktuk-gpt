@@ -2,55 +2,58 @@
 Por quê? Porque dá autonomia ao condutor, controle ao admin, e mantém segurança e rastreabilidade.
 
 🛠️ Passo a Passo Técnico para Implementar
-🔁 1. Unificar Tabelas de Condutores e Rastreamento
-Crie uma única tabela no Supabase chamada conductors com os campos:
-
 ts
-Copiar
-Editar
+
+🔁 1. Separação de Tabelas de Condutores e Rastreamento
+Mantenha a tabela conductors apenas para dados estáticos:
+
 id: string (UUID, PK)
 name: string
 whatsapp: string
 email: string
 password_hash: string (se usares autenticação por email)
-latitude: number
-longitude: number
-is_active: boolean         // Status de rastreamento atual
-last_updated: timestamp    // Última vez em que a posição foi atualizada
 role: 'conductor' | 'admin'
-📌 Se já tens tabela drivers, podes migrar dados e eliminar redundância.
+
+E use a tabela active_conductors para todos os dados dinâmicos de tracking:
+
+conductor_id: string (UUID, FK para conductors)
+current_latitude: number
+current_longitude: number
+is_active: boolean
+is_available: boolean
+status: enum
+occupied_until: timestamp
+last_updated: timestamp
+
+
+tsx
 
 📲 2. App do Condutor: Ativar/Desativar Rastreamento
 ✅ No frontend do condutor:
-Botão “Entrar em serviço” → atualiza is_active = true
+Botão “Entrar em serviço” → cria/atualiza registro em active_conductors com is_active = true
 
-Botão “Sair de serviço” → atualiza is_active = false
+Botão “Sair de serviço” → atualiza active_conductors.is_active = false
 
 tsx
-Copiar
-Editar
-// Exemplo com Supabase e React
+// Exemplo correto com Supabase e React
 const toggleStatus = async (newStatus: boolean) => {
   const { data, error } = await supabase
-    .from("conductors")
-    .update({ is_active: newStatus, last_updated: new Date() })
-    .eq("id", user.id);
-
+    .from("active_conductors")
+    .upsert({ conductor_id: user.id, is_active: newStatus, last_updated: new Date() }, { onConflict: ["conductor_id"] });
   if (error) {
     console.error("Erro ao atualizar status:", error.message);
   }
 };
-📍 3. Mapa do Passageiro: Mostrar Condutores Ativos
-Use useQuery com filtro por is_active = true:
 ts
-Copiar
-Editar
-const fetchActiveConductors = async (): Promise<Conductor[]> => {
+
+📍 3. Mapa do Passageiro: Mostrar Condutores Ativos
+Use useQuery com filtro por is_active = true na tabela active_conductors:
+ts
+const fetchActiveConductors = async (): Promise<ActiveConductor[]> => {
   const { data, error } = await supabase
-    .from("conductors")
+    .from("active_conductors")
     .select("*")
     .eq("is_active", true);
-
   if (error) throw error;
   return data;
 };

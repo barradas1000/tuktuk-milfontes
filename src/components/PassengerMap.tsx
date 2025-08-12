@@ -271,7 +271,6 @@ const PassengerMap: React.FC = () => {
       setLoading(false);
       return;
     }
-    let conductorChannel: ReturnType<typeof supabase.channel> | null = null;
     let activeChannel: ReturnType<typeof supabase.channel> | null = null;
 
     // Listen for custom events as fallback
@@ -298,28 +297,28 @@ const PassengerMap: React.FC = () => {
     const refreshConductorData = async (conductorId: string) => {
       try {
         const { data, error } = await supabase
-          .from("conductors")
-          .select("*")
-          .eq("id", conductorId)
+          .from("active_conductors")
+          .select(
+            "conductor_id, current_latitude, current_longitude, is_available, occupied_until"
+          )
+          .eq("conductor_id", conductorId)
           .eq("is_active", true)
           .single();
 
         if (!error && data) {
-          const lat = data.latitude ?? 37.725;
-          const lng = data.longitude ?? -8.783;
-          const statusData = await fetchConductorStatusFromActiveTable(data.id);
-
+          const lat = data.current_latitude ?? 37.725;
+          const lng = data.current_longitude ?? -8.783;
           setActiveConductors((prev) => {
-            const others = prev.filter((c) => c.id !== data.id);
+            const others = prev.filter((c) => c.id !== data.conductor_id);
             return [
               ...others,
               {
-                id: data.id,
+                id: data.conductor_id,
                 lat: lat as number,
                 lng: lng as number,
-                name: data.name ?? "TukTuk",
-                status: statusData.status,
-                occupiedUntil: statusData.occupiedUntil,
+                name: "TukTuk",
+                status: data.is_available ? "available" : "busy",
+                occupiedUntil: data.occupied_until ?? null,
               },
             ];
           });
@@ -355,32 +354,40 @@ const PassengerMap: React.FC = () => {
           return;
         }
         const { data, error } = await supabase
-          .from("conductors")
-          .select("*")
+          .from("active_conductors")
+          .select(
+            "conductor_id, current_latitude, current_longitude, is_available, occupied_until"
+          )
           .eq("is_active", true);
         if (error || !data) {
           setActiveConductors([]);
         } else {
-          const enriched = await Promise.all(
-            (data as ConductorRow[]).map(async (d: ConductorRow) => {
-              const lat = d.latitude ?? 37.725;
-              const lng = d.longitude ?? -8.783;
+          type ActiveConductorRow = {
+            conductor_id: string;
+            current_latitude?: number | null;
+            current_longitude?: number | null;
+            is_available: boolean;
+            occupied_until?: string | null;
+          };
+          const enriched = (data as ActiveConductorRow[])
+            .map((d) => {
+              const lat = d.current_latitude ?? 37.725;
+              const lng = d.current_longitude ?? -8.783;
               if (!isValidCoordinate(lat ?? undefined, lng ?? undefined))
                 return null;
-              const statusData = await fetchConductorStatusFromActiveTable(
-                d.id
-              );
               return {
-                id: d.id,
+                id: d.conductor_id,
                 lat: lat as number,
                 lng: lng as number,
-                name: d.name ?? "TukTuk",
-                status: statusData.status,
-                occupiedUntil: statusData.occupiedUntil,
-              } as ConductorLocation;
+                name: "TukTuk",
+                status: (d.is_available
+                  ? "available"
+                  : "busy") as ConductorStatus,
+                occupiedUntil: d.occupied_until ?? null,
+              };
             })
-          );
-          setActiveConductors(enriched.filter(Boolean) as ConductorLocation[]);
+            .filter(Boolean) as ConductorLocation[];
+          setActiveConductors(enriched);
         }
       } catch {
         setActiveConductors([]);
@@ -390,86 +397,7 @@ const PassengerMap: React.FC = () => {
     };
 
     const subscribe = () => {
-      conductorChannel = supabase
-        .channel("conductor_location")
-        .on(
-          "postgres_changes",
-          { event: "UPDATE", schema: "public", table: "conductors" },
-          async (payload: RealtimePostgresChangesPayload<ConductorRow>) => {
-            console.log(
-              "[PassengerMap] Realtime UPDATE on conductors:",
-              payload
-            );
-            if (!payload.new || typeof payload.new !== "object") return;
-            const newData = payload.new as ConductorRow;
-            console.log(
-              "[DEBUG] Dados recebidos do Supabase (conductors):",
-              newData
-            );
-            if (!newData?.is_active) {
-              setActiveConductors((prev) => {
-                const filtered = prev.filter((c) => c.id !== newData.id);
-                console.log(
-                  "[DEBUG] Removendo condutor inativo. Novo array:",
-                  filtered
-                );
-                return filtered;
-              });
-              return;
-            }
-            const lat = newData.latitude ?? 37.725;
-            const lng = newData.longitude ?? -8.783;
-            const statusData = await fetchConductorStatusFromActiveTable(
-              newData.id
-            );
-            setActiveConductors((prev) => {
-              const others = prev.filter((c) => c.id !== newData.id);
-              let novoArray;
-              if (!isValidCoordinate(lat ?? undefined, lng ?? undefined)) {
-                console.warn(
-                  "[DEBUG] Coordenadas inválidas recebidas:",
-                  lat,
-                  lng
-                );
-                // Adiciona o condutor ativo sem posição
-                novoArray = [
-                  ...others,
-                  {
-                    id: newData.id,
-                    lat: null,
-                    lng: null,
-                    name: newData.name ?? "TukTuk",
-                    status: statusData.status,
-                    occupiedUntil: statusData.occupiedUntil,
-                  },
-                ];
-                console.log(
-                  "[DEBUG] Novo array de condutores após update (sem posição):",
-                  novoArray
-                );
-              } else {
-                novoArray = [
-                  ...others,
-                  {
-                    id: newData.id,
-                    lat: lat as number,
-                    lng: lng as number,
-                    name: newData.name ?? "TukTuk",
-                    status: statusData.status,
-                    occupiedUntil: statusData.occupiedUntil,
-                  },
-                ];
-                console.log(
-                  "[DEBUG] Novo array de condutores após update:",
-                  novoArray
-                );
-              }
-              return novoArray;
-            });
-          }
-        )
-        .subscribe();
-
+      // Subscrição correta: apenas active_conductors
       activeChannel = supabase
         .channel("active_conductors_status")
         .on(
@@ -485,23 +413,129 @@ const PassengerMap: React.FC = () => {
             if (!payload.new || typeof payload.new !== "object") return;
             const newData = payload.new as ActiveConductorRow;
             if (!newData?.conductor_id) return;
-            const status: ConductorStatus = newData.is_available
-              ? "available"
-              : "busy";
             setActiveConductors((prev) => {
-              const idx = prev.findIndex((c) => c.id === newData.conductor_id);
-              if (idx === -1) return prev;
-              const updated = [...prev];
-              updated[idx] = {
-                ...updated[idx],
-                status,
-                occupiedUntil: newData.occupied_until ?? null,
-              };
-              return updated;
+              const others = prev.filter((c) => c.id !== newData.conductor_id);
+              // Atualiza status e localização
+              const lat =
+                typeof newData.current_latitude === "number"
+                  ? newData.current_latitude
+                  : null;
+              const lng =
+                typeof newData.current_longitude === "number"
+                  ? newData.current_longitude
+                  : null;
+              const status: ConductorStatus = newData.is_available
+                ? "available"
+                : "busy";
+              const occupiedUntil = newData.occupied_until ?? null;
+              // Se não for válido, não adiciona
+              if (
+                lat === null ||
+                lng === null ||
+                !isValidCoordinate(lat, lng)
+              ) {
+                return others;
+              }
+              return [
+                ...others,
+                {
+                  id: newData.conductor_id,
+                  lat,
+                  lng,
+                  name: "TukTuk",
+                  status,
+                  occupiedUntil,
+                },
+              ];
             });
           }
         )
         .subscribe();
+
+      const subscribe = () => {
+      // Canal único que escuta todas as alterações em active_conductors
+      activeChannel = supabase
+        .channel("active_conductors_realtime")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "active_conductors" },
+          (payload) => {
+            console.log(
+              "[PassengerMap] Realtime event on active_conductors:",
+              payload
+            );
+
+            // Lida com a remoção de um condutor (quando a linha é apagada)
+            if (payload.eventType === "DELETE") {
+              const oldId = payload.old.conductor_id;
+              if (oldId) {
+                setActiveConductors((prev) =>
+                  prev.filter((c) => c.id !== oldId)
+                );
+              }
+              return;
+            }
+
+            // Lida com INSERT e UPDATE
+            if (payload.new && typeof payload.new === "object") {
+              type ActiveConductorPayload = {
+                conductor_id: string;
+                is_active?: boolean;
+                is_available?: boolean;
+                occupied_until?: string | null;
+                current_latitude?: number | null;
+                current_longitude?: number | null;
+              };
+
+              const newData = payload.new as ActiveConductorPayload;
+
+              // Se o condutor ficar inativo, remove-o do mapa
+              if (newData.is_active === false) {
+                setActiveConductors((prev) =>
+                  prev.filter((c) => c.id !== newData.conductor_id)
+                );
+                return;
+              }
+
+              const lat = newData.current_latitude;
+              const lng = newData.current_longitude;
+
+              // Se as coordenadas forem inválidas, não o adicione/atualize no mapa
+              if (!isValidCoordinate(lat, lng)) {
+                // Remove do mapa se já existia mas perdeu as coordenadas
+                setActiveConductors((prev) =>
+                  prev.filter((c) => c.id !== newData.conductor_id)
+                );
+                return;
+              }
+
+              const updatedConductor: ConductorLocation = {
+                id: newData.conductor_id,
+                lat: lat as number,
+                lng: lng as number,
+                name: "TukTuk", // O nome é estático, pode ser melhorado com um JOIN no load inicial
+                status: newData.is_available ? "available" : "busy",
+                occupiedUntil: newData.occupied_until ?? null,
+              };
+
+              // Atualiza ou adiciona o condutor na lista
+              setActiveConductors((prev) => {
+                const existingIdx = prev.findIndex(
+                  (c) => c.id === newData.conductor_id
+                );
+                if (existingIdx > -1) {
+                  const newState = [...prev];
+                  newState[existingIdx] = updatedConductor;
+                  return newState;
+                } else {
+                  return [...prev, updatedConductor];
+                }
+              });
+            }
+          }
+        )
+        .subscribe();
+    };
     };
 
     load();
@@ -512,7 +546,7 @@ const PassengerMap: React.FC = () => {
     }
 
     return () => {
-      if (conductorChannel) supabase.removeChannel(conductorChannel);
+      
       if (activeChannel) supabase.removeChannel(activeChannel);
       window.removeEventListener(
         "conductorStatusChanged",

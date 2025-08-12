@@ -6,9 +6,8 @@ interface Conductor {
   id: string;
   name: string;
   whatsapp?: string;
-  latitude?: number;
-  longitude?: number;
-  is_active?: boolean;
+  // Dados estáticos apenas. Não incluir latitude, longitude ou is_active.
+  // end interface Conductor
 }
 
 export interface ActiveConductor {
@@ -16,8 +15,7 @@ export interface ActiveConductor {
   is_active: boolean;
   status?: "available" | "busy";
   occupied_until?: string | null;
-  activated_at?: string;
-  deactivated_at?: string;
+  session_start?: string;
 }
 // Atualiza status e occupied_until do condutor ativo
 export const updateTuktukStatus = async (
@@ -186,17 +184,20 @@ export const updateManualPaymentInSupabase = async (
 export const fetchActiveConductors = async (): Promise<string[]> => {
   try {
     const { data, error } = await supabase
-      .from("conductors")
-      .select("id")
+      .from("active_conductors")
+      .select("conductor_id")
       .eq("is_active", true);
     if (error) {
       console.error("Error fetching active conductors:", error);
-      return ["condutor2"];
+      return [];
     }
-    return (data as Conductor[])?.map((item) => item.id) || ["condutor2"];
+    return (
+      (data as { conductor_id: string }[])?.map((item) => item.conductor_id) ||
+      []
+    );
   } catch (error) {
     console.error("Error fetching active conductors:", error);
-    return ["condutor2"];
+    return [];
   }
 };
 
@@ -204,13 +205,7 @@ export const updateActiveConductors = async (
   conductorIds: string[]
 ): Promise<void> => {
   try {
-    // 1. Desativar todos os condutores na tabela conductors
-    await supabase
-      .from("conductors")
-      .update({ is_active: false })
-      .eq("is_active", true);
-
-    // 2. Finalizar sessões ativas na tabela active_conductors
+    // 1. Finalizar sessões ativas na tabela active_conductors
     await supabase
       .from("active_conductors")
       .update({
@@ -219,14 +214,8 @@ export const updateActiveConductors = async (
       })
       .eq("is_active", true);
 
-    // 3. Ativar condutores selecionados
+    // 2. Ativar condutores selecionados
     if (conductorIds.length > 0) {
-      // Ativar na tabela conductors
-      await supabase
-        .from("conductors")
-        .update({ is_active: true })
-        .in("id", conductorIds);
-
       // Criar registros na tabela active_conductors
       const activeRecords = conductorIds.map((id) => ({
         conductor_id: id,
@@ -234,13 +223,12 @@ export const updateActiveConductors = async (
         is_available: true,
         status: "available",
         session_start: new Date().toISOString(),
-        activated_at: new Date().toISOString(),
       }));
 
       await supabase.from("active_conductors").insert(activeRecords);
     }
   } catch (error) {
-    console.error("Error updating conductors and active sessions:", error);
+    console.error("Error updating active sessions:", error);
     throw error;
   }
 };
@@ -249,7 +237,7 @@ export const fetchConductors = async (): Promise<Conductor[]> => {
   try {
     const { data, error } = await supabase
       .from("conductors")
-      .select("*")
+      .select("id, name, tuktuk_id, whatsapp")
       .order("name");
     if (error) {
       console.error("Error fetching conductors:", error);

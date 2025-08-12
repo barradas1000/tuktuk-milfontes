@@ -17,6 +17,8 @@ import {
   MapPin,
   Loader2,
 } from "lucide-react";
+import { supabase } from "../../lib/supabase";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 
 // Hook para gerir status de localização de todos os condutores ativos
 function useAllConductorsLocationStatus(conductors, activeConductors) {
@@ -247,6 +249,9 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   const [tuktukStatus, setTuktukStatus] = useState<"available" | "busy">(
     "available"
   );
+
+  // Estado de status de localização dos condutores ativos
+  const locationStatus = useAllConductorsLocationStatus(conductors, activeConductors);
   const [occupiedMinutes, setOccupiedMinutes] = useState(30);
   const [occupiedUntil, setOccupiedUntil] = useState<Date | null>(null);
 
@@ -1139,9 +1144,44 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     loadDataForDate();
   }, [calendarDate]);
 
-  // --- Efeitos para carregar dados do Supabase e subscrever realtime ---
+  // Recarregar dados do Supabase quando a data do calendário mudar
   useEffect(() => {
-    let conductorsChannel: any = null;
+    const loadBlockedPeriods = async () => {
+      try {
+        setBlockedPeriodsLoading(true);
+        const data = await fetchBlockedPeriods();
+        setBlockedPeriods(data);
+      } catch (error) {
+        console.error("Error loading blocked periods:", error);
+      } finally {
+        setBlockedPeriodsLoading(false);
+      }
+    };
+
+    const loadActiveConductors = async () => {
+      try {
+        setConductorsLoading(true);
+        const activeIds = await fetchActiveConductors();
+        setActiveConductors(activeIds);
+        const conductorsData = await fetchConductors();
+        if (conductorsData.length > 0) {
+          setConductors(conductorsData);
+        }
+      } catch (error) {
+        console.error("Error loading active conductors:", error);
+        setActiveConductors(["condutor2"]); // fallback
+      } finally {
+        setConductorsLoading(false);
+      }
+    };
+
+    loadBlockedPeriods();
+    loadActiveConductors();
+  }, [calendarDate]);
+
+  // Recarregar dados do Supabase e subscrever realtime
+  useEffect(() => {
+    let conductorsChannel: RealtimeChannel | null = null;
     const loadBlockedPeriods = async () => {
       try {
         setBlockedPeriodsLoading(true);
@@ -1175,34 +1215,17 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
     loadActiveConductors();
 
     // Subscrição realtime para updates na tabela conductors
-    if (window?.supabase) {
-      // Se já existe supabase global, usar
-      conductorsChannel = window.supabase
-        .channel("conductors_realtime")
-        .on(
-          "postgres_changes",
-          { event: "UPDATE", schema: "public", table: "conductors" },
-          async (payload) => {
-            // Sempre que qualquer condutor muda is_active, recarrega lista
-            const activeIds = await fetchActiveConductors();
-            setActiveConductors(activeIds);
-          }
-        )
-        .subscribe();
-    } else if (typeof supabase !== "undefined") {
-      // fallback: usar import local
-      conductorsChannel = supabase
-        .channel("conductors_realtime")
-        .on(
-          "postgres_changes",
-          { event: "UPDATE", schema: "public", table: "conductors" },
-          async (payload) => {
-            const activeIds = await fetchActiveConductors();
-            setActiveConductors(activeIds);
-          }
-        )
-        .subscribe();
-    }
+    conductorsChannel = supabase
+      .channel("conductors_realtime")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "conductors" },
+        async (payload) => {
+          const activeIds = await fetchActiveConductors();
+          setActiveConductors(activeIds);
+        }
+      )
+      .subscribe();
 
     return () => {
       if (conductorsChannel && typeof supabase !== "undefined") {
@@ -1299,113 +1322,109 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
   };
   // --- Renderização do Componente ---
   return (
-    <div>
-      <style>{sliderStyles}</style>
-      {/* Debug info - remover depois */}
-      {/* {debugInfo && (
-        <div className="mb-4 p-2 bg-blue-100 border border-blue-300 rounded text-xs">
-          <strong>Debug:</strong> {debugInfo}
-          <div className="mt-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={handleCleanDuplicates}
-              disabled={isCleaningDuplicates}
-              className="text-xs"
-          },
-          [blockTime]
-      {/* Painel de seleção de condutores ativos */}
-      <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex flex-col gap-3 items-center shadow-md">
-        <h2 className="text-lg font-bold text-purple-900 mb-2">
-          Condutores Ativos
-        </h2>
-        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-          {(() => {
-            const locationStatus = useAllConductorsLocationStatus(
-              conductors,
-              activeConductors
-            );
-            return conductors.map((c) => {
+    <>
+      <div>
+        <style>{sliderStyles}</style>
+        {/* Debug info - remover depois */}
+        {/* {debugInfo && (
+          <div className="mb-4 p-2 bg-blue-100 border border-blue-300 rounded text-xs">
+            <strong>Debug:</strong> {debugInfo}
+            <div className="mt-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleCleanDuplicates}
+                disabled={isCleaningDuplicates}
+                className="text-xs"
+            },
+            [blockTime]
+        {/* Painel de seleção de condutores ativos */}
+        <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex flex-col gap-3 items-center shadow-md">
+          <h2 className="text-lg font-bold text-purple-900 mb-2">
+            Condutores Ativos
+          </h2>
+          <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+            {conductors.map((c) => {
               const isActive = activeConductors.includes(c.id);
               const status = locationStatus[c.id]?.status || "red";
               const error = locationStatus[c.id]?.error || null;
               return (
                 <div
-                  key={c.id}
-                  className="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border border-gray-200"
-                >
-                  <span className="font-semibold text-gray-800 min-w-[90px] flex items-center gap-2">
-                    {c.name}
-                    {/* Ícone de status de localização */}
-                    {status === "green" && (
-                      <span title="Localização ativa">
-                        <MapPin className="w-5 h-5 text-green-500" />
+                      key={c.id}
+                      className="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border border-gray-200"
+                    >
+                      <span className="font-semibold text-gray-800 min-w-[90px] flex items-center gap-2">
+                        {c.name}
+                        {/* Ícone de status de localização */}
+                        {status === "green" && (
+                          <span title="Localização ativa">
+                            <MapPin className="w-5 h-5 text-green-500" />
+                          </span>
+                        )}
+                        {status === "yellow" && (
+                          <span title="A tentar obter localização">
+                            <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />
+                          </span>
+                        )}
+                        {status === "red" && (
+                          <span title={error || "Sem localização"}>
+                            <MapPin className="w-5 h-5 text-red-500" />
+                          </span>
+                        )}
+                        <span className="ml-2 text-xs text-gray-500">
+                          ({c.whatsapp})
+                        </span>
                       </span>
-                    )}
-                    {status === "yellow" && (
-                      <span title="A tentar obter localização">
-                        <Loader2 className="w-5 h-5 text-yellow-500 animate-spin" />
-                      </span>
-                    )}
-                    {status === "red" && (
-                      <span title={error || "Sem localização"}>
-                        <MapPin className="w-5 h-5 text-red-500" />
-                      </span>
-                    )}
-                    <span className="ml-2 text-xs text-gray-500">
-                      ({c.whatsapp})
-                    </span>
-                  </span>
-                  <Switch
-                    checked={isActive}
-                    onCheckedChange={(checked) => {
-                      const newActiveConductors = checked
-                        ? [...activeConductors, c.id]
-                        : activeConductors.filter((id) => id !== c.id);
-                      setActiveConductors(newActiveConductors);
-                      updateActiveConductors(newActiveConductors).catch(
-                        (error) => {
-                          console.error(
-                            "Error updating active conductors:",
-                            error
+                      <Switch
+                        checked={isActive}
+                        onCheckedChange={(checked) => {
+                          const newActiveConductors = checked
+                            ? [...activeConductors, c.id]
+                            : activeConductors.filter((id) => id !== c.id);
+                          setActiveConductors(newActiveConductors);
+                          updateActiveConductors(newActiveConductors).catch(
+                            (error) => {
+                              console.error(
+                                "Error updating active conductors:",
+                                error
+                              );
+                            }
                           );
+                        }}
+                        id={`switch-${c.id}`}
+                      />
+                      <span
+                        className={
+                          isActive
+                            ? "text-green-600 font-semibold"
+                            : "text-gray-400"
                         }
-                      );
-                    }}
-                    id={`switch-${c.id}`}
-                  />
-                  <span
-                    className={
-                      isActive
-                        ? "text-green-600 font-semibold"
-                        : "text-gray-400"
-                    }
-                  >
-                    {isActive ? "Ativo" : "Inativo"}
-                  </span>
-                </div>
-              );
-            });
-          })()}
-        </div>
-
-        {/* Mensagem visual de localização em tempo real */}
-        {activeConductors.length === 1 && (
-          <div className="mt-4 px-4 py-2 bg-green-100 border border-green-300 rounded text-green-800 flex items-center gap-2 animate-pulse">
-            <MapPin className="w-5 h-5 text-green-600" />
-            <span>
-              Localização em tempo real ativa: o seu dispositivo está a enviar a posição para o sistema.
-            </span>
+                      >
+                        {isActive ? "Ativo" : "Inativo"}
+                      </span>
+                    </div>
+                  );
+                })}
           </div>
-        )}
 
-        {/* Exibir o WhatsApp responsável atual */}
-        <div className="mt-4 text-base text-purple-900 font-semibold">
-          WhatsApp responsável: {" "}
-          <span className="text-purple-700">{getCurrentWhatsapp()}</span>
-        </div>
-        {/* Bloco de rastreamento em tempo real desabilitado */}
-        {/*
+          {/* Mensagem visual de localização em tempo real */}
+          {activeConductors.length === 1 && (
+            <div className="mt-4 px-4 py-2 bg-green-100 border border-green-300 rounded text-green-800 flex items-center gap-2 animate-pulse">
+              <MapPin className="w-5 h-5 text-green-600" />
+              <span>
+                Localização em tempo real ativa: o seu dispositivo está a enviar
+                a posição para o sistema.
+              </span>
+            </div>
+          )}
+
+          {/* Exibir o WhatsApp responsável atual */}
+          <div className="mt-4 text-base text-purple-900 font-semibold">
+            WhatsApp responsável:{" "}
+            <span className="text-purple-700">{getCurrentWhatsapp()}</span>
+          </div>
+          {/* Bloco de rastreamento em tempo real desabilitado */}
+          {/*
   <Card className="mt-6 w-full max-w-md mx-auto bg-blue-50 border-blue-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-blue-900">
@@ -1474,613 +1493,619 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           </CardContent>
         </Card>
   */}
-      </div>
+        </div>
 
-      {/* Painel de Disponibilidade do TukTuk para o condutor */}
-      <div
-        className={`mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex flex-col gap-4 items-center shadow-md ${
-          activeConductors.length !== 1 ? "opacity-60 pointer-events-none" : ""
-        }`}
-      >
-        <h2 className="text-lg font-bold text-green-900 mb-2 flex items-center gap-2">
-          <Clock className="h-5 w-5" /> Disponibilidade do TukTuk
-        </h2>
-        <div className="flex flex-col md:flex-row gap-4 items-center w-full justify-center">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-gray-800">Status:</span>
-            <Switch
-              checked={tuktukStatus === "available"}
-              onCheckedChange={async (checked) => {
-                if (activeConductors.length === 1) {
-                  const conductorId = activeConductors[0];
-                  if (checked) {
-                    setTuktukStatus("available");
-                    setOccupiedUntil(null);
-                    await updateTuktukStatus(conductorId, "available", null);
-                  } else {
-                    setTuktukStatus("busy");
-                    await updateTuktukStatus(
-                      conductorId,
-                      "busy",
-                      occupiedUntil
-                    );
-                  }
-                } else {
-                  // fallback local
-                  if (checked) {
-                    setTuktukStatus("available");
-                    setOccupiedUntil(null);
-                  } else {
-                    setTuktukStatus("busy");
-                  }
-                }
-              }}
-              id="switch-tuktuk-status"
-              disabled={activeConductors.length !== 1}
-            />
-            <span
-              className={
-                tuktukStatus === "available"
-                  ? "text-green-600 font-semibold"
-                  : "text-red-600 font-semibold"
-              }
-            >
-              {tuktukStatus === "available" ? "Disponível" : "Ocupado"}
-            </span>
-          </div>
-          {tuktukStatus === "busy" && (
+        {/* Painel de Disponibilidade do TukTuk para o condutor */}
+        <div
+          className={`mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex flex-col gap-4 items-center shadow-md ${
+            activeConductors.length !== 1
+              ? "opacity-60 pointer-events-none"
+              : ""
+          }`}
+        >
+          <h2 className="text-lg font-bold text-green-900 mb-2 flex items-center gap-2">
+            <Clock className="h-5 w-5" /> Disponibilidade do TukTuk
+          </h2>
+          <div className="flex flex-col md:flex-row gap-4 items-center w-full justify-center">
             <div className="flex items-center gap-2">
-              <span className="text-sm">Tempo previsto ocupado:</span>
-              <input
-                type="number"
-                min={1}
-                max={180}
-                value={occupiedMinutes}
-                onChange={(e) => setOccupiedMinutes(Number(e.target.value))}
-                className="border rounded px-2 py-1 w-20 text-center"
-                disabled={activeConductors.length !== 1}
-              />
-              <span className="text-xs text-gray-500">minutos</span>
-              <Button
-                size="sm"
-                variant="default"
-                onClick={async () => {
-                  const until = new Date(Date.now() + occupiedMinutes * 60000);
-                  setOccupiedUntil(until);
+              <span className="font-semibold text-gray-800">Status:</span>
+              <Switch
+                checked={tuktukStatus === "available"}
+                onCheckedChange={async (checked) => {
                   if (activeConductors.length === 1) {
                     const conductorId = activeConductors[0];
-                    await updateTuktukStatus(conductorId, "busy", until);
+                    if (checked) {
+                      setTuktukStatus("available");
+                      setOccupiedUntil(null);
+                      await updateTuktukStatus(conductorId, "available", null);
+                    } else {
+                      setTuktukStatus("busy");
+                      await updateTuktukStatus(
+                        conductorId,
+                        "busy",
+                        occupiedUntil
+                      );
+                    }
+                  } else {
+                    // fallback local
+                    if (checked) {
+                      setTuktukStatus("available");
+                      setOccupiedUntil(null);
+                    } else {
+                      setTuktukStatus("busy");
+                    }
                   }
-                  toast({
-                    title: "TukTuk marcado como Ocupado",
-                    description: `Disponível a partir das ${until.toLocaleTimeString(
-                      "pt-PT",
-                      { hour: "2-digit", minute: "2-digit" }
-                    )}`,
-                    variant: "default",
-                  });
                 }}
-                disabled={
-                  !occupiedMinutes ||
-                  occupiedMinutes < 1 ||
-                  activeConductors.length !== 1
+                id="switch-tuktuk-status"
+                disabled={activeConductors.length !== 1}
+              />
+              <span
+                className={
+                  tuktukStatus === "available"
+                    ? "text-green-600 font-semibold"
+                    : "text-red-600 font-semibold"
                 }
               >
-                Confirmar
-              </Button>
+                {tuktukStatus === "available" ? "Disponível" : "Ocupado"}
+              </span>
+            </div>
+            {tuktukStatus === "busy" && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm">Tempo previsto ocupado:</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={180}
+                  value={occupiedMinutes}
+                  onChange={(e) => setOccupiedMinutes(Number(e.target.value))}
+                  className="border rounded px-2 py-1 w-20 text-center"
+                  disabled={activeConductors.length !== 1}
+                />
+                <span className="text-xs text-gray-500">minutos</span>
+                <Button
+                  size="sm"
+                  variant="default"
+                  onClick={async () => {
+                    const until = new Date(
+                      Date.now() + occupiedMinutes * 60000
+                    );
+                    setOccupiedUntil(until);
+                    if (activeConductors.length === 1) {
+                      const conductorId = activeConductors[0];
+                      await updateTuktukStatus(conductorId, "busy", until);
+                    }
+                    toast({
+                      title: "TukTuk marcado como Ocupado",
+                      description: `Disponível a partir das ${until.toLocaleTimeString(
+                        "pt-PT",
+                        { hour: "2-digit", minute: "2-digit" }
+                      )}`,
+                      variant: "default",
+                    });
+                  }}
+                  disabled={
+                    !occupiedMinutes ||
+                    occupiedMinutes < 1 ||
+                    activeConductors.length !== 1
+                  }
+                >
+                  Confirmar
+                </Button>
+              </div>
+            )}
+          </div>
+          {tuktukStatus === "busy" && occupiedUntil && (
+            <div className="text-sm text-red-700 mt-2">
+              Ocupado até:{" "}
+              <b>
+                {occupiedUntil.toLocaleTimeString("pt-PT", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </b>
+            </div>
+          )}
+          {tuktukStatus === "available" && (
+            <div className="text-sm text-green-700 mt-2">
+              TukTuk disponível para novas viagens!
             </div>
           )}
         </div>
-        {tuktukStatus === "busy" && occupiedUntil && (
-          <div className="text-sm text-red-700 mt-2">
-            Ocupado até:{" "}
-            <b>
-              {occupiedUntil.toLocaleTimeString("pt-PT", {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </b>
-          </div>
-        )}
-        {tuktukStatus === "available" && (
-          <div className="text-sm text-green-700 mt-2">
-            TukTuk disponível para novas viagens!
-          </div>
-        )}
-      </div>
 
-      {/* Disponibilidade por Horário Card */}
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5" />
-            Disponibilidade por Horário
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex justify-between items-center mb-3">
-            <div className="text-sm text-gray-600">
-              Clique em um horário para bloquear/desbloquear
+        {/* Disponibilidade por Horário Card */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Disponibilidade por Horário
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center mb-3">
+              <div className="text-sm text-gray-600">
+                Clique em um horário para bloquear/desbloquear
+              </div>
+              <div className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
+                {format(calendarDate, "dd/MM", { locale: pt })}
+              </div>
             </div>
-            <div className="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg border border-blue-200">
-              {format(calendarDate, "dd/MM", { locale: pt })}
-            </div>
-          </div>
 
-          {/* Slider de dias */}
-          <div className="mb-4">
-            <div className="text-sm font-medium text-gray-700 mb-2">
-              Próximos 10 dias:
+            {/* Slider de dias */}
+            <div className="mb-4">
+              <div className="text-sm font-medium text-gray-700 mb-2">
+                Próximos 10 dias:
+              </div>
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {sliderDays.map((day, index) => {
+                  const isSelected =
+                    format(day, "yyyy-MM-dd") ===
+                    format(selectedSliderDate, "yyyy-MM-dd");
+                  const isToday =
+                    format(day, "yyyy-MM-dd") ===
+                    format(new Date(), "yyyy-MM-dd");
+                  const dayName = format(day, "EEE", { locale: pt });
+                  const dayNumber = format(day, "dd");
+                  const month = format(day, "MM");
+
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => handleSliderDateSelect(day)}
+                      className={`flex flex-col items-center justify-center min-w-[60px] h-16 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
+                        isSelected
+                          ? "border-blue-500 bg-blue-50 text-blue-700 shadow-md"
+                          : isToday
+                          ? "border-purple-400 bg-purple-50 text-purple-700"
+                          : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+                      }`}
+                    >
+                      <div className="text-xs font-medium uppercase">
+                        {dayName}
+                      </div>
+                      <div className="text-lg font-bold">{dayNumber}</div>
+                      <div className="text-xs text-gray-500">{month}</div>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {sliderDays.map((day, index) => {
-                const isSelected =
-                  format(day, "yyyy-MM-dd") ===
-                  format(selectedSliderDate, "yyyy-MM-dd");
-                const isToday =
-                  format(day, "yyyy-MM-dd") ===
-                  format(new Date(), "yyyy-MM-dd");
-                const dayName = format(day, "EEE", { locale: pt });
-                const dayNumber = format(day, "dd");
-                const month = format(day, "MM");
+
+            {/* Legenda dos tipos de bloqueio */}
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
+              <div className="text-sm font-medium text-gray-700 mb-2">
+                Legenda dos horários:
+              </div>
+              <div className="flex flex-wrap gap-4 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-green-50 border-2 border-green-200 rounded"></div>
+                  <span className="text-green-600">Disponível</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-orange-50 border-2 border-orange-300 rounded"></div>
+                  <span className="text-orange-600">Reserva confirmada</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-red-50 border-2 border-red-300 rounded"></div>
+                  <span className="text-red-600">Bloqueado pelo admin</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-200 border-2 border-gray-400 rounded"></div>
+                  <span className="text-gray-500">Indisponível</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2">
+              {availabilitySlots.map((slot) => {
+                let cardClass = "";
+                let textClass = "";
+                let statusText = "";
+
+                switch (slot.status) {
+                  case "blocked_by_reservation":
+                    cardClass =
+                      "border-orange-300 bg-orange-50 hover:bg-orange-100";
+                    textClass = "text-orange-600";
+                    statusText = "Reserva confirmada";
+                    break;
+                  case "blocked_by_admin":
+                    cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
+                    textClass = "text-red-600";
+                    statusText = "Bloqueado pelo admin";
+                    break;
+                  case "available":
+                    cardClass =
+                      "border-green-200 bg-green-50 hover:bg-green-100";
+                    textClass = "text-green-600";
+                    statusText = "Disponível";
+                    break;
+                  default:
+                    cardClass =
+                      "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
+                    textClass = "text-gray-500";
+                    statusText = "Indisponível";
+                }
 
                 return (
-                  <button
-                    key={index}
-                    onClick={() => handleSliderDateSelect(day)}
-                    className={`flex flex-col items-center justify-center min-w-[60px] h-16 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                      isSelected
-                        ? "border-blue-500 bg-blue-50 text-blue-700 shadow-md"
-                        : isToday
-                        ? "border-purple-400 bg-purple-50 text-purple-700"
-                        : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
-                    }`}
+                  <div
+                    key={slot.time}
+                    className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
+                    title={slot.reason || statusText}
+                    onClick={() => {
+                      if (slot.status === "blocked_by_reservation") {
+                        toast({
+                          title: "Não é possível desbloquear",
+                          description:
+                            "Este horário está bloqueado por uma reserva confirmada. Cancele a reserva primeiro.",
+                          variant: "destructive",
+                        });
+                      } else if (slot.status === "blocked_by_admin") {
+                        unblockTime(calendarDate, slot.time);
+                      } else if (slot.status === "available") {
+                        blockTime(calendarDate, slot.time, "");
+                      }
+                    }}
                   >
-                    <div className="text-xs font-medium uppercase">
-                      {dayName}
+                    <div className="font-semibold flex items-center justify-center gap-1">
+                      {slot.time}{" "}
+                      {slot.status !== "available" && (
+                        <Lock className="w-4 h-4 inline ml-1" />
+                      )}
                     </div>
-                    <div className="text-lg font-bold">{dayNumber}</div>
-                    <div className="text-xs text-gray-500">{month}</div>
-                  </button>
+                    <div className="text-xs text-gray-600">
+                      {slot.reserved}/{slot.capacity} pessoas
+                    </div>
+                    <div className={`text-xs font-medium mt-1 ${textClass}`}>
+                      {statusText}
+                    </div>
+                  </div>
                 );
               })}
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* Legenda dos tipos de bloqueio */}
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg border">
-            <div className="text-sm font-medium text-gray-700 mb-2">
-              Legenda dos horários:
+        {/* Main Calendar Card */}
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5" />
+              Disponibilidade
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Removido bloco dos botões de bloqueio/desbloqueio */}
+            <div className="rounded-2xl shadow-xl bg-white p-2">
+              <DayPicker
+                mode="single"
+                selected={calendarDate}
+                onSelect={handleDayClick}
+                className="rounded-2xl border-0"
+                locale={pt}
+                modifiers={modifiers}
+                modifiersClassNames={modifiersClassNames}
+                components={{
+                  Day: (props) => {
+                    const status = getDayStatus(props.date);
+                    const isSelected =
+                      format(props.date, "yyyy-MM-dd") ===
+                      format(calendarDate, "yyyy-MM-dd");
+                    const isToday =
+                      format(props.date, "yyyy-MM-dd") ===
+                      format(new Date(), "yyyy-MM-dd");
+                    const blocked = isDayBlocked(props.date);
+                    const textColor = blocked ? "text-gray-400" : "text-black";
+
+                    return (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            className={
+                              `h-10 w-10 flex items-center justify-center rounded-full transition-all duration-150 ` +
+                              (isSelected
+                                ? "ring-2 ring-blue-500 bg-blue-100 font-bold "
+                                : "") +
+                              (isToday
+                                ? "ring-2 ring-purple-600 ring-offset-2 "
+                                : "") +
+                              (blocked
+                                ? "bg-gray-300 cursor-pointer hover:bg-gray-400 "
+                                : modifiersClassNames[
+                                    status as keyof typeof modifiersClassNames
+                                  ] + " ") +
+                              textColor +
+                              " hover:scale-110 hover:shadow-lg focus:outline-none"
+                            }
+                            onClick={() => handleDayClick(props.date)}
+                          >
+                            {blocked ? (
+                              <Lock className="w-4 h-4" />
+                            ) : (
+                              props.date.getDate()
+                            )}
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {blocked
+                            ? `${getDayBlockReason(
+                                props.date
+                              )} - Clique para desbloquear`
+                            : `${getDayLabel(status)} - Clique para bloquear`}
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  },
+                }}
+              />
             </div>
-            <div className="flex flex-wrap gap-4 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-green-50 border-2 border-green-200 rounded"></div>
-                <span className="text-green-600">Disponível</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-orange-50 border-2 border-orange-300 rounded"></div>
-                <span className="text-orange-600">Reserva confirmada</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-red-50 border-2 border-red-300 rounded"></div>
-                <span className="text-red-600">Bloqueado pelo admin</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 bg-gray-200 border-2 border-gray-400 rounded"></div>
-                <span className="text-gray-500">Indisponível</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-8 gap-2">
-            {availabilitySlots.map((slot) => {
-              let cardClass = "";
-              let textClass = "";
-              let statusText = "";
-
-              switch (slot.status) {
-                case "blocked_by_reservation":
-                  cardClass =
-                    "border-orange-300 bg-orange-50 hover:bg-orange-100";
-                  textClass = "text-orange-600";
-                  statusText = "Reserva confirmada";
-                  break;
-                case "blocked_by_admin":
-                  cardClass = "border-red-300 bg-red-50 hover:bg-red-100";
-                  textClass = "text-red-600";
-                  statusText = "Bloqueado pelo admin";
-                  break;
-                case "available":
-                  cardClass = "border-green-200 bg-green-50 hover:bg-green-100";
-                  textClass = "text-green-600";
-                  statusText = "Disponível";
-                  break;
-                default:
-                  cardClass =
-                    "border-gray-400 bg-gray-200 text-gray-500 hover:bg-gray-300";
-                  textClass = "text-gray-500";
-                  statusText = "Indisponível";
-              }
-
-              return (
-                <div
-                  key={slot.time}
-                  className={`p-2 h-20 rounded-lg text-sm flex flex-col items-center justify-center border cursor-pointer transition-all duration-150 shadow-sm mb-1 ${cardClass}`}
-                  title={slot.reason || statusText}
-                  onClick={() => {
-                    if (slot.status === "blocked_by_reservation") {
-                      toast({
-                        title: "Não é possível desbloquear",
-                        description:
-                          "Este horário está bloqueado por uma reserva confirmada. Cancele a reserva primeiro.",
-                        variant: "destructive",
-                      });
-                    } else if (slot.status === "blocked_by_admin") {
-                      unblockTime(calendarDate, slot.time);
-                    } else if (slot.status === "available") {
-                      blockTime(calendarDate, slot.time, "");
-                    }
-                  }}
-                >
-                  <div className="font-semibold flex items-center justify-center gap-1">
-                    {slot.time}{" "}
-                    {slot.status !== "available" && (
-                      <Lock className="w-4 h-4 inline ml-1" />
-                    )}
-                  </div>
-                  <div className="text-xs text-gray-600">
-                    {slot.reserved}/{slot.capacity} pessoas
-                  </div>
-                  <div className={`text-xs font-medium mt-1 ${textClass}`}>
-                    {statusText}
-                  </div>
+            <div className="mt-4 space-y-2">
+              <h4 className="font-semibold text-sm">Legenda:</h4>
+              <div className="flex flex-wrap gap-2 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-gray-300 rounded"></div>
+                  <span>Sem reservas</span>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Main Calendar Card */}
-      <Card className="lg:col-span-1">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CalendarIcon className="h-5 w-5" />
-            Disponibilidade
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {/* Removido bloco dos botões de bloqueio/desbloqueio */}
-          <div className="rounded-2xl shadow-xl bg-white p-2">
-            <DayPicker
-              mode="single"
-              selected={calendarDate}
-              onSelect={handleDayClick}
-              className="rounded-2xl border-0"
-              locale={pt}
-              modifiers={modifiers}
-              modifiersClassNames={modifiersClassNames}
-              components={{
-                Day: (props) => {
-                  const status = getDayStatus(props.date);
-                  const isSelected =
-                    format(props.date, "yyyy-MM-dd") ===
-                    format(calendarDate, "yyyy-MM-dd");
-                  const isToday =
-                    format(props.date, "yyyy-MM-dd") ===
-                    format(new Date(), "yyyy-MM-dd");
-                  const blocked = isDayBlocked(props.date);
-                  const textColor = blocked ? "text-gray-400" : "text-black";
-
-                  return (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className={
-                            `h-10 w-10 flex items-center justify-center rounded-full transition-all duration-150 ` +
-                            (isSelected
-                              ? "ring-2 ring-blue-500 bg-blue-100 font-bold "
-                              : "") +
-                            (isToday
-                              ? "ring-2 ring-purple-600 ring-offset-2 "
-                              : "") +
-                            (blocked
-                              ? "bg-gray-300 cursor-pointer hover:bg-gray-400 "
-                              : modifiersClassNames[
-                                  status as keyof typeof modifiersClassNames
-                                ] + " ") +
-                            textColor +
-                            " hover:scale-110 hover:shadow-lg focus:outline-none"
-                          }
-                          onClick={() => handleDayClick(props.date)}
-                        >
-                          {blocked ? (
-                            <Lock className="w-4 h-4" />
-                          ) : (
-                            props.date.getDate()
-                          )}
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {blocked
-                          ? `${getDayBlockReason(
-                              props.date
-                            )} - Clique para desbloquear`
-                          : `${getDayLabel(status)} - Clique para bloquear`}
-                      </TooltipContent>
-                    </Tooltip>
-                  );
-                },
-              }}
-            />
-          </div>
-          <div className="mt-4 space-y-2">
-            <h4 className="font-semibold text-sm">Legenda:</h4>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-gray-300 rounded"></div>
-                <span>Sem reservas</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-green-400 rounded"></div>
-                <span>Poucas reservas</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-yellow-300 rounded"></div>
-                <span>Várias reservas</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-red-400 rounded"></div>
-                <span>Cheio</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-blue-300 rounded"></div>
-                <span>Serviço não ativo</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-gray-300 rounded flex items-center justify-center">
-                  <Lock className="w-2 h-2" />
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-green-400 rounded"></div>
+                  <span>Poucas reservas</span>
                 </div>
-                <span>Dia bloqueado (clique para desbloquear)</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-white border border-gray-300 rounded flex items-center justify-center">
-                  <span className="text-xs">+</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-yellow-300 rounded"></div>
+                  <span>Várias reservas</span>
                 </div>
-                <span>Dia disponível (clique para bloquear)</span>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-red-400 rounded"></div>
+                  <span>Cheio</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-blue-300 rounded"></div>
+                  <span>Serviço não ativo</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-gray-300 rounded flex items-center justify-center">
+                    <Lock className="w-2 h-2" />
+                  </div>
+                  <span>Dia bloqueado (clique para desbloquear)</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-3 h-3 bg-white border border-gray-300 rounded flex items-center justify-center">
+                    <span className="text-xs">+</span>
+                  </div>
+                  <span>Dia disponível (clique para bloquear)</span>
+                </div>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
 
-      {/* Seção de Visualização de Bloqueios */}
-      <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-xl shadow-md">
-        <h2 className="text-lg font-bold text-orange-900 mb-4 flex items-center gap-2">
-          <Lock className="h-5 w-5" />
-          Visualização de Bloqueios
-        </h2>
+        {/* Seção de Visualização de Bloqueios */}
+        <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-xl shadow-md">
+          <h2 className="text-lg font-bold text-orange-900 mb-4 flex items-center gap-2">
+            <Lock className="h-5 w-5" />
+            Visualização de Bloqueios
+          </h2>
 
-        {/* Filtros */}
-        <div className="mb-4 flex flex-wrap gap-3 items-center">
-          <div className="flex items-center gap-2">
-            <label
-              className="text-sm font-medium text-orange-800"
-              htmlFor="block-filter-type"
-            >
-              Filtrar por:
-            </label>
-            <select
-              id="block-filter-type"
-              name="block-filter-type"
-              value={blockFilterType}
-              onChange={(e) =>
-                setBlockFilterType(e.target.value as "all" | "days" | "hours")
-              }
-              className="border border-orange-200 rounded px-2 py-1 text-sm"
-            >
-              <option value="all">Todos</option>
-              <option value="days">Apenas Dias</option>
-              <option value="hours">Apenas Horários</option>
-            </select>
-          </div>
-          <div className="flex items-center gap-2">
-            <label
-              className="text-sm font-medium text-orange-800"
-              htmlFor="block-filter-date"
-            >
-              Data:
-            </label>
-            <input
-              id="block-filter-date"
-              name="block-filter-date"
-              type="date"
-              value={blockFilterDate}
-              onChange={(e) => setBlockFilterDate(e.target.value)}
-              className="border border-orange-200 rounded px-2 py-1 text-sm"
-            />
-            {blockFilterDate && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setBlockFilterDate("")}
-                className="text-xs"
+          {/* Filtros */}
+          <div className="mb-4 flex flex-wrap gap-3 items-center">
+            <div className="flex items-center gap-2">
+              <label
+                className="text-sm font-medium text-orange-800"
+                htmlFor="block-filter-type"
               >
-                Limpar
-              </Button>
-            )}
+                Filtrar por:
+              </label>
+              <select
+                id="block-filter-type"
+                name="block-filter-type"
+                value={blockFilterType}
+                onChange={(e) =>
+                  setBlockFilterType(e.target.value as "all" | "days" | "hours")
+                }
+                className="border border-orange-200 rounded px-2 py-1 text-sm"
+              >
+                <option value="all">Todos</option>
+                <option value="days">Apenas Dias</option>
+                <option value="hours">Apenas Horários</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label
+                className="text-sm font-medium text-orange-800"
+                htmlFor="block-filter-date"
+              >
+                Data:
+              </label>
+              <input
+                id="block-filter-date"
+                name="block-filter-date"
+                type="date"
+                value={blockFilterDate}
+                onChange={(e) => setBlockFilterDate(e.target.value)}
+                className="border border-orange-200 rounded px-2 py-1 text-sm"
+              />
+              {blockFilterDate && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setBlockFilterDate("")}
+                  className="text-xs"
+                >
+                  Limpar
+                </Button>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Dias Bloqueados */}
-          <div className="bg-white rounded-lg p-4 border border-orange-200">
-            <h3 className="font-semibold text-orange-800 mb-3 flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4" />
-              Dias Bloqueados (
-              {getFilteredBlocks().filter((b) => !b.startTime).length})
-            </h3>
-            {getFilteredBlocks().filter((b) => !b.startTime).length === 0 ? (
-              <div className="text-gray-500 text-sm text-center py-4">
-                {blockFilterType === "hours"
-                  ? "Filtro aplicado: apenas horários"
-                  : "Nenhum dia bloqueado"}
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {getFilteredBlocks()
-                  .filter((b) => !b.startTime)
-                  .sort(
-                    (a, b) =>
-                      new Date(a.date).getTime() - new Date(b.date).getTime()
-                  )
-                  .map((block) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Dias Bloqueados */}
+            <div className="bg-white rounded-lg p-4 border border-orange-200">
+              <h3 className="font-semibold text-orange-800 mb-3 flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                Dias Bloqueados (
+                {getFilteredBlocks().filter((b) => !b.startTime).length})
+              </h3>
+              {getFilteredBlocks().filter((b) => !b.startTime).length === 0 ? (
+                <div className="text-gray-500 text-sm text-center py-4">
+                  {blockFilterType === "hours"
+                    ? "Filtro aplicado: apenas horários"
+                    : "Nenhum dia bloqueado"}
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {getFilteredBlocks()
+                    .filter((b) => !b.startTime)
+                    .sort(
+                      (a, b) =>
+                        new Date(a.date).getTime() - new Date(b.date).getTime()
+                    )
+                    .map((block) => (
+                      <div
+                        key={block.id}
+                        className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-100"
+                      >
+                        <div className="flex-1">
+                          <span className="font-medium text-sm">
+                            {format(new Date(block.date), "dd/MM/yyyy", {
+                              locale: pt,
+                            })}
+                          </span>
+                          {block.reason && (
+                            <span className="text-xs text-gray-500 ml-2">
+                              ({block.reason})
+                            </span>
+                          )}
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => unblockDay(new Date(block.date))}
+                        >
+                          Desbloquear
+                        </Button>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            {/* Horários Bloqueados */}
+            <div className="bg-white rounded-lg p-4 border border-orange-200">
+              <h3 className="font-semibold text-orange-800 mb-3 flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Horários Bloqueados (
+                {getFilteredBlocks().filter((b) => b.startTime).length})
+              </h3>
+              {getFilteredBlocks().filter((b) => b.startTime).length === 0 ? (
+                <div className="text-gray-500 text-sm text-center py-4">
+                  {blockFilterType === "days"
+                    ? "Filtro aplicado: apenas dias"
+                    : "Nenhum horário bloqueado"}
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {[
+                    ...new Map(
+                      getFilteredBlocks()
+                        .filter((b) => b.startTime)
+                        .map((block) => [
+                          block.date + "-" + block.startTime,
+                          block,
+                        ])
+                    ).values(),
+                  ].map((block) => (
                     <div
                       key={block.id}
                       className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-100"
                     >
                       <div className="flex-1">
-                        <span className="font-medium text-sm">
-                          {format(new Date(block.date), "dd/MM/yyyy", {
+                        <div className="font-medium text-sm">
+                          {format(new Date(block.date), "dd/MM", {
                             locale: pt,
-                          })}
-                        </span>
+                          })}{" "}
+                          às {block.startTime}
+                        </div>
                         {block.reason && (
-                          <span className="text-xs text-gray-500 ml-2">
-                            ({block.reason})
+                          <span className="text-xs text-gray-500">
+                            {block.reason}
                           </span>
                         )}
                       </div>
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => unblockDay(new Date(block.date))}
+                        onClick={() =>
+                          unblockTime(new Date(block.date), block.startTime!)
+                        }
                       >
                         Desbloquear
                       </Button>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Resumo */}
+          <div className="mt-4 p-3 bg-orange-100 rounded-lg">
+            <div className="flex justify-between items-center text-sm">
+              <span className="font-medium text-orange-800">
+                {blockFilterDate || blockFilterType !== "all"
+                  ? `Bloqueios filtrados: ${getFilteredBlocks().length}`
+                  : `Total de bloqueios: ${blockedPeriods.length}`}
+              </span>
+              <div className="flex gap-4 text-xs text-orange-700">
+                <span>
+                  Dias: {getFilteredBlocks().filter((b) => !b.startTime).length}
+                </span>
+                <span>
+                  Horários:{" "}
+                  {getFilteredBlocks().filter((b) => b.startTime).length}
+                </span>
+              </div>
+            </div>
+            {(blockFilterDate || blockFilterType !== "all") && (
+              <div className="mt-2 text-xs text-orange-600">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setBlockFilterDate("");
+                    setBlockFilterType("all");
+                  }}
+                  className="text-xs h-6"
+                >
+                  Limpar filtros
+                </Button>
               </div>
             )}
           </div>
+        </div>
 
-          {/* Horários Bloqueados */}
-          <div className="bg-white rounded-lg p-4 border border-orange-200">
-            <h3 className="font-semibold text-orange-800 mb-3 flex items-center gap-2">
-              <Clock className="h-4 w-4" />
-              Horários Bloqueados (
-              {getFilteredBlocks().filter((b) => b.startTime).length})
-            </h3>
-            {getFilteredBlocks().filter((b) => b.startTime).length === 0 ? (
-              <div className="text-gray-500 text-sm text-center py-4">
-                {blockFilterType === "days"
-                  ? "Filtro aplicado: apenas dias"
-                  : "Nenhum horário bloqueado"}
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-32 overflow-y-auto">
-                {[
-                  ...new Map(
-                    getFilteredBlocks()
-                      .filter((b) => b.startTime)
-                      .map((block) => [
-                        block.date + "-" + block.startTime,
-                        block,
-                      ])
-                  ).values(),
-                ].map((block) => (
-                  <div
-                    key={block.id}
-                    className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-100"
-                  >
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">
-                        {format(new Date(block.date), "dd/MM", {
-                          locale: pt,
-                        })}{" "}
-                        às {block.startTime}
-                      </div>
-                      {block.reason && (
-                        <span className="text-xs text-gray-500">
-                          {block.reason}
-                        </span>
-                      )}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Dialog open={quickViewOpen} onOpenChange={setQuickViewOpen}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>
+                  Reservas em{" "}
+                  {quickViewDate
+                    ? format(quickViewDate, "dd/MM/yyyy", { locale: pt })
+                    : ""}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                {quickViewDate &&
+                  getReservationsByDate(format(quickViewDate, "yyyy-MM-dd"))
+                    .length === 0 && (
+                    <div className="text-center text-gray-500">
+                      Nenhuma reserva para este dia.
                     </div>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() =>
-                        unblockTime(new Date(block.date), block.startTime!)
-                      }
-                    >
-                      Desbloquear
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Resumo */}
-        <div className="mt-4 p-3 bg-orange-100 rounded-lg">
-          <div className="flex justify-between items-center text-sm">
-            <span className="font-medium text-orange-800">
-              {blockFilterDate || blockFilterType !== "all"
-                ? `Bloqueios filtrados: ${getFilteredBlocks().length}`
-                : `Total de bloqueios: ${blockedPeriods.length}`}
-            </span>
-            <div className="flex gap-4 text-xs text-orange-700">
-              <span>
-                Dias: {getFilteredBlocks().filter((b) => !b.startTime).length}
-              </span>
-              <span>
-                Horários:{" "}
-                {getFilteredBlocks().filter((b) => b.startTime).length}
-              </span>
-            </div>
-          </div>
-          {(blockFilterDate || blockFilterType !== "all") && (
-            <div className="mt-2 text-xs text-orange-600">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setBlockFilterDate("");
-                  setBlockFilterType("all");
-                }}
-                className="text-xs h-6"
-              >
-                Limpar filtros
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Dialog open={quickViewOpen} onOpenChange={setQuickViewOpen}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>
-                Reservas em{" "}
-                {quickViewDate
-                  ? format(quickViewDate, "dd/MM/yyyy", { locale: pt })
-                  : ""}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {quickViewDate &&
-                getReservationsByDate(format(quickViewDate, "yyyy-MM-dd"))
-                  .length === 0 && (
-                  <div className="text-center text-gray-500">
-                    Nenhuma reserva para este dia.
-                  </div>
-                )}
-              {quickViewDate &&
-                getReservationsByDate(format(quickViewDate, "yyyy-MM-dd")).map(
-                  (reserva) => (
+                  )}
+                {quickViewDate &&
+                  getReservationsByDate(
+                    format(quickViewDate, "yyyy-MM-dd")
+                  ).map((reserva) => (
                     <div
                       key={reserva.id}
                       className="p-3 rounded-lg border bg-white shadow flex flex-col gap-1"
@@ -2115,703 +2140,720 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                         </div>
                       )}
                     </div>
-                  )
-                )}
-            </div>
-            <DialogClose asChild>
-              <Button variant="outline" className="mt-4 w-full">
-                Fechar
-              </Button>
-            </DialogClose>
-          </DialogContent>
-        </Dialog>
-
-        {/* Modal de bloqueio de dias */}
-        <Dialog open={blockDayModalOpen} onOpenChange={setBlockDayModalOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Lock className="h-5 w-5" />
-                Bloquear Dia
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {blockDate && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    <strong>Dia selecionado:</strong>{" "}
-                    {format(blockDate, "dd/MM/yyyy", { locale: pt })}
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    {format(blockDate, "EEEE", { locale: pt })}
-                  </p>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="block-day-reason">
-                  Motivo do bloqueio (opcional):
-                </Label>
-                <Textarea
-                  id="block-day-reason"
-                  placeholder="Ex: Manutenção, feriado, condições meteorológicas, etc."
-                  value={blockDayReason}
-                  onChange={(e) => setBlockDayReason(e.target.value)}
-                  rows={3}
-                />
+                  ))}
               </div>
-
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <p className="text-sm text-yellow-800">
-                  <strong>Atenção:</strong> Ao bloquear este dia:
-                </p>
-                <ul className="text-sm text-yellow-700 mt-1 list-disc list-inside">
-                  <li>Não será possível fazer novas reservas</li>
-                  <li>Reservas existentes continuarão válidas</li>
-                  <li>O dia ficará marcado como indisponível no calendário</li>
-                </ul>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setBlockDayModalOpen(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  onClick={() => {
-                    if (blockDate) {
-                      blockDay(blockDate, blockDayReason);
-                      setBlockDayModalOpen(false);
-                      setBlockDayReason("");
-                      toast({
-                        title: "Dia bloqueado",
-                        description: `O dia ${format(
-                          blockDate,
-                          "dd/MM"
-                        )} foi bloqueado com sucesso.`,
-                        variant: "success",
-                      });
-                    }
-                  }}
-                >
-                  Confirmar Bloqueio
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Modal de bloqueio/desbloqueio de horas */}
-        <Dialog open={blockHourModalOpen} onOpenChange={setBlockHourModalOpen}>
-          <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden">
-            <DialogHeader>
-              <DialogTitle>Bloquear/Desbloquear Horas</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4 overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
-              {/* Seleção de data */}
-              <div className="space-y-2">
-                <label
-                  className="font-semibold text-sm"
-                  htmlFor="block-hour-date"
-                >
-                  Data:
-                </label>
-                <input
-                  id="block-hour-date"
-                  name="block-hour-date"
-                  type="date"
-                  value={blockDate ? format(blockDate, "yyyy-MM-dd") : ""}
-                  onChange={(e) => setBlockDate(new Date(e.target.value))}
-                  className="border rounded p-2 w-full"
-                />
-              </div>
-
-              {/* Bloqueio de horário individual */}
-              <div className="space-y-2 border-t pt-4">
-                <h4 className="font-semibold text-sm">
-                  Bloquear horário individual:
-                </h4>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={blockHourStart}
-                    onChange={(e) => setBlockHourStart(e.target.value)}
-                    className="border rounded p-2 flex-1"
-                  >
-                    {timeSlots.map((slot) => (
-                      <option key={slot} value={slot}>
-                        {slot}
-                      </option>
-                    ))}
-                  </select>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() =>
-                      blockDate &&
-                      blockTime(
-                        blockDate,
-                        blockHourStart,
-                        blockTimeReason[blockHourStart] || ""
-                      )
-                    }
-                    disabled={!blockDate}
-                  >
-                    Bloquear
-                  </Button>
-                </div>
-                <input
-                  id="block-hour-reason"
-                  name="block-hour-reason"
-                  type="text"
-                  placeholder="Motivo (opcional)"
-                  className="border rounded p-2 text-sm w-full"
-                  value={blockTimeReason[blockHourStart] || ""}
-                  onChange={(e) =>
-                    setBlockTimeReason((prev) => ({
-                      ...prev,
-                      [blockHourStart]: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              {/* Bloqueio de intervalo */}
-              <div className="space-y-2 border-t pt-4">
-                <h4 className="font-semibold text-sm">
-                  Bloquear intervalo de horários:
-                </h4>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">De:</span>
-                  <select
-                    value={blockHourStart}
-                    onChange={(e) => setBlockHourStart(e.target.value)}
-                    className="border rounded p-2 flex-1"
-                  >
-                    {timeSlots.map((slot) => (
-                      <option key={slot} value={slot}>
-                        {slot}
-                      </option>
-                    ))}
-                  </select>
-                  <span className="text-sm">Até:</span>
-                  <select
-                    value={blockHourEnd}
-                    onChange={(e) => setBlockHourEnd(e.target.value)}
-                    className="border rounded p-2 flex-1"
-                  >
-                    {timeSlots.map((slot) => (
-                      <option key={slot} value={slot}>
-                        {slot}
-                      </option>
-                    ))}
-                  </select>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() =>
-                      blockDate &&
-                      blockTimeRange(
-                        blockDate,
-                        blockHourStart,
-                        blockHourEnd,
-                        blockTimeReason[`${blockHourStart}-${blockHourEnd}`] ||
-                          ""
-                      )
-                    }
-                    disabled={!blockDate}
-                  >
-                    Bloquear
-                  </Button>
-                </div>
-                <input
-                  id="block-hour-range-reason"
-                  name="block-hour-range-reason"
-                  type="text"
-                  placeholder="Motivo (opcional)"
-                  className="border rounded p-2 text-sm w-full"
-                  value={
-                    blockTimeReason[`${blockHourStart}-${blockHourEnd}`] || ""
-                  }
-                  onChange={(e) =>
-                    setBlockTimeReason((prev) => ({
-                      ...prev,
-                      [`${blockHourStart}-${blockHourEnd}`]: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-
-              {/* Listar horários bloqueados */}
-              <div className="space-y-2 border-t pt-4">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-semibold text-sm">
-                    Horários bloqueados:
-                  </h4>
-                  {blockDate &&
-                    getAllDayBlocks(blockDate).filter((b) => b.startTime)
-                      .length > 3 && (
-                      <span className="text-xs text-gray-500">
-                        (Role para ver mais)
-                      </span>
-                    )}
-                </div>
-                {blockDate &&
-                getAllDayBlocks(blockDate).filter((b) => b.startTime).length ===
-                  0 ? (
-                  <div className="text-gray-500 text-sm text-center py-4">
-                    Nenhum horário bloqueado neste dia.
-                  </div>
-                ) : (
-                  <div className="space-y-2 max-h-48 overflow-y-auto border rounded p-2 bg-gray-25">
-                    {blockDate &&
-                      [
-                        ...new Map(
-                          getAllDayBlocks(blockDate)
-                            .filter((b) => b.startTime)
-                            .map((block) => [
-                              block.date + "-" + block.startTime,
-                              block,
-                            ])
-                        ).values(),
-                      ].map((block) => (
-                        <div
-                          key={block.id}
-                          className="flex items-center justify-between p-2 bg-white rounded border shadow-sm hover:shadow-md transition-shadow"
-                        >
-                          <div className="flex-1">
-                            <span className="font-medium text-sm">
-                              {block.startTime}
-                            </span>
-                            {block.reason && (
-                              <span className="text-xs text-gray-500 ml-2">
-                                ({block.reason})
-                              </span>
-                            )}
-                          </div>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() =>
-                              blockDate &&
-                              unblockTime(blockDate, block.startTime!)
-                            }
-                          >
-                            Desbloquear
-                          </Button>
-                        </div>
-                      ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex justify-end pt-4 border-t">
-                <Button
-                  variant="secondary"
-                  onClick={() => setBlockHourModalOpen(false)}
-                >
+              <DialogClose asChild>
+                <Button variant="outline" className="mt-4 w-full">
                   Fechar
                 </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+              </DialogClose>
+            </DialogContent>
+          </Dialog>
 
-        {/* Modal de Anulação de Reserva */}
-        <Dialog
-          open={cancelReservationModalOpen}
-          onOpenChange={setCancelReservationModalOpen}
-        >
-          <DialogContent className="max-h-[80vh] overflow-hidden">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <XCircle className="h-5 w-5 text-red-500" />
-                Anular Reserva
-              </DialogTitle>
-            </DialogHeader>
-            {reservationToCancel && (
-              <div className="space-y-4 overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <h4 className="font-semibold text-red-800 mb-2">
-                    Confirmar anulação da reserva:
-                  </h4>
-                  <div className="space-y-1 text-sm">
-                    <p>
-                      <strong>Cliente:</strong>{" "}
-                      {reservationToCancel.customer_name}
+          {/* Modal de bloqueio de dias */}
+          <Dialog open={blockDayModalOpen} onOpenChange={setBlockDayModalOpen}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Lock className="h-5 w-5" />
+                  Bloquear Dia
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                {blockDate && (
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>Dia selecionado:</strong>{" "}
+                      {format(blockDate, "dd/MM/yyyy", { locale: pt })}
                     </p>
-                    <p>
-                      <strong>Telefone:</strong>{" "}
-                      {reservationToCancel.customer_phone}
-                    </p>
-                    <p>
-                      <strong>Tour:</strong>{" "}
-                      {getTourDisplayName(reservationToCancel.tour_type)}
-                    </p>
-                    <p>
-                      <strong>Data:</strong>{" "}
-                      {reservationToCancel.reservation_date}
-                    </p>
-                    <p>
-                      <strong>Hora:</strong>{" "}
-                      {reservationToCancel.reservation_time}
-                    </p>
-                    <p>
-                      <strong>Pessoas:</strong>{" "}
-                      {reservationToCancel.number_of_people}
-                    </p>
-                    <p>
-                      <strong>Valor:</strong> €{reservationToCancel.total_price}
+                    <p className="text-xs text-blue-600 mt-1">
+                      {format(blockDate, "EEEE", { locale: pt })}
                     </p>
                   </div>
-                </div>
+                )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="cancel-reason">
-                    Motivo da anulação (opcional):
+                  <Label htmlFor="block-day-reason">
+                    Motivo do bloqueio (opcional):
                   </Label>
                   <Textarea
-                    id="cancel-reason"
-                    placeholder="Ex: Cliente solicitou cancelamento, condições meteorológicas, etc."
-                    value={cancelReason}
-                    onChange={(e) => setCancelReason(e.target.value)}
+                    id="block-day-reason"
+                    placeholder="Ex: Manutenção, feriado, condições meteorológicas, etc."
+                    value={blockDayReason}
+                    onChange={(e) => setBlockDayReason(e.target.value)}
                     rows={3}
                   />
                 </div>
 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                   <p className="text-sm text-yellow-800">
-                    <strong>Atenção:</strong> Esta ação irá:
+                    <strong>Atenção:</strong> Ao bloquear este dia:
                   </p>
                   <ul className="text-sm text-yellow-700 mt-1 list-disc list-inside">
-                    <li>Alterar o status da reserva para "Cancelada"</li>
+                    <li>Não será possível fazer novas reservas</li>
+                    <li>Reservas existentes continuarão válidas</li>
                     <li>
-                      Enviar uma mensagem automática via WhatsApp para o cliente
+                      O dia ficará marcado como indisponível no calendário
                     </li>
-                    <li>Liberar o horário para novas reservas</li>
                   </ul>
                 </div>
-              </div>
-            )}
-            <DialogFooter>
-              <Button
-                variant="destructive"
-                onClick={() =>
-                  reservationToCancel &&
-                  cancelReservation(reservationToCancel, cancelReason)
-                }
-                disabled={isCancelling}
-              >
-                {isCancelling ? "Anulando..." : "Confirmar Anulação"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setCancelReservationModalOpen(false);
-                  setReservationToCancel(null);
-                  setCancelReason("");
-                }}
-                disabled={isCancelling}
-              >
-                Cancelar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
 
-        {/* Modal de Edição de Mensagem do WhatsApp */}
-        <Dialog
-          open={whatsappMessageModalOpen}
-          onOpenChange={setWhatsappMessageModalOpen}
-        >
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <Phone className="h-5 w-5 text-green-500" />
-                Editar Mensagem do WhatsApp
-              </DialogTitle>
-            </DialogHeader>
-            {reservationForMessage && (
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setBlockDayModalOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (blockDate) {
+                        blockDay(blockDate, blockDayReason);
+                        setBlockDayModalOpen(false);
+                        setBlockDayReason("");
+                        toast({
+                          title: "Dia bloqueado",
+                          description: `O dia ${format(
+                            blockDate,
+                            "dd/MM"
+                          )} foi bloqueado com sucesso.`,
+                          variant: "success",
+                        });
+                      }
+                    }}
+                  >
+                    Confirmar Bloqueio
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Modal de bloqueio/desbloqueio de horas */}
+          <Dialog
+            open={blockHourModalOpen}
+            onOpenChange={setBlockHourModalOpen}
+          >
+            <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden">
+              <DialogHeader>
+                <DialogTitle>Bloquear/Desbloquear Horas</DialogTitle>
+              </DialogHeader>
               <div className="space-y-4 overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="font-semibold text-blue-800 mb-2">
-                    Detalhes da Reserva:
-                  </h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <p>
-                      <strong>Cliente:</strong>{" "}
-                      {reservationForMessage.customer_name}
-                    </p>
-                    <p>
-                      <strong>Telefone:</strong>{" "}
-                      {reservationForMessage.customer_phone}
-                    </p>
-                    <p>
-                      <strong>Idioma:</strong>{" "}
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {getClientLanguage(reservationForMessage).toUpperCase()}
-                      </span>
-                    </p>
-                    <p>
-                      <strong>Tour:</strong>{" "}
-                      {getTourDisplayName(reservationForMessage.tour_type)}
-                    </p>
-                    <p>
-                      <strong>Data:</strong>{" "}
-                      {reservationForMessage.reservation_date}
-                    </p>
-                    <p>
-                      <strong>Hora:</strong>{" "}
-                      {reservationForMessage.reservation_time}
-                    </p>
-                    <p>
-                      <strong>Pessoas:</strong>{" "}
-                      {reservationForMessage.number_of_people}
-                    </p>
-                    <p>
-                      <strong>Valor:</strong> €
-                      {reservationForMessage.total_price}
-                    </p>
-                  </div>
-                </div>
-
+                {/* Seleção de data */}
                 <div className="space-y-2">
-                  <Label htmlFor="whatsapp-message">
-                    Mensagem para o cliente:
-                  </Label>
-                  <Textarea
-                    id="whatsapp-message"
-                    value={editableMessage}
-                    onChange={(e) => setEditableMessage(e.target.value)}
-                    rows={8}
-                    className="font-mono text-sm"
-                    placeholder="Digite a mensagem que será enviada via WhatsApp..."
+                  <label
+                    className="font-semibold text-sm"
+                    htmlFor="block-hour-date"
+                  >
+                    Data:
+                  </label>
+                  <input
+                    id="block-hour-date"
+                    name="block-hour-date"
+                    type="date"
+                    value={blockDate ? format(blockDate, "yyyy-MM-dd") : ""}
+                    onChange={(e) => setBlockDate(new Date(e.target.value))}
+                    className="border rounded p-2 w-full"
                   />
-                  <div className="text-xs text-gray-500">
-                    Caracteres: {editableMessage.length} | Linhas:{" "}
-                    {editableMessage.split("\n").length}
-                  </div>
                 </div>
 
-                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                  <p className="text-sm text-green-800">
-                    <strong>Dica:</strong> A mensagem será enviada para o
-                    WhatsApp do cliente ({reservationForMessage.customer_phone})
-                    no idioma{" "}
-                    {getClientLanguage(reservationForMessage).toUpperCase()}.
-                  </p>
-                  <ul className="text-sm text-green-700 mt-1 list-disc list-inside">
-                    <li>Pode personalizar a mensagem conforme necessário</li>
-                    <li>Use emojis para tornar a comunicação mais amigável</li>
-                    <li>
-                      Inclua informações importantes como local de encontro
-                    </li>
-                    <li>
-                      A mensagem inicial foi gerada automaticamente no idioma do
-                      cliente
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            )}
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setWhatsappMessageModalOpen(false);
-                  setReservationForMessage(null);
-                  setEditableMessage("");
-                }}
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={sendWhatsappMessage}
-                disabled={!editableMessage.trim()}
-                className="bg-green-500 hover:bg-green-600"
-              >
-                <Phone className="w-4 h-4 mr-2" />
-                Abrir WhatsApp do Cliente
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Daily Reservations Card */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5" />
-              {format(new Date(selectedDate), "dd MMMM", { locale: pt })}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div>
-              <h3 className="font-semibold mb-3">
-                Reservas ({selectedDateReservations.length})
-              </h3>
-              {selectedDateReservations.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                  <p>Nenhuma reserva para este dia</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {selectedDateReservations.map((reservation) => (
-                    <div
-                      key={reservation.id}
-                      className={`p-4 border rounded-lg shadow-sm ${
-                        reservation.status === "cancelled"
-                          ? "bg-gray-100 opacity-60"
-                          : "bg-white"
-                      }`}
+                {/* Bloqueio de horário individual */}
+                <div className="space-y-2 border-t pt-4">
+                  <h4 className="font-semibold text-sm">
+                    Bloquear horário individual:
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={blockHourStart}
+                      onChange={(e) => setBlockHourStart(e.target.value)}
+                      className="border rounded p-2 flex-1"
                     >
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="font-semibold">
-                            {reservation.customer_name}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {getTourDisplayName(reservation.tour_type)}
-                          </p>
-                        </div>
-                        {getStatusBadge(reservation.status)}
-                      </div>
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-4 w-4 text-gray-400" />
-                          {reservation.reservation_time}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4 text-gray-400" />
-                          {reservation.number_of_people} pessoas
-                        </div>
-                      </div>
-                      <div className="mt-2 text-sm">
-                        <p className="font-semibold">
-                          €{reservation.total_price}
-                        </p>
-                        {reservation.special_requests && (
-                          <p className="text-gray-600 italic">
-                            "{reservation.special_requests}"
-                          </p>
-                        )}
-                      </div>
-                      {/* Botões de ação */}
-                      <div className="mt-3 flex justify-end gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            openWhatsappMessageEditor(reservation, "confirmed")
-                          }
-                          className="inline-flex items-center gap-2 px-3 py-1.5 text-green-600 border-green-200 hover:bg-green-50 text-xs font-semibold"
-                        >
-                          Enviar WhatsApp
-                        </Button>
-
-                        {/* Botão de anular reserva - apenas para reservas não canceladas */}
-                        {reservation.status !== "cancelled" && (
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              setReservationToCancel(reservation);
-                              setCancelReservationModalOpen(true);
-                            }}
-                            className="text-xs"
-                          >
-                            <XCircle className="w-3 h-3 mr-1" />
-                            Anular
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                      {timeSlots.map((slot) => (
+                        <option key={slot} value={slot}>
+                          {slot}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() =>
+                        blockDate &&
+                        blockTime(
+                          blockDate,
+                          blockHourStart,
+                          blockTimeReason[blockHourStart] || ""
+                        )
+                      }
+                      disabled={!blockDate}
+                    >
+                      Bloquear
+                    </Button>
+                  </div>
+                  <input
+                    id="block-hour-reason"
+                    name="block-hour-reason"
+                    type="text"
+                    placeholder="Motivo (opcional)"
+                    className="border rounded p-2 text-sm w-full"
+                    value={blockTimeReason[blockHourStart] || ""}
+                    onChange={(e) =>
+                      setBlockTimeReason((prev) => ({
+                        ...prev,
+                        [blockHourStart]: e.target.value,
+                      }))
+                    }
+                  />
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Modal de confirmação para tornar horário disponível */}
-      <Dialog
-        open={makeAvailableModalOpen}
-        onOpenChange={setMakeAvailableModalOpen}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Tornar horário disponível</DialogTitle>
-          </DialogHeader>
-          <p>
-            Deseja tornar o horário <b>{slotToMakeAvailable}</b> disponível?
-          </p>
-          {/* Exibir motivo e data/hora da última alteração, se houver bloqueio */}
-          {slotToMakeAvailable &&
-            (() => {
-              const currentDate = format(calendarDate, "yyyy-MM-dd");
-              console.log("Looking for block:", {
-                date: currentDate,
-                time: slotToMakeAvailable,
-                blockedPeriods: blockedPeriods,
-              });
+                {/* Bloqueio de intervalo */}
+                <div className="space-y-2 border-t pt-4">
+                  <h4 className="font-semibold text-sm">
+                    Bloquear intervalo de horários:
+                  </h4>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">De:</span>
+                    <select
+                      value={blockHourStart}
+                      onChange={(e) => setBlockHourStart(e.target.value)}
+                      className="border rounded p-2 flex-1"
+                    >
+                      {timeSlots.map((slot) => (
+                        <option key={slot} value={slot}>
+                          {slot}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="text-sm">Até:</span>
+                    <select
+                      value={blockHourEnd}
+                      onChange={(e) => setBlockHourEnd(e.target.value)}
+                      className="border rounded p-2 flex-1"
+                    >
+                      {timeSlots.map((slot) => (
+                        <option key={slot} value={slot}>
+                          {slot}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() =>
+                        blockDate &&
+                        blockTimeRange(
+                          blockDate,
+                          blockHourStart,
+                          blockHourEnd,
+                          blockTimeReason[
+                            `${blockHourStart}-${blockHourEnd}`
+                          ] || ""
+                        )
+                      }
+                      disabled={!blockDate}
+                    >
+                      Bloquear
+                    </Button>
+                  </div>
+                  <input
+                    id="block-hour-range-reason"
+                    name="block-hour-range-reason"
+                    type="text"
+                    placeholder="Motivo (opcional)"
+                    className="border rounded p-2 text-sm w-full"
+                    value={
+                      blockTimeReason[`${blockHourStart}-${blockHourEnd}`] || ""
+                    }
+                    onChange={(e) =>
+                      setBlockTimeReason((prev) => ({
+                        ...prev,
+                        [`${blockHourStart}-${blockHourEnd}`]: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
 
-              const block = blockedPeriods.find(
-                (b) =>
-                  b.date === currentDate && b.startTime === slotToMakeAvailable
-              );
-
-              console.log("Found block:", block);
-
-              if (!block) {
-                return (
-                  <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                    <div className="text-sm text-yellow-800">
-                      Nenhum bloqueio encontrado para este horário.
+                {/* Listar horários bloqueados */}
+                <div className="space-y-2 border-t pt-4">
+                  <div className="flex justify-between items-center">
+                    <h4 className="font-semibold text-sm">
+                      Horários bloqueados:
+                    </h4>
+                    {blockDate &&
+                      getAllDayBlocks(blockDate).filter((b) => b.startTime)
+                        .length > 3 && (
+                        <span className="text-xs text-gray-500">
+                          (Role para ver mais)
+                        </span>
+                      )}
+                  </div>
+                  {blockDate &&
+                  getAllDayBlocks(blockDate).filter((b) => b.startTime)
+                    .length === 0 ? (
+                    <div className="text-gray-500 text-sm text-center py-4">
+                      Nenhum horário bloqueado neste dia.
                     </div>
-                  </div>
-                );
-              }
-
-              return (
-                <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
-                  <div className="text-sm text-red-800 font-semibold mb-1">
-                    Motivo da indisponibilidade:
-                  </div>
-                  <div className="text-sm text-gray-700 mb-1">
-                    {block.reason || "(Sem motivo especificado)"}
-                  </div>
-                  {block.createdAt && (
-                    <div className="text-xs text-gray-500">
-                      Última alteração:{" "}
-                      {new Date(block.createdAt).toLocaleString("pt-PT")}
+                  ) : (
+                    <div className="space-y-2 max-h-48 overflow-y-auto border rounded p-2 bg-gray-25">
+                      {blockDate &&
+                        [
+                          ...new Map(
+                            getAllDayBlocks(blockDate)
+                              .filter((b) => b.startTime)
+                              .map((block) => [
+                                block.date + "-" + block.startTime,
+                                block,
+                              ])
+                          ).values(),
+                        ].map((block) => (
+                          <div
+                            key={block.id}
+                            className="flex items-center justify-between p-2 bg-white rounded border shadow-sm hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex-1">
+                              <span className="font-medium text-sm">
+                                {block.startTime}
+                              </span>
+                              {block.reason && (
+                                <span className="text-xs text-gray-500 ml-2">
+                                  ({block.reason})
+                                </span>
+                              )}
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() =>
+                                blockDate &&
+                                unblockTime(blockDate, block.startTime!)
+                              }
+                            >
+                              Desbloquear
+                            </Button>
+                          </div>
+                        ))}
                     </div>
                   )}
                 </div>
-              );
-            })()}
-          <DialogFooter>
-            <Button
-              variant="default"
-              onClick={async () => {
-                if (slotToMakeAvailable) {
-                  await makeTimeAvailable(calendarDate, slotToMakeAvailable);
+
+                <div className="flex justify-end pt-4 border-t">
+                  <Button
+                    variant="secondary"
+                    onClick={() => setBlockHourModalOpen(false)}
+                  >
+                    Fechar
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          {/* Modal de Anulação de Reserva */}
+          <Dialog
+            open={cancelReservationModalOpen}
+            onOpenChange={setCancelReservationModalOpen}
+          >
+            <DialogContent className="max-h-[80vh] overflow-hidden">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-red-500" />
+                  Anular Reserva
+                </DialogTitle>
+              </DialogHeader>
+              {reservationToCancel && (
+                <div className="space-y-4 overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <h4 className="font-semibold text-red-800 mb-2">
+                      Confirmar anulação da reserva:
+                    </h4>
+                    <div className="space-y-1 text-sm">
+                      <p>
+                        <strong>Cliente:</strong>{" "}
+                        {reservationToCancel.customer_name}
+                      </p>
+                      <p>
+                        <strong>Telefone:</strong>{" "}
+                        {reservationToCancel.customer_phone}
+                      </p>
+                      <p>
+                        <strong>Tour:</strong>{" "}
+                        {getTourDisplayName(reservationToCancel.tour_type)}
+                      </p>
+                      <p>
+                        <strong>Data:</strong>{" "}
+                        {reservationToCancel.reservation_date}
+                      </p>
+                      <p>
+                        <strong>Hora:</strong>{" "}
+                        {reservationToCancel.reservation_time}
+                      </p>
+                      <p>
+                        <strong>Pessoas:</strong>{" "}
+                        {reservationToCancel.number_of_people}
+                      </p>
+                      <p>
+                        <strong>Valor:</strong> €
+                        {reservationToCancel.total_price}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="cancel-reason">
+                      Motivo da anulação (opcional):
+                    </Label>
+                    <Textarea
+                      id="cancel-reason"
+                      placeholder="Ex: Cliente solicitou cancelamento, condições meteorológicas, etc."
+                      value={cancelReason}
+                      onChange={(e) => setCancelReason(e.target.value)}
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p className="text-sm text-yellow-800">
+                      <strong>Atenção:</strong> Esta ação irá:
+                    </p>
+                    <ul className="text-sm text-yellow-700 mt-1 list-disc list-inside">
+                      <li>Alterar o status da reserva para "Cancelada"</li>
+                      <li>
+                        Enviar uma mensagem automática via WhatsApp para o
+                        cliente
+                      </li>
+                      <li>Liberar o horário para novas reservas</li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              <DialogFooter>
+                <Button
+                  variant="destructive"
+                  onClick={() =>
+                    reservationToCancel &&
+                    cancelReservation(reservationToCancel, cancelReason)
+                  }
+                  disabled={isCancelling}
+                >
+                  {isCancelling ? "Anulando..." : "Confirmar Anulação"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCancelReservationModalOpen(false);
+                    setReservationToCancel(null);
+                    setCancelReason("");
+                  }}
+                  disabled={isCancelling}
+                >
+                  Cancelar
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Modal de Edição de Mensagem do WhatsApp */}
+          <Dialog
+            open={whatsappMessageModalOpen}
+            onOpenChange={setWhatsappMessageModalOpen}
+          >
+            <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <Phone className="h-5 w-5 text-green-500" />
+                  Editar Mensagem do WhatsApp
+                </DialogTitle>
+              </DialogHeader>
+              {reservationForMessage && (
+                <div className="space-y-4 overflow-y-auto max-h-[calc(80vh-120px)] pr-2">
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="font-semibold text-blue-800 mb-2">
+                      Detalhes da Reserva:
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 text-sm">
+                      <p>
+                        <strong>Cliente:</strong>{" "}
+                        {reservationForMessage.customer_name}
+                      </p>
+                      <p>
+                        <strong>Telefone:</strong>{" "}
+                        {reservationForMessage.customer_phone}
+                      </p>
+                      <p>
+                        <strong>Idioma:</strong>{" "}
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {getClientLanguage(
+                            reservationForMessage
+                          ).toUpperCase()}
+                        </span>
+                      </p>
+                      <p>
+                        <strong>Tour:</strong>{" "}
+                        {getTourDisplayName(reservationForMessage.tour_type)}
+                      </p>
+                      <p>
+                        <strong>Data:</strong>{" "}
+                        {reservationForMessage.reservation_date}
+                      </p>
+                      <p>
+                        <strong>Hora:</strong>{" "}
+                        {reservationForMessage.reservation_time}
+                      </p>
+                      <p>
+                        <strong>Pessoas:</strong>{" "}
+                        {reservationForMessage.number_of_people}
+                      </p>
+                      <p>
+                        <strong>Valor:</strong> €
+                        {reservationForMessage.total_price}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="whatsapp-message">
+                      Mensagem para o cliente:
+                    </Label>
+                    <Textarea
+                      id="whatsapp-message"
+                      value={editableMessage}
+                      onChange={(e) => setEditableMessage(e.target.value)}
+                      rows={8}
+                      className="font-mono text-sm"
+                      placeholder="Digite a mensagem que será enviada via WhatsApp..."
+                    />
+                    <div className="text-xs text-gray-500">
+                      Caracteres: {editableMessage.length} | Linhas:{" "}
+                      {editableMessage.split("\n").length}
+                    </div>
+                  </div>
+
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-sm text-green-800">
+                      <strong>Dica:</strong> A mensagem será enviada para o
+                      WhatsApp do cliente (
+                      {reservationForMessage.customer_phone}) no idioma{" "}
+                      {getClientLanguage(reservationForMessage).toUpperCase()}.
+                    </p>
+                    <ul className="text-sm text-green-700 mt-1 list-disc list-inside">
+                      <li>Pode personalizar a mensagem conforme necessário</li>
+                      <li>
+                        Use emojis para tornar a comunicação mais amigável
+                      </li>
+                      <li>
+                        Inclua informações importantes como local de encontro
+                      </li>
+                      <li>
+                        A mensagem inicial foi gerada automaticamente no idioma
+                        do cliente
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              )}
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setWhatsappMessageModalOpen(false);
+                    setReservationForMessage(null);
+                    setEditableMessage("");
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={sendWhatsappMessage}
+                  disabled={!editableMessage.trim()}
+                  className="bg-green-500 hover:bg-green-600"
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Abrir WhatsApp do Cliente
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Daily Reservations Card */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                {format(new Date(selectedDate), "dd MMMM", { locale: pt })}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div>
+                <h3 className="font-semibold mb-3">
+                  Reservas ({selectedDateReservations.length})
+                </h3>
+                {selectedDateReservations.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Clock className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>Nenhuma reserva para este dia</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {selectedDateReservations.map((reservation) => (
+                      <div
+                        key={reservation.id}
+                        className={`p-4 border rounded-lg shadow-sm ${
+                          reservation.status === "cancelled"
+                            ? "bg-gray-100 opacity-60"
+                            : "bg-white"
+                        }`}
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h4 className="font-semibold">
+                              {reservation.customer_name}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {getTourDisplayName(reservation.tour_type)}
+                            </p>
+                          </div>
+                          {getStatusBadge(reservation.status)}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 text-gray-400" />
+                            {reservation.reservation_time}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Users className="h-4 w-4 text-gray-400" />
+                            {reservation.number_of_people} pessoas
+                          </div>
+                        </div>
+                        <div className="mt-2 text-sm">
+                          <p className="font-semibold">
+                            €{reservation.total_price}
+                          </p>
+                          {reservation.special_requests && (
+                            <p className="text-gray-600 italic">
+                              "{reservation.special_requests}"
+                            </p>
+                          )}
+                        </div>
+                        {/* Botões de ação */}
+                        <div className="mt-3 flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              openWhatsappMessageEditor(
+                                reservation,
+                                "confirmed"
+                              )
+                            }
+                            className="inline-flex items-center gap-2 px-3 py-1.5 text-green-600 border-green-200 hover:bg-green-50 text-xs font-semibold"
+                          >
+                            Enviar WhatsApp
+                          </Button>
+
+                          {/* Botão de anular reserva - apenas para reservas não canceladas */}
+                          {reservation.status !== "cancelled" && (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                setReservationToCancel(reservation);
+                                setCancelReservationModalOpen(true);
+                              }}
+                              className="text-xs"
+                            >
+                              <XCircle className="w-3 h-3 mr-1" />
+                              Anular
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Modal de confirmação para tornar horário disponível */}
+        <Dialog
+          open={makeAvailableModalOpen}
+          onOpenChange={setMakeAvailableModalOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Tornar horário disponível</DialogTitle>
+            </DialogHeader>
+            <p>
+              Deseja tornar o horário <b>{slotToMakeAvailable}</b> disponível?
+            </p>
+            {/* Exibir motivo e data/hora da última alteração, se houver bloqueio */}
+            {slotToMakeAvailable &&
+              (() => {
+                const currentDate = format(calendarDate, "yyyy-MM-dd");
+                console.log("Looking for block:", {
+                  date: currentDate,
+                  time: slotToMakeAvailable,
+                  blockedPeriods: blockedPeriods,
+                });
+
+                const block = blockedPeriods.find(
+                  (b) =>
+                    b.date === currentDate &&
+                    b.startTime === slotToMakeAvailable
+                );
+
+                console.log("Found block:", block);
+
+                if (!block) {
+                  return (
+                    <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                      <div className="text-sm text-yellow-800">
+                        Nenhum bloqueio encontrado para este horário.
+                      </div>
+                    </div>
+                  );
                 }
-                setMakeAvailableModalOpen(false);
-                setSlotToMakeAvailable(null);
-              }}
-            >
-              Tornar Disponível
-            </Button>
-            <DialogClose asChild>
-              <Button variant="outline">Cancelar</Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+
+                return (
+                  <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+                    <div className="text-sm text-red-800 font-semibold mb-1">
+                      Motivo da indisponibilidade:
+                    </div>
+                    <div className="text-sm text-gray-700 mb-1">
+                      {block.reason || "(Sem motivo especificado)"}
+                    </div>
+                    {block.createdAt && (
+                      <div className="text-xs text-gray-500">
+                        Última alteração:{" "}
+                        {new Date(block.createdAt).toLocaleString("pt-PT")}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+            <DialogFooter>
+              <Button
+                variant="default"
+                onClick={async () => {
+                  if (slotToMakeAvailable) {
+                    await makeTimeAvailable(calendarDate, slotToMakeAvailable);
+                  }
+                  setMakeAvailableModalOpen(false);
+                  setSlotToMakeAvailable(null);
+                }}
+              >
+                Tornar Disponível
+              </Button>
+              <DialogClose asChild>
+                <Button variant="outline">Cancelar</Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+      );
+    </>
   );
 };
 

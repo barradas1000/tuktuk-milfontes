@@ -32,7 +32,7 @@ const DriverDashboard: React.FC = () => {
       try {
         const { data: existingConductor, error: fetchError } = await supabase
           .from("conductors")
-          .select("*")
+          .select("id, name, whatsapp, email")
           .eq("id", user.id)
           .maybeSingle();
 
@@ -41,17 +41,14 @@ const DriverDashboard: React.FC = () => {
         }
 
         if (!existingConductor) {
-          // Condutor não existe, criar novo registo
+          // Condutor não existe, criar novo registo apenas com dados estáticos
           const { data: newConductor, error: insertError } = await supabase
             .from("conductors")
             .insert({
               id: user.id,
               name: user.email ? user.email.split("@")[0] : "Condutor",
-              is_active: false,
-              latitude: 37.725,
-              longitude: -8.783,
             })
-            .select()
+            .select("id, name, whatsapp, email")
             .single();
 
           if (insertError) {
@@ -64,12 +61,9 @@ const DriverDashboard: React.FC = () => {
           setConductorId(existingConductor.id);
         }
       } catch (error) {
-        console.error("Erro ao verificar condutor:", error);
-      } finally {
-        setLoading(false);
+        console.error("Erro ao buscar/criar condutor:", error);
       }
     };
-
     checkUser();
   }, [navigate]);
 

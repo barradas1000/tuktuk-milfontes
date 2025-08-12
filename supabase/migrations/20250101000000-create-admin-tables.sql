@@ -13,8 +13,7 @@ CREATE TABLE public.active_conductors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   conductor_id UUID NOT NULL REFERENCES public.conductors(id),
   is_active BOOLEAN DEFAULT true,
-  activated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  deactivated_at TIMESTAMP WITH TIME ZONE,
+  session_start TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

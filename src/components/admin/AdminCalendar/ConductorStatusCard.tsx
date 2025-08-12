@@ -38,9 +38,13 @@ const AdminConductorStatusCard: React.FC<AdminConductorStatusCardProps> = ({
     }
     try {
       await supabase
-        .from("conductors")
-        .update({ status: newStatus, busy_until })
-        .eq("id", conductor.id);
+        .from("active_conductors")
+        .update({
+          status: newStatus,
+          occupied_until: busy_until,
+        })
+        .eq("conductor_id", conductor.id)
+        .eq("is_active", true);
     } catch (e) {
       // erro
     } finally {
