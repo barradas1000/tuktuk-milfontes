@@ -1,3 +1,84 @@
+---
+
+## Toggle de Ativação/Desativação do Condutor (Tracking TukTuk) — Snapshot Técnico Agosto/2025
+
+### Componentes e Ficheiros Envolvidos
+
+- **src/components/ToggleTrackingButton.tsx**
+  - Componente React responsável por ativar/desativar o tracking de um condutor (admin ou condutor).
+  - Faz upsert/update na tabela `active_conductors` do Supabase.
+  - Sempre envia as coordenadas atuais ao ativar (`current_latitude`, `current_longitude`).
+  - Usa o hook `useDriverTracking` para enviar localização em tempo real enquanto ativo.
+  - Sincroniza estado via realtime (canal Postgres Changes) e polling (fallback).
+  - Dispara evento customizado `conductorStatusChanged` para sincronizar UI em múltiplos painéis/admins.
+
+- **src/components/admin/AdminCalendar.tsx**
+  - Painel administrativo onde o admin pode ativar/desativar qualquer condutor usando o `ToggleTrackingButton`.
+  - Mantém lista de condutores ativos sincronizada via realtime e eventos customizados.
+  - Atualiza UI imediatamente após qualquer toggle, sem necessidade de refresh manual.
+
+- **src/components/PassengerMap.tsx**
+  - Renderiza o mapa do passageiro e exibe o TukTuk em tempo real.
+  - Subscrição realtime apenas em `active_conductors`.
+  - O TukTuk só aparece se houver registro válido em `active_conductors` com `is_active = true` e coordenadas válidas.
+
+### Fluxo Crítico do Toggle
+
+1. **Ativar Tracking**
+   - O botão chama `navigator.geolocation.getCurrentPosition` para obter a localização atual.
+   - Faz `upsert` em `active_conductors` com:
+     - `conductor_id`
+     - `is_active: true`
+     - `is_available: true`
+     - `current_latitude`, `current_longitude`
+     - `updated_at`
+   - Inicia o envio periódico de localização via `useDriverTracking`.
+   - Dispara evento customizado para sincronizar UI.
+
+2. **Desativar Tracking**
+   - Faz `update` em `active_conductors` com:
+     - `is_active: false`
+     - `is_available: false`
+     - `updated_at`
+   - Para o envio de localização.
+   - Dispara evento customizado para sincronizar UI.
+
+3. **Sincronização e Realtime**
+   - O estado do toggle é sincronizado por:
+     - Subscrição realtime (Postgres Changes) em `active_conductors`.
+     - Polling periódico (5s) como fallback.
+     - Evento customizado `conductorStatusChanged` para atualização instantânea em múltiplos painéis.
+
+4. **Requisitos para o TukTuk aparecer no mapa**
+   - Registro em `active_conductors` com:
+     - `is_active = true`
+     - `is_available = true`
+     - Coordenadas válidas (`current_latitude`, `current_longitude`)
+   - O passageiro vê o TukTuk em tempo real via `PassengerMap.tsx`.
+
+### Pontos Críticos e Boas Práticas
+
+- Nunca fazer update/insert/subscribe de tracking dinâmico em `conductors`.
+- Toda lógica dinâmica (tracking, status, disponibilidade) deve ser feita exclusivamente em `active_conductors`.
+- Policies RLS garantem que apenas o próprio condutor ou admin podem alterar o status.
+- O botão de toggle nunca altera dados estáticos do condutor.
+- Sempre validar coordenadas antes de atualizar o mapa.
+- Se o TukTuk não aparece, verifique se as coordenadas foram enviadas corretamente no momento da ativação.
+
+### Rollback e Diagnóstico
+
+- Se houver problemas, restaurar os ficheiros:
+  - `src/components/ToggleTrackingButton.tsx`
+  - `src/components/admin/AdminCalendar.tsx`
+  - `src/components/PassengerMap.tsx`
+- Validar policies RLS e variáveis de ambiente.
+- Testar fluxo completo: admin ativa/desativa, passageiro vê atualização em tempo real.
+
+---
+
+**Atualização aplicada em agosto/2025.**  
+Se houver problemas futuros, volte a este ponto de configuração para garantir o funcionamento correto do toggle e do tracking.
+
 #
 
 # Colunas de Localização e Sessão em active_conductors

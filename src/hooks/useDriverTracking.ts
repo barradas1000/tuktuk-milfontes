@@ -25,8 +25,8 @@ export function useDriverTracking(
   opts: UseDriverTrackingOpts = {}
 ) {
   const {
-    minIntervalMs = 3000,
-    minDeltaMeters = 2,
+    minIntervalMs = 3000, // 3 segundos
+    minDeltaMeters = 2, // só envia se mover pelo menos 2 metros
     highAccuracy = true,
   } = opts;
 
@@ -78,6 +78,26 @@ export function useDriverTracking(
       const now = Date.now();
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
+
+      // Validação das coordenadas
+      const isValid =
+        typeof lat === "number" &&
+        typeof lng === "number" &&
+        !isNaN(lat) &&
+        !isNaN(lng) &&
+        lat >= -90 &&
+        lat <= 90 &&
+        lng >= -180 &&
+        lng <= 180;
+
+      if (!isValid) {
+        setError("Coordenadas inválidas recebidas do dispositivo.");
+        console.warn("[useDriverTracking] Coordenadas inválidas:", {
+          lat,
+          lng,
+        });
+        return;
+      }
 
       // Throttling: só envia se mudou o suficiente ou passou tempo mínimo
       if (lastPosRef.current) {
@@ -133,8 +153,8 @@ export function useDriverTracking(
 
     const options: PositionOptions = {
       enableHighAccuracy: highAccuracy,
-      maximumAge: 2000,
-      timeout: 10000,
+      maximumAge: 2000, // Equilíbrio: permite cache de até 2s
+      timeout: 7000, // Equilíbrio: espera até 7s por fix
     };
 
     watchIdRef.current = navigator.geolocation.watchPosition(

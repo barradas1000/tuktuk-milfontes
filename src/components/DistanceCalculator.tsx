@@ -109,7 +109,7 @@ export const DistanceCalculator: React.FC<DistanceCalculatorProps> = ({
           </div>
           <div className="flex justify-between text-xs">
             <span className="text-gray-600">Velocidade média:</span>
-            <span className="font-semibold text-gray-800">30 km/h</span>
+            <span className="font-semibold text-gray-800">15 km/h</span>
           </div>
         </div>
       )}

@@ -47,7 +47,7 @@ export const calculateDistance = (
 export const calculateDistanceAndTime = (
   point1: Coordinates,
   point2: Coordinates,
-  averageSpeed: number = 30
+  averageSpeed: number = 15
 ): DistanceResult => {
   const distance = calculateDistance(
     point1.lat,

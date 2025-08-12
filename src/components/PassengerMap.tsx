@@ -22,7 +22,7 @@ import ReservationForm from "./ReservationForm";
 import { Coordinates } from "../utils/locationUtils";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
-import { RealtimePostgresChangesPayload } from "@supabase/supabase-js";
+import { RealtimeChannel } from "@supabase/supabase-js";
 
 // Corrigir ícones do Leaflet
 import iconUrl from "leaflet/dist/images/marker-icon.png";
@@ -52,21 +52,18 @@ interface ConductorLocation {
   name?: string;
   status?: ConductorStatus;
   occupiedUntil?: string | null;
-}
-
-// Tipos das linhas do banco
-interface ConductorRow {
-  id: string;
-  is_active?: boolean | null;
-  latitude?: number | null;
-  longitude?: number | null;
-  name?: string | null;
+  updatedAt?: string;
+  accuracy?: number;
 }
 
 interface ActiveConductorRow {
   conductor_id: string;
+  current_latitude?: number | null;
+  current_longitude?: number | null;
   is_available: boolean;
   occupied_until?: string | null;
+  updated_at?: string;
+  accuracy?: number | null;
 }
 
 // Controlador simples para recenter/pan logic conforme interação do usuário
@@ -222,7 +219,9 @@ const PassengerMap: React.FC = () => {
     if (activeConductors.length === 0) {
       return (
         <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000] max-w-xs">
-          <p className="text-sm font-semibold">🚫 TukTuk offline</p>
+          <p className="text-sm font-semibold">
+            🚫 TukTuk offline
+          </p>
           <p className="text-xs mt-1">
             O TukTuk não está disponível neste momento
           </p>
@@ -271,141 +270,64 @@ const PassengerMap: React.FC = () => {
       setLoading(false);
       return;
     }
-    let activeChannel: ReturnType<typeof supabase.channel> | null = null;
-
-    // Listen for custom events as fallback
-    const handleConductorStatusChange = (event: CustomEvent) => {
-      const { conductorId, isActive } = event.detail;
-      console.log(
-        `[PassengerMap] Custom event received: ${conductorId} -> ${isActive}`
-      );
-
-      if (!isActive) {
-        // Remove conductor from map immediately
-        setActiveConductors((prev) => prev.filter((c) => c.id !== conductorId));
-      } else {
-        // Force refresh conductor data
-        refreshConductorData(conductorId);
-      }
-    };
-
-    window.addEventListener(
-      "conductorStatusChanged",
-      handleConductorStatusChange
-    );
-
-    const refreshConductorData = async (conductorId: string) => {
-      try {
-        const { data, error } = await supabase
-          .from("active_conductors")
-          .select(
-            "conductor_id, current_latitude, current_longitude, is_available, occupied_until"
-          )
-          .eq("conductor_id", conductorId)
-          .eq("is_active", true)
-          .single();
-
-        if (!error && data) {
-          const lat = data.current_latitude ?? 37.725;
-          const lng = data.current_longitude ?? -8.783;
-          setActiveConductors((prev) => {
-            const others = prev.filter((c) => c.id !== data.conductor_id);
-            return [
-              ...others,
-              {
-                id: data.conductor_id,
-                lat: lat as number,
-                lng: lng as number,
-                name: "TukTuk",
-                status: data.is_available ? "available" : "busy",
-                occupiedUntil: data.occupied_until ?? null,
-              },
-            ];
-          });
-        }
-      } catch (error) {
-        console.error("Error refreshing conductor data:", error);
-      }
-    };
-
-    const fetchConductorStatusFromActiveTable = async (
-      conductorId: string
-    ): Promise<{ status: ConductorStatus; occupiedUntil: string | null }> => {
-      const { data, error } = await supabase
-        .from("active_conductors")
-        .select("is_available, occupied_until")
-        .eq("conductor_id", conductorId)
-        .maybeSingle();
-      if (error || !data) return { status: "available", occupiedUntil: null };
-      const row = data as ActiveConductorRow;
-      return {
-        status: row.is_available ? "available" : "busy",
-        occupiedUntil: row.occupied_until ?? null,
-      };
-    };
+    let activeChannel: RealtimeChannel | null = null;
 
     const load = async () => {
       try {
-        if (
-          !import.meta.env.VITE_SUPABASE_URL ||
-          !import.meta.env.VITE_SUPABASE_ANON_KEY
-        ) {
-          setActiveConductors([]);
-          return;
-        }
         const { data, error } = await supabase
           .from("active_conductors")
           .select(
-            "conductor_id, current_latitude, current_longitude, is_available, occupied_until"
+            "conductor_id, current_latitude, current_longitude, is_available, occupied_until, updated_at, accuracy"
           )
           .eq("is_active", true);
         if (error || !data) {
+          console.error("[PassengerMap] Erro na query inicial:", error);
           setActiveConductors([]);
         } else {
-          type ActiveConductorRow = {
-            conductor_id: string;
-            current_latitude?: number | null;
-            current_longitude?: number | null;
-            is_available: boolean;
-            occupied_until?: string | null;
-          };
+          console.log("[PassengerMap] Dados carregados da query inicial:", data);
           const enriched = (data as ActiveConductorRow[])
             .map((d) => {
-              const lat = d.current_latitude ?? 37.725;
-              const lng = d.current_longitude ?? -8.783;
-              if (!isValidCoordinate(lat ?? undefined, lng ?? undefined))
+              const lat = d.current_latitude;
+              const lng = d.current_longitude;
+              const accuracy = d.accuracy ?? Infinity;
+              if (!isValidCoordinate(lat, lng) || accuracy > 50) {
+                console.warn("[PassengerMap] Registro ignorado por coordenadas inválidas ou baixa precisão:", d);
                 return null;
+              }
               return {
                 id: d.conductor_id,
                 lat: lat as number,
                 lng: lng as number,
                 name: "TukTuk",
-                status: (d.is_available
-                  ? "available"
-                  : "busy") as ConductorStatus,
+                status: d.is_available ? "available" : "busy",
                 occupiedUntil: d.occupied_until ?? null,
+                updatedAt: d.updated_at ?? new Date().toISOString(),
               };
             })
             .filter(Boolean) as ConductorLocation[];
           setActiveConductors(enriched);
         }
-      } catch {
+      } catch (e) {
+        console.error("[PassengerMap] Erro no load:", e);
         setActiveConductors([]);
       } finally {
         setLoading(false);
       }
     };
 
-    // Subscrição realtime única e correta
+    // Subscrição realtime com mais logs e sem filter restritivo para depuração
     activeChannel = supabase
       .channel("active_conductors_realtime")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "active_conductors" },
+        {
+          event: "*",
+          schema: "public",
+          table: "active_conductors",
+        },
         (payload) => {
           console.log(
-            "[PassengerMap] Realtime event on active_conductors:",
-            payload
+            "[PassengerMap] Realtime event on active_conductors:", payload
           );
 
           // Lida com a remoção de um condutor (quando a linha é apagada)
@@ -426,6 +348,8 @@ const PassengerMap: React.FC = () => {
               occupied_until?: string | null;
               current_latitude?: number | null;
               current_longitude?: number | null;
+              updated_at?: string;
+              accuracy?: number | null;
             };
 
             const newData = payload.new as ActiveConductorPayload;
@@ -440,6 +364,7 @@ const PassengerMap: React.FC = () => {
 
             const lat = newData.current_latitude;
             const lng = newData.current_longitude;
+            const accuracy = newData.accuracy ?? Infinity;
 
             // Se as coordenadas forem inválidas, não o adicione/atualize no mapa
             if (!isValidCoordinate(lat, lng)) {
@@ -457,6 +382,7 @@ const PassengerMap: React.FC = () => {
               name: "TukTuk", // O nome é estático, pode ser melhorado com um JOIN no load inicial
               status: newData.is_available ? "available" : "busy",
               occupiedUntil: newData.occupied_until ?? null,
+              updatedAt: newData.updated_at ?? new Date().toISOString(),
             };
 
             // Atualiza ou adiciona o condutor na lista
@@ -475,16 +401,19 @@ const PassengerMap: React.FC = () => {
           }
         }
       )
-      .subscribe();
+      .subscribe((status, err) => {
+        if (status === "SUBSCRIBED") {
+          console.log("[PassengerMap] Realtime subscription active");
+        } else if (err) {
+          console.error("[PassengerMap] Realtime subscription error:", err);
+          setActiveConductors([]);
+        }
+      });
 
     load();
 
     return () => {
       if (activeChannel) supabase.removeChannel(activeChannel);
-      window.removeEventListener(
-        "conductorStatusChanged",
-        handleConductorStatusChange
-      );
     };
   }, []);
 
@@ -540,34 +469,26 @@ const PassengerMap: React.FC = () => {
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
           {/* Renderizar apenas condutores com coordenadas válidas */}
-          {activeConductors[0] &&
-            isValidCoordinate(
-              activeConductors[0].lat,
-              activeConductors[0].lng
-            ) && (
-              <TukTukMarker
-                key={
-                  activeConductors[0].id +
-                  "-" +
-                  activeConductors[0].lat +
-                  "-" +
-                  activeConductors[0].lng
-                }
-                position={[activeConductors[0].lat, activeConductors[0].lng]}
-              >
-                <Popup>
-                  <div className="text-center">
-                    <h3 className="font-bold text-blue-600">
-                      {activeConductors[0].name}
-                    </h3>
-                    <p className="text-sm text-gray-600">TukTuk disponível</p>
-                    <p className="text-xs text-gray-500">
-                      Última atualização: {new Date().toLocaleTimeString()}
-                    </p>
-                  </div>
-                </Popup>
-              </TukTukMarker>
-            )}
+          {activeConductors.map((conductor) => (
+            <TukTukMarker
+              key={`${conductor.id}-${conductor.lat}-${conductor.lng}`}
+              position={[conductor.lat, conductor.lng]}
+            >
+              <Popup>
+                <div className="text-center">
+                  <h3 className="font-bold text-blue-600">
+                    {conductor.name}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {conductor.status === "available" ? "Disponível" : "Ocupado"}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Última atualização: {new Date(conductor.updatedAt ?? "").toLocaleTimeString()}
+                  </p>
+                </div>
+              </Popup>
+            </TukTukMarker>
+          ))}
 
           {/* Controlador do mapa */}
           <MapController
@@ -610,31 +531,16 @@ const PassengerMap: React.FC = () => {
         >
           {userPosition &&
           activeConductors.length > 0 &&
-          activeConductors[0] &&
-          isValidCoordinate(
-            activeConductors[0].lat,
-            activeConductors[0].lng
-          ) ? (
-            <DistanceCalculator
-              userPosition={userPosition}
-              tuktukPosition={{
-                lat: activeConductors[0].lat,
-                lng: activeConductors[0].lng,
-              }}
-              showDetails={true}
-            />
-          ) : (
-            <LocationPermissionButton
-              onLocationGranted={handleLocationGranted}
-              onLocationDenied={handleLocationDenied}
-              showStatus={false}
-            >
-              <div className="flex items-center gap-1 bg-white rounded px-2 py-1 cursor-pointer text-sm text-blue-700">
-                <span style={{ fontSize: "1.1em" }}>📍</span>
-                <span>{t("locationPermission.grantAccess")}</span>
-              </div>
-            </LocationPermissionButton>
-          )}
+          activeConductors.map((conductor) => (
+            isValidCoordinate(conductor.lat, conductor.lng) ? (
+              <DistanceCalculator
+                key={conductor.id}
+                userPosition={userPosition}
+                tuktukPosition={{ lat: conductor.lat, lng: conductor.lng }}
+                showDetails={true}
+              />
+            ) : null
+          ))}
         </div>
 
         {/* Status do TukTuk */}
