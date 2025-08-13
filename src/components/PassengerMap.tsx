@@ -521,9 +521,13 @@ const PassengerMap: React.FC = () => {
         <div
           id="draggable-distance-card"
           style={{
-            position: "absolute",
-            top: draggable.position.top ?? 16,
-            right: draggable.position.right ?? 16,
+            position: "fixed",
+            top: draggable.position.top ?? undefined,
+            left: (draggable.position as DragPosition).left ?? undefined,
+            right:
+              (draggable.position as DragPosition).left === undefined
+                ? (draggable.position as DragPosition).right
+                : undefined,
             zIndex: 1100,
             touchAction: "none",
             cursor: "grab",
