@@ -85,12 +85,40 @@ const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
     let watchId: number | null = null;
     if (navigator.geolocation) {
       watchId = navigator.geolocation.watchPosition(
-        (pos) => {
-          setDeviceCoords({
+        async (pos) => {
+          const coords = {
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude,
             accuracy: pos.coords.accuracy,
-          });
+          };
+          setDeviceCoords(coords);
+          // Enviar para Supabase
+          if (
+            conductorId &&
+            coords.latitude !== null &&
+            coords.longitude !== null
+          ) {
+            const now = new Date().toISOString();
+            const { error } = await supabase.from("active_conductors").upsert(
+              {
+                conductor_id: conductorId,
+                current_latitude: coords.latitude,
+                current_longitude: coords.longitude,
+                accuracy: coords.accuracy,
+                updated_at: now,
+                is_active: true,
+                is_available: true,
+                last_seen: now,
+              },
+              { onConflict: "conductor_id" }
+            );
+            if (error) {
+              console.error(
+                "Erro ao atualizar localização no Supabase:",
+                error
+              );
+            }
+          }
         },
         () => {
           setDeviceCoords({ latitude: null, longitude: null, accuracy: null });
@@ -103,7 +131,7 @@ const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
         navigator.geolocation.clearWatch(watchId);
       }
     };
-  }, []);
+  }, [conductorId]);
 
   return (
     <Card className="mb-4 bg-blue-50 border-blue-200">

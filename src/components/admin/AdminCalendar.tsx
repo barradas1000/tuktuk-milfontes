@@ -123,6 +123,7 @@ import {
 } from "@/utils/reservationUtils";
 import ToggleTrackingButton from "../ToggleTrackingButton";
 import ConductorLocationCard from "./AdminCalendar/ConductorLocationCard";
+import AdminTuktukMap from "./AdminTuktukMap";
 // Helper to force refresh activeConductors after toggle
 function useSyncActiveConductors(fetchActiveConductors, setActiveConductors) {
   useEffect(() => {
@@ -1631,12 +1632,17 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
           )}
           {/* Card de localização do condutor ativo */}
           {activeConductors.length === 1 && (
-            <ConductorLocationCard
-              conductorId={activeConductors[0]}
-              conductorName={
-                conductors.find((c) => c.id === activeConductors[0])?.name || ""
-              }
-            />
+            <>
+              <ConductorLocationCard
+                conductorId={activeConductors[0]}
+                conductorName={
+                  conductors.find((c) => c.id === activeConductors[0])?.name ||
+                  ""
+                }
+              />
+              {/* Mapa de Milfontes com TukTuks ativos */}
+              <AdminTuktukMap />
+            </>
           )}
         </div>
 
