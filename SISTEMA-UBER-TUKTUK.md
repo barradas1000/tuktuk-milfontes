@@ -1,30 +1,128 @@
 ---
 
-## Toggle de Ativação/Desativação do Condutor (Tracking TukTuk) — Snapshot Técnico Agosto/2025
+## Snapshot Técnico — Agosto/2025 (Configuração Atual)
 
-### Componentes e Ficheiros Envolvidos
 
-- **src/components/ToggleTrackingButton.tsx**
-  - Componente React responsável por ativar/desativar o tracking de um condutor (admin ou condutor).
-  - Faz upsert/update na tabela `active_conductors` do Supabase.
-  - Sempre envia as coordenadas atuais ao ativar (`current_latitude`, `current_longitude`).
-  - Usa o hook `useDriverTracking` para enviar localização em tempo real enquanto ativo.
-  - Sincroniza estado via realtime (canal Postgres Changes) e polling (fallback).
-  - Dispara evento customizado `conductorStatusChanged` para sincronizar UI em múltiplos painéis/admins.
+### 1. Estrutura de Dados e Tracking
 
-- **src/components/admin/AdminCalendar.tsx**
-  - Painel administrativo onde o admin pode ativar/desativar qualquer condutor usando o `ToggleTrackingButton`.
-  - Mantém lista de condutores ativos sincronizada via realtime e eventos customizados.
-  - Atualiza UI imediatamente após qualquer toggle, sem necessidade de refresh manual.
+- **active_conductors** é a única tabela usada para tracking dinâmico (posição, status, disponibilidade, precisão, sessão).
+- **conductors** armazena apenas dados estáticos (nome, tuktuk_id, whatsapp, etc).
+- O frontend e o backend nunca fazem update/insert/subscribe de tracking em `conductors`.
 
-- **src/components/PassengerMap.tsx**
-  - Renderiza o mapa do passageiro e exibe o TukTuk em tempo real.
-  - Subscrição realtime apenas em `active_conductors`.
-  - O TukTuk só aparece se houver registro válido em `active_conductors` com `is_active = true` e coordenadas válidas.
+#### Interface TypeScript (frontend)
+
+```ts
+interface ActiveConductorRow {
+  conductor_id: string;
+  current_latitude?: number | null;
+  current_longitude?: number | null;
+  is_available: boolean;
+  is_active: boolean;
+  occupied_until?: string | null;
+  updated_at?: string;
+  accuracy?: number | null;
+}
+```
+- Esta interface garante que o frontend manipula apenas dados válidos e tipados, alinhados com o schema do Supabase.
+
+
+### 2. Fluxo de Ativação/Desativação do Tracking
+
+**Comportamento Padrão Consolidado:**
+
+- **Ativar Tracking**:
+  - O botão (`ToggleTrackingButton`) SEMPRE obtém a localização atual via `navigator.geolocation.getCurrentPosition`.
+  - Faz `upsert` em `active_conductors` incluindo obrigatoriamente:
+    - `conductor_id`, `is_active: true`, `is_available: true`, `current_latitude`, `current_longitude`, `accuracy`, `updated_at`.
+  - Isso garante que o TukTuk apareça imediatamente no mapa após ativação, sem depender do primeiro update do watchPosition.
+  - Em seguida, inicia envio periódico de localização via `useDriverTracking` (com throttling: só envia se mover >8m ou após 3s).
+  - Sincroniza estado via canal realtime (`postgres_changes`) e dispara evento customizado para UI.
+
+- **Desativar Tracking**:
+  - Faz `update` em `active_conductors` com:
+    - `is_active: false`, `is_available: false`, `updated_at`.
+  - Para o envio de localização.
+  - Sincroniza UI via evento customizado.
+
+### 3. Sincronização Realtime
+
+- O frontend (`PassengerMap.tsx`) subscreve apenas eventos da tabela `active_conductors` via canal realtime.
+- O array `activeConductors` é atualizado em tempo real e re-renderiza o mapa e os marcadores.
+- O TukTuk só aparece se houver registro válido em `active_conductors` com `is_active = true`, `is_available = true` e coordenadas válidas (com precisão ≤ 50m).
+
+### 4. Validação e Filtragem
+
+- Antes de renderizar marcadores, o código valida:
+  - Latitude/longitude são números válidos e dentro dos limites [-90, 90], [-180, 180].
+  - Precisão (`accuracy`) ≤ 50m.
+- Registros inválidos são filtrados e não aparecem no mapa.
+
+### 5. Policies RLS (Supabase)
+
+- Policies garantem que:
+  - O condutor só pode alterar o próprio registro.
+  - O admin pode ativar/desativar qualquer condutor.
+  - Leitura pública dos campos necessários para o mapa.
+- Função auxiliar `get_user_role()` define permissões dinâmicas.
+
+### 6. Componentes e Arquitetura do Frontend
+
+- **PassengerMap.tsx**:
+  - Renderiza o mapa, marcador do TukTuk (ícone customizado), marcador do usuário, card de distância, banners de status.
+  - Subscrição realtime e validação de dados.
+  - Suporte a múltiplos condutores ativos (exibe todos no mapa).
+  - Recenter automático no TukTuk, exceto se o usuário interagir manualmente.
+  - Card de distância calcula tempo estimado com velocidade média de 15 km/h.
+
+- **ToggleTrackingButton.tsx**:
+  - Ativa/desativa tracking do condutor/admin.
+  - Upsert/update apenas em `active_conductors`.
+  - Usa `useDriverTracking` para envio periódico de localização.
+
+- **UserLocationMarker.tsx**:
+  - Renderiza marcador customizado para posição do usuário.
+
+- **LocationPermissionButton.tsx**:
+  - Gerencia permissões de localização e UX de ajuda.
+
+- **DistanceCalculator.tsx**:
+  - Calcula distância e tempo estimado entre usuário e TukTuk.
+
+### 7. Checklist de Diagnóstico
+
+- Se o TukTuk não aparece:
+  - Verifique se há registro válido em `active_conductors` com status/disponibilidade e coordenadas corretas.
+  - Confirme variáveis de ambiente (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`).
+  - Teste o fluxo completo: admin ativa/desativa, passageiro vê atualização em tempo real.
+
+### 8. Boas Práticas e Garantias
+
+- Nunca misture tracking dinâmico em `conductors`.
+- Toda lógica dinâmica isolada em `active_conductors`.
+- Policies e roles implementados conforme especificação.
+- Validação estrita de coordenadas e precisão.
+- Build limpo e deploy atualizado para evitar artefatos antigos.
+
+---
+
+## Resumo Final
+
+- **active_conductors** = tracking dinâmico (posição, status, disponibilidade, precisão, realtime)
+- **conductors** = dados estáticos (nome, tuktuk_id, whatsapp, etc)
+- O frontend e backend estão alinhados para garantir atualização em tempo real, validação de dados e separação total entre dados dinâmicos e estáticos.
+- O sistema está pronto para múltiplos condutores ativos, com filtragem por precisão e status, e UX otimizada para passageiro e admin.
+
+---
+
+Se precisar de rollback, restaure os arquivos listados e valide policies e variáveis de ambiente.  
+Para dúvidas ou bugs, revise logs do Supabase e do frontend, e siga o checklist acima.
+
+**Atualização técnica concluída — Agosto/2025.**
 
 ### Fluxo Crítico do Toggle
 
 1. **Ativar Tracking**
+
    - O botão chama `navigator.geolocation.getCurrentPosition` para obter a localização atual.
    - Faz `upsert` em `active_conductors` com:
      - `conductor_id`
@@ -36,6 +134,7 @@
    - Dispara evento customizado para sincronizar UI.
 
 2. **Desativar Tracking**
+
    - Faz `update` em `active_conductors` com:
      - `is_active: false`
      - `is_available: false`
@@ -44,6 +143,7 @@
    - Dispara evento customizado para sincronizar UI.
 
 3. **Sincronização e Realtime**
+
    - O estado do toggle é sincronizado por:
      - Subscrição realtime (Postgres Changes) em `active_conductors`.
      - Polling periódico (5s) como fallback.
@@ -261,141 +361,16 @@ Se o admin precisar ativar o tracking de um condutor que ainda não tem registro
 
 ---
 
-### Policies RLS (atualizadas 2024)
-
-**Função de roles:**
-
-```sql
--- Função auxiliar para obter o papel do usuário
-create or replace function get_user_role()
-returns text as $$
-  select role from profiles where id = auth.uid();
-$$ language sql stable;
-```
-
-**Policies para active_conductors:**
-
-```sql
--- Leitura pública (apenas campos necessários para o mapa)
-create policy "Public read for tracking" on active_conductors
-  for select using (true);
-
--- Condutor pode inserir/atualizar o próprio registro
-create policy "Conductor can upsert own tracking" on active_conductors
-  for insert using (auth.uid() = conductor_id)
-  with check (auth.uid() = conductor_id);
-
-create policy "Conductor can update own tracking" on active_conductors
-  for update using (auth.uid() = conductor_id);
-
--- Admin e super_admin podem inserir/atualizar qualquer registro
-create policy "Admin or SuperAdmin can upsert any tracking" on active_conductors
-  for insert using (get_user_role() in ('admin', 'super_admin'));
-
-create policy "Admin or SuperAdmin can update any tracking" on active_conductors
-  for update using (get_user_role() in ('admin', 'super_admin'));
-```
-
-**Notas:**
-
-- O papel do usuário é definido em `profiles.role` (`admin`, `super_admin`, `conductor`).
-- Usuários podem acumular múltiplos papéis (ex: admin e conductor).
-- Policies garantem que admin/super_admin podem ativar/desativar qualquer condutor via painel/admin.
-- Nunca use `conductors` para tracking dinâmico.
-
-## Resumo das mudanças recentes (2024)
-
-- Toda lógica de tracking dinâmico (posição, status, disponibilidade) foi migrada para `active_conductors`.
-- `conductors` agora armazena apenas dados estáticos (nome, tuktuk_id, whatsapp, etc).
-- Policies RLS revisadas para permitir que admin e super_admin possam ativar/desativar qualquer condutor.
-- Colunas de localização (`current_latitude`, `current_longitude`) e sessão (`session_start`) são do tipo `float8`/`timestamptz`.
-- O frontend usa apenas `active_conductors` para tracking e subscrições realtime.
-- O botão de tracking do admin nunca altera `conductors`.
-- Documentação e código auditados para garantir separação total entre dados estáticos e dinâmicos.
-- Build process atualizado para evitar artefatos antigos (`npm run clean`).
-- Mapas usam `react-leaflet` v4.
-
 ---
 
-1. **Admin** acessa o painel e pode ativar/desativar qualquer condutor via ToggleTrackingButton. O botão SEMPRE faz update/upsert em `active_conductors`:
+## Histórico de Mudanças
 
-   ```js
-   // Código correto e robusto para ativar tracking de um condutor
-   await supabase.from("active_conductors").upsert(
-     {
-       conductor_id: conductorId,
-       is_active: true,
-       is_available: true,
-       // outros campos default se necessário
-     },
-     { onConflict: "conductor_id" }
-   );
-   ```
+### Mudanças de 2024 (Obsoletas)
 
-   Para desligar:
-
-   ```js
-   await supabase
-     .from("active_conductors")
-     .update({
-       is_active: false,
-       is_available: false,
-     })
-     .eq("conductor_id", conductorId);
-   ```
-
-   > **Nunca** faça update em `conductors.is_active` para tracking dinâmico.
-
-2. **Condutor** pode ativar/desativar o próprio status e enviar localização, sempre via `active_conductors`.
-3. **Passageiro** acessa `/tracking`, vê posição do TukTuk em tempo real (apenas via `active_conductors`), pode conceder localização e calcular distância.
-4. **Realtime**: Toda subscrição e atualização dinâmica é feita exclusivamente em `active_conductors`.
-5. **RLS**: Policies garantem que condutor só altera o próprio registro e admin pode alterar qualquer um.
-6. **Dados estáticos** (nome, tuktuk_id, whatsapp) vêm apenas de `conductors`.
-
-## 6. Garantias e Checklist
-
-- Nenhum código faz update/insert/subscribe de tracking em `conductors`.
-- Toda lógica dinâmica isolada em `active_conductors`.
-- Policies e função de roles implementadas conforme acima.
-- Documentação e código alinhados.
-- Testes manuais e automatizados recomendados para evitar regressão.
+- As seções "Policies RLS (atualizadas 2024)", "Resumo das mudanças recentes (2024)", "Garantias e Checklist (2024)", "Checklist de Atualização do Ambiente de Produção (2024)", "Resumo (2024)", "Erros comuns e como resolver (2024)" foram consolidadas ou substituídas pelas práticas e políticas de Agosto/2025.
+- Consulte apenas as seções principais deste documento para a configuração vigente.
 
 ---
-
-## Checklist de Atualização do Ambiente de Produção
-
-Se você ainda está vendo problemas (ex: mapa não atualiza, posição não aparece, status não reflete o esperado), pode ser devido a cache, build antigo ou algum componente legado não referenciado. Siga este checklist para garantir que tudo está atualizado:
-
-- [ ] Realize um build limpo do frontend (ex: `npm run build` após `npm run clean` ou apagar a pasta `dist`/`build`).
-- [ ] Faça deploy do build mais recente para produção (Vercel, etc).
-- [ ] Limpe o cache do navegador e force reload (Ctrl+Shift+R ou equivalente).
-- [ ] Certifique-se de que não há múltiplas abas antigas abertas usando versões antigas do app.
-- [ ] Confirme que as variáveis de ambiente (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`) estão corretas no ambiente de produção.
-- [ ] Verifique se não há componentes legados ou arquivos não referenciados no deploy (ex: código antigo em `conductors`).
-- [ ] Teste o fluxo completo: admin liga/desliga tracking, passageiro vê posição em tempo real, status/disponibilidade refletem corretamente.
-- [ ] Se persistir algum bug, tente limpar cache do CDN (Vercel, Cloudflare, etc) e reimplantar.
-
-Se após todos esses passos o problema persistir, revise logs do Supabase e do frontend para identificar possíveis causas.
-
-> **Nota:** O código principal está correto: envio e recepção de localização em tempo real usam apenas `active_conductors`. Se encontrar qualquer uso de `conductors` para tracking dinâmico, trate como bug crítico.
-
----
-
-**Resumo:**
-
-- `active_conductors` = tracking dinâmico (posição, status, disponibilidade, realtime)
-- `conductors` = dados estáticos (nome, tuktuk_id, whatsapp, etc)
-- Nunca misture responsabilidades. Se encontrar código que faz tracking dinâmico em `conductors`, corrija imediatamente.
-
-## Erros comuns e como resolver
-
-- **ENUM inválido**: Se aparecer erro de ENUM, execute `ALTER TYPE conductor_status ADD VALUE IF NOT EXISTS 'available';` (ou o valor necessário).
-- **Coluna ausente**: Se faltar coluna, use `ALTER TABLE ... ADD COLUMN ...` antes de atualizar dados.
-- **TukTuk não aparece no mapa**: Verifique se há registro válido em `active_conductors` com status/disponibilidade e coordenadas corretas.
-
----
-
-Este documento foi atualizado em agosto/2025 para refletir a arquitetura e práticas atuais do sistema TukTuk Milfontes.
 
 ## Snapshot do Passageiro (estado funcional atual)
 

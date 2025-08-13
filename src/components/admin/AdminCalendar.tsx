@@ -122,6 +122,7 @@ import {
   generateDynamicTimeSlots,
 } from "@/utils/reservationUtils";
 import ToggleTrackingButton from "../ToggleTrackingButton";
+import ConductorLocationCard from "./AdminCalendar/ConductorLocationCard";
 // Helper to force refresh activeConductors after toggle
 function useSyncActiveConductors(fetchActiveConductors, setActiveConductors) {
   useEffect(() => {
@@ -1627,6 +1628,15 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             <div className="text-sm text-green-700 mt-2">
               TukTuk disponível para novas viagens!
             </div>
+          )}
+          {/* Card de localização do condutor ativo */}
+          {activeConductors.length === 1 && (
+            <ConductorLocationCard
+              conductorId={activeConductors[0]}
+              conductorName={
+                conductors.find((c) => c.id === activeConductors[0])?.name || ""
+              }
+            />
           )}
         </div>
 
