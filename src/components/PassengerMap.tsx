@@ -219,9 +219,7 @@ const PassengerMap: React.FC = () => {
     if (activeConductors.length === 0) {
       return (
         <div className="absolute bottom-4 left-4 bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-2 rounded z-[1000] max-w-xs">
-          <p className="text-sm font-semibold">
-            🚫 TukTuk offline
-          </p>
+          <p className="text-sm font-semibold">🚫 TukTuk offline</p>
           <p className="text-xs mt-1">
             O TukTuk não está disponível neste momento
           </p>
@@ -284,14 +282,20 @@ const PassengerMap: React.FC = () => {
           console.error("[PassengerMap] Erro na query inicial:", error);
           setActiveConductors([]);
         } else {
-          console.log("[PassengerMap] Dados carregados da query inicial:", data);
+          console.log(
+            "[PassengerMap] Dados carregados da query inicial:",
+            data
+          );
           const enriched = (data as ActiveConductorRow[])
             .map((d) => {
               const lat = d.current_latitude;
               const lng = d.current_longitude;
               const accuracy = d.accuracy ?? Infinity;
               if (!isValidCoordinate(lat, lng) || accuracy > 50) {
-                console.warn("[PassengerMap] Registro ignorado por coordenadas inválidas ou baixa precisão:", d);
+                console.warn(
+                  "[PassengerMap] Registro ignorado por coordenadas inválidas ou baixa precisão:",
+                  d
+                );
                 return null;
               }
               return {
@@ -327,7 +331,8 @@ const PassengerMap: React.FC = () => {
         },
         (payload) => {
           console.log(
-            "[PassengerMap] Realtime event on active_conductors:", payload
+            "[PassengerMap] Realtime event on active_conductors:",
+            payload
           );
 
           // Lida com a remoção de um condutor (quando a linha é apagada)
@@ -476,14 +481,15 @@ const PassengerMap: React.FC = () => {
             >
               <Popup>
                 <div className="text-center">
-                  <h3 className="font-bold text-blue-600">
-                    {conductor.name}
-                  </h3>
+                  <h3 className="font-bold text-blue-600">{conductor.name}</h3>
                   <p className="text-sm text-gray-600">
-                    {conductor.status === "available" ? "Disponível" : "Ocupado"}
+                    {conductor.status === "available"
+                      ? "Disponível"
+                      : "Ocupado"}
                   </p>
                   <p className="text-xs text-gray-500">
-                    Última atualização: {new Date(conductor.updatedAt ?? "").toLocaleTimeString()}
+                    Última atualização:{" "}
+                    {new Date(conductor.updatedAt ?? "").toLocaleTimeString()}
                   </p>
                 </div>
               </Popup>
@@ -515,13 +521,9 @@ const PassengerMap: React.FC = () => {
         <div
           id="draggable-distance-card"
           style={{
-            position: "fixed",
-            top: draggable.position.top ?? undefined,
-            left: (draggable.position as DragPosition).left ?? undefined,
-            right:
-              (draggable.position as DragPosition).left === undefined
-                ? (draggable.position as DragPosition).right
-                : undefined,
+            position: "absolute",
+            top: draggable.position.top ?? 16,
+            right: draggable.position.right ?? 16,
             zIndex: 1100,
             touchAction: "none",
             cursor: "grab",
@@ -530,17 +532,17 @@ const PassengerMap: React.FC = () => {
           {...draggable.eventHandlers}
         >
           {userPosition &&
-          activeConductors.length > 0 &&
-          activeConductors.map((conductor) => (
-            isValidCoordinate(conductor.lat, conductor.lng) ? (
-              <DistanceCalculator
-                key={conductor.id}
-                userPosition={userPosition}
-                tuktukPosition={{ lat: conductor.lat, lng: conductor.lng }}
-                showDetails={true}
-              />
-            ) : null
-          ))}
+            activeConductors.length > 0 &&
+            activeConductors.map((conductor) =>
+              isValidCoordinate(conductor.lat, conductor.lng) ? (
+                <DistanceCalculator
+                  key={conductor.id}
+                  userPosition={userPosition}
+                  tuktukPosition={{ lat: conductor.lat, lng: conductor.lng }}
+                  showDetails={true}
+                />
+              ) : null
+            )}
         </div>
 
         {/* Status do TukTuk */}

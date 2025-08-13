@@ -40,6 +40,8 @@ function TukTukMarker({ position, conductor }) {
 const AdminTuktukMap: React.FC = () => {
   const [activeConductors, setActiveConductors] = useState<any[]>([]);
   const mapRef = useRef<L.Map | null>(null);
+  // Buscar lista de condutores do painel admin
+  const conductors = window.__ADMIN_CONDUCTORS__ || [];
 
   useEffect(() => {
     let channel: any = null;
@@ -47,7 +49,7 @@ const AdminTuktukMap: React.FC = () => {
       const { data, error } = await supabase
         .from("active_conductors")
         .select(
-          "conductor_id, current_latitude, current_longitude, is_available, updated_at"
+          "conductor_id, name, current_latitude, current_longitude, is_available, updated_at"
         )
         .eq("is_active", true);
       if (!error && data) {
@@ -62,7 +64,7 @@ const AdminTuktukMap: React.FC = () => {
               id: d.conductor_id,
               lat: d.current_latitude,
               lng: d.current_longitude,
-              name: d.conductor_id,
+              name: d.name || d.conductor_id,
               status: d.is_available ? "available" : "busy",
               updatedAt: d.updated_at,
             }))
@@ -87,7 +89,7 @@ const AdminTuktukMap: React.FC = () => {
     return () => {
       if (channel) supabase.removeChannel(channel);
     };
-  }, []);
+  }, [conductors]);
 
   return (
     <div className="w-full h-[400px] my-6 rounded-lg overflow-hidden shadow-lg">
