@@ -68,7 +68,7 @@ const AvailabilityCalendar = () => {
       // Buscar bloqueios manuais para hoje
       const { data: blockedPeriods, error: blockedError } = await supabase
         .from("blocked_periods")
-        .select("startTime, reason")
+        .select("start_time, reason")
         .eq("date", today);
 
       if (blockedError) {
@@ -85,7 +85,7 @@ const AvailabilityCalendar = () => {
         const isReserved = !!reservation;
 
         // Verificar se está bloqueado manualmente
-        const isBlocked = blockedPeriods?.some((b) => b.startTime === time);
+        const isBlocked = blockedPeriods?.some((b) => b.start_time === time);
 
         return {
           time,

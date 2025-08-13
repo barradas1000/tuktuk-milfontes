@@ -1,4 +1,5 @@
 {
+
   "hero": {
     "title": "Descubra Milfontes com Estilo",
     "subtitle": "Aventuras de Tuk-Tuk pela Costa Vicentina",
@@ -25,6 +26,7 @@
     }
   },
   "pricing": {
+    "title": "Preços",
     "whatsappMessages": {
       "phoneHint": "⚠️ Por favor, inclua o indicativo internacional do seu país (ex: +351 para Portugal) no número de WhatsApp para garantir o correto envio da confirmação."
     },
@@ -423,6 +425,14 @@
     "kilometers": "km",
     "minutes": "min",
     "hours": "h"
+  },
+  "climateProtection": {
+    "title": "Proteção Climática",
+    "description": "Capota retrátil e proteção contra chuva"
+  },
+  "uniqueExperience": {
+    "title": "Experiência Única",
+    "description": "Paisagens deslumbrantes ao pôr do sol"
   },
   "realTimeTracking": {
     "title": "🛺 Acompanhe o nosso TukTuk em tempo real!",

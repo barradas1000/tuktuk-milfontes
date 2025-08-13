@@ -425,6 +425,14 @@
     "minutes": "min",
     "hours": "uur"
   },
+  "climateProtection": {
+    "title": "Klimaatbescherming",
+    "description": "Uitschuifbaar dak en bescherming tegen regen"
+  },
+  "uniqueExperience": {
+    "title": "Unieke Ervaring",
+    "description": "Adembenemende zonsonderganglandschappen"
+  },
   "realTimeTracking": {
     "title": "🛺 Volg onze TukTuk in real-time!",
     "description": "Zie waar onze TukTuk nu is en volg zijn locatie in real-time",

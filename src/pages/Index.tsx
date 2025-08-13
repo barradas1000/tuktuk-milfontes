@@ -161,12 +161,13 @@ const Index = () => {
         id="hero"
         className="relative min-h-screen w-screen flex flex-col justify-center items-center text-white overflow-y-auto"
         style={{
-          backgroundImage: "url('https://tuktuk-milfontes.vercel.app/lovable-uploads/c772d42e-6be5-4512-b5cd-e797cb242fe4.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          minHeight: '100vh',
-          width: '100vw',
+          backgroundImage:
+            "url('https://tuktuk-milfontes.vercel.app/lovable-uploads/c772d42e-6be5-4512-b5cd-e797cb242fe4.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          minHeight: "100vh",
+          width: "100vw",
         }}
       >
         {/* Removido o gradiente sobre a imagem para máxima visibilidade */}
@@ -183,10 +184,16 @@ const Index = () => {
           </div>
           <div className="animate-fade-in">
             <h1 className="font-bold text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white mb-3 sm:mb-5 leading-tight">
-              {t("hero.title")}
-              <br />
-              <span className="text-amber-400 text-xl sm:text-2xl md:text-3xl lg:text-4xl">{t("hero.subtitle")}</span>
-              <span className="text-4xl md:text-6xl ml-2 align-middle">🛺✨</span>
+              <span className="block text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl !leading-tight">
+                {t("hero.title")}
+              </span>
+
+              <span className="block text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-amber-400 !leading-tight">
+                {t("hero.subtitle")} <br />
+              </span>
+              <span className="text-4xl md:text-6xl ml-2 align-middle">
+                🛺✨
+              </span>
             </h1>
 
             <p className="text-lg md:text-xl lg:text-2xl text-blue-100 mb-5 sm:mb-10 font-medium max-w-3xl mx-auto leading-relaxed">
@@ -255,31 +262,29 @@ const Index = () => {
             <div className="relative">
               <img
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/bc9c590b-26bf-4d4d-a27c-3e917afef291.png"
-                alt="Nosso Tuk-Tuk ao pôr do sol em Milfontes"
+                alt={t("uniqueExperience.title")}
                 className="w-full h-64 object-cover rounded-xl shadow-lg"
                 loading="lazy"
                 decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl"></div>
               <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-xl font-bold">Experiência Única</h3>
-                <p className="text-sm">Paisagens deslumbrantes ao pôr do sol</p>
+                <h3 className="text-xl font-bold">{t("uniqueExperience.title")}</h3>
+                <p className="text-sm">{t("uniqueExperience.description")}</p>
               </div>
             </div>
             <div className="relative">
               <img
                 src="https://tuktuk-milfontes.vercel.app/lovable-uploads/ddc85a0b-4a74-44e3-a0a6-bed937a5a686.png"
-                alt="Tuk-Tuk com cobertura contra chuva"
+                alt={t("climateProtection.title")}
                 className="w-full h-64 object-cover rounded-xl shadow-lg"
                 loading="lazy"
                 decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl"></div>
               <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-xl font-bold">Proteção Climática</h3>
-                <p className="text-sm">
-                  Capota retrátil e proteção contra chuva
-                </p>
+                <h3 className="text-xl font-bold">{t("climateProtection.title")}</h3>
+                <p className="text-sm">{t("climateProtection.description")}</p>
               </div>
             </div>
           </div>

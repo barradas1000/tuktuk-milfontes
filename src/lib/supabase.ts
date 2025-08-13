@@ -9,7 +9,7 @@ const envOk = !!supabaseUrl && !!supabaseAnonKey;
 
 // Tipagens mínimas para um cliente "like" do Supabase usadas pela app
 interface MinimalChannel {
-  on: (...args: unknown[]) => MinimalChannel;
+  on: (event: "postgres_changes" | "system", ...args: unknown[]) => MinimalChannel;
   subscribe: () => MinimalChannel;
 }
 
@@ -32,7 +32,7 @@ interface MinimalSupabaseLike {
 function createNoopSupabase(): MinimalSupabaseLike {
   const noop = () => undefined;
   const noopChannel: MinimalChannel = {
-    on: () => noopChannel,
+    on: (event: "postgres_changes" | "system", ...args: unknown[]) => noopChannel,
     subscribe: () => noopChannel,
   };
   return {

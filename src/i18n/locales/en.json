@@ -25,6 +25,7 @@
     }
   },
   "pricing": {
+    "title": "Pricing",
     "whatsappMessages": {},
     "titleHighlight": "Transparent",
     "subtitle": "Fair and clear prices, no surprises. Guaranteed fun for the whole family!",
@@ -421,6 +422,14 @@
     "kilometers": "km",
     "minutes": "min",
     "hours": "h"
+  },
+  "climateProtection": {
+    "title": "Climate Protection",
+    "description": "Retractable roof and rain protection"
+  },
+  "uniqueExperience": {
+    "title": "Unique Experience",
+    "description": "Stunning sunset landscapes"
   },
   "realTimeTracking": {
     "title": "🛺 Track our TukTuk in real time!",

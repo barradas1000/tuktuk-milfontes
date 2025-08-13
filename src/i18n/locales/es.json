@@ -425,6 +425,14 @@
     "minutes": "min",
     "hours": "h"
   },
+  "climateProtection": {
+    "title": "Protección Climática",
+    "description": "Capota retráctil y protección contra la lluvia"
+  },
+  "uniqueExperience": {
+    "title": "Experiencia Única",
+    "description": "Paisajes impresionantes al atardecer"
+  },
   "realTimeTracking": {
     "title": "🛺 ¡Sigue nuestro TukTuk en tiempo real!",
     "description": "Mira dónde está nuestro TukTuk ahora mismo y sigue su ubicación en tiempo real",

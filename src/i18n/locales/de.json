@@ -425,6 +425,14 @@
     "minutes": "Min",
     "hours": "Std"
   },
+  "climateProtection": {
+    "title": "Klimaschutz",
+    "description": "Verstellbares Dach und Regenschutz"
+  },
+  "uniqueExperience": {
+    "title": "Einzigartiges Erlebnis",
+    "description": "Atemberaubende Sonnenuntergangslandschaften"
+  },
   "realTimeTracking": {
     "title": "🛺 Verfolgen Sie unser Tuk-Tuk in Echtzeit!",
     "description": "Sehen Sie, wo sich unser Tuk-Tuk gerade befindet, und verfolgen Sie seine Position in Echtzeit",
