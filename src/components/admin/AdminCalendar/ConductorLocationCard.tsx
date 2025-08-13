@@ -7,6 +7,12 @@ interface ConductorLocationCardProps {
   conductorName: string;
 }
 
+interface DeviceCoords {
+  latitude: number | null;
+  longitude: number | null;
+  accuracy: number | null;
+}
+
 const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
   conductorId,
   conductorName,
@@ -17,6 +23,11 @@ const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
     accuracy: number | null;
   } | null>(null);
   const [connected, setConnected] = useState(false);
+  const [deviceCoords, setDeviceCoords] = useState<DeviceCoords>({
+    latitude: null,
+    longitude: null,
+    accuracy: null,
+  });
 
   useEffect(() => {
     let channel: any;
@@ -69,6 +80,31 @@ const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
     };
   }, [conductorId]);
 
+  // Obter coordenadas reais do dispositivo
+  useEffect(() => {
+    let watchId: number | null = null;
+    if (navigator.geolocation) {
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          setDeviceCoords({
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            accuracy: pos.coords.accuracy,
+          });
+        },
+        () => {
+          setDeviceCoords({ latitude: null, longitude: null, accuracy: null });
+        },
+        { enableHighAccuracy: true, maximumAge: 2000, timeout: 7000 }
+      );
+    }
+    return () => {
+      if (watchId !== null && navigator.geolocation.clearWatch) {
+        navigator.geolocation.clearWatch(watchId);
+      }
+    };
+  }, []);
+
   return (
     <Card className="mb-4 bg-blue-50 border-blue-200">
       <CardHeader>
@@ -96,6 +132,32 @@ const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
             Condutor não está ativo ou sem localização.
           </div>
         )}
+        <div className="mt-4 p-3 bg-white border rounded-lg">
+          <div className="font-semibold text-blue-700 mb-1">
+            Coordenadas Reais do Dispositivo
+          </div>
+          {deviceCoords.latitude !== null && deviceCoords.longitude !== null ? (
+            <>
+              <div>
+                Latitude: <b>{deviceCoords.latitude}</b>
+              </div>
+              <div>
+                Longitude: <b>{deviceCoords.longitude}</b>
+              </div>
+              <div>
+                Precisão: <b>{deviceCoords.accuracy ?? "N/A"} m</b>
+              </div>
+              <div className="text-xs text-gray-500 mt-1">
+                Essas são as coordenadas que o dispositivo está pronto para
+                enviar ao Supabase.
+              </div>
+            </>
+          ) : (
+            <div className="text-red-600">
+              Não foi possível obter a localização do dispositivo.
+            </div>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

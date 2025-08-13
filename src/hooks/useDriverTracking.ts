@@ -96,6 +96,9 @@ export function useDriverTracking(
           lat,
           lng,
         });
+        alert(
+          "Erro: Coordenadas inválidas recebidas do dispositivo. Verifique permissões e GPS."
+        );
         return;
       }
 
@@ -141,6 +144,7 @@ export function useDriverTracking(
       if (updErr) {
         console.error("[useDriverTracking] Erro ao upsert Supabase:", updErr);
         setError(updErr.message);
+        alert("Erro ao enviar localização para Supabase: " + updErr.message);
       } else {
         setError(null);
         setLastUpdateAt(now);
@@ -149,6 +153,7 @@ export function useDriverTracking(
 
     const onError = (e: GeolocationPositionError) => {
       setError(e.message || "Erro de geolocalização");
+      alert("Erro de geolocalização: " + (e.message || "Erro desconhecido"));
     };
 
     const options: PositionOptions = {
