@@ -269,7 +269,9 @@ const Index = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl"></div>
               <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-xl font-bold">{t("uniqueExperience.title")}</h3>
+                <h3 className="text-xl font-bold">
+                  {t("uniqueExperience.title")}
+                </h3>
                 <p className="text-sm">{t("uniqueExperience.description")}</p>
               </div>
             </div>
@@ -283,7 +285,9 @@ const Index = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent rounded-xl"></div>
               <div className="absolute bottom-4 left-4 text-white">
-                <h3 className="text-xl font-bold">{t("climateProtection.title")}</h3>
+                <h3 className="text-xl font-bold">
+                  {t("climateProtection.title")}
+                </h3>
                 <p className="text-sm">{t("climateProtection.description")}</p>
               </div>
             </div>

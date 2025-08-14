@@ -1,4 +1,62 @@
 {
+  "instructions": {
+    "title": "Instruções de uso do sistema de reservas",
+    "accountLogin": {
+      "title": "1. Criação de Conta e Login",
+      "client": "Cliente: Não é necessário criar conta para fazer uma reserva. Basta preencher o formulário e confirmar via WhatsApp.",
+      "admin": "Administrador: O acesso ao backoffice requer uma conta de admin. Solicite as credenciais à equipa de gestão. Aceda ao painel em https://tuktuk-milfontes.vercel.app/admin e faça login. Após autenticação, será direcionado para a aba Reservas."
+    },
+    "backoffice": {
+      "title": "2. Backoffice/Admin",
+      "description": "O painel administrativo apresenta três abas principais:",
+      "reservas": "Reservas: Lista e gestão de todas as reservas (pendentes, confirmadas, concluídas, canceladas).",
+      "calendario": "Calendário: Visualização das reservas por data/hora, facilitando a gestão de horários e disponibilidade.",
+      "relatorios": "Relatórios: Estatísticas e análises de reservas, desempenho e faturação.",
+      "funcionalidades": "Funcionalidades principais: gerir reservas, eliminar, enviar mensagens automáticas, ver estatísticas e gerir condutores ativos."
+    },
+    "driver": {
+      "title": "3. Escolha e Importância do Motorista Disponível",
+      "reservaCondutor": "Cada reserva pode ser associada a um condutor/motorista disponível.",
+      "whatsappCondutor": "Cada condutor tem um número de WhatsApp para comunicação direta com o cliente.",
+      "selecionarCondutor": "O admin pode selecionar o condutor ativo para cada serviço, garantindo que o cliente recebe informações do motorista correto.",
+      "importanciaCondutor": "A escolha correta do condutor é fundamental para o bom funcionamento do serviço e satisfação do cliente."
+    },
+    "fluxoReserva": {
+      "title": "4. Fluxo de Reserva (Cliente)",
+      "formulario": "O cliente preenche o formulário: nome, email, telefone, data, hora, tipo de tour, nº de pessoas e mensagem (opcional).",
+      "verificaDisponibilidade": "Assim que escolhe o tour, o sistema verifica automaticamente a disponibilidade para a duração do percurso.",
+      "sugereHorario": "Se o horário estiver ocupado, o sistema sugere a próxima hora disponível para o tour escolhido. O cliente pode aceitar ou escolher outro horário.",
+      "redirecionaWhatsapp": "Se o horário estiver livre, o cliente é redirecionado para o WhatsApp com a mensagem de reserva pronta a enviar."
+    },
+    "gestaoConfirmacao": {
+      "title": "5. Gestão e Confirmação de Reservas (Admin)",
+      "analiseReservas": "Analise as reservas pendentes na aba Reservas.",
+      "confirmarReserva": "Clique em Confirmar para aprovar uma reserva (o cliente recebe mensagem de confirmação via WhatsApp, enviada pelo condutor ativo).",
+      "cancelarEliminar": "Se necessário, cancele ou elimine reservas.",
+      "marcarConcluida": "Após o serviço, marque como Concluída para manter o histórico organizado.",
+      "abaCalendario": "Use a aba Calendário para garantir que não há sobreposição de horários.",
+      "mensagensAutomaticas": "Ao confirmar ou cancelar, o sistema permite enviar mensagens automáticas para o cliente, com todos os dados interpolados (nome, tour, data, hora, etc). Certifique-se de que o condutor correto está selecionado/ativo antes de enviar mensagens ao cliente."
+    },
+    "mensagens": {
+      "title": "6. Mensagens Pré-definidas",
+      "clienteAdmin": "Do Cliente para o Admin (via WhatsApp):",
+      "mensagemSimples": "Mensagem simples: Olá, gostaria de fazer uma reserva!",
+      "mensagemCompleta": "Mensagem completa: Olá, gostaria de reservar o passeio '{{ tour_type }}' para o dia {{ reservation_date }} às {{ reservation_time }} para {{ number_of_people }} pessoas. Nome: {{ name }} Email: {{ email }} Telefone: {{ phone }} Mensagem: {{ message }} Pedido feito em: {{ created_at }}",
+      "adminCliente": "Do Admin para o Cliente (via WhatsApp):",
+      "confirmacao": "Confirmação: Olá {{ name }}, a sua reserva para o passeio '{{ tour_type }}' está confirmada para o dia {{ reservation_date }} às {{ reservation_time }}. Encontre-nos no centro de Milfontes, junto ao jardim público. Qualquer dúvida, estamos à disposição!",
+      "cancelamento": "Cancelamento: Olá {{ name }}, lamentamos informar que a sua reserva para o passeio '{{ tour_type }}' no dia {{ reservation_date }} às {{ reservation_time }} foi cancelada. Se precisar reagendar ou tiver alguma dúvida, entre em contacto connosco.",
+      "outrasMensagens": "Lembrete de pagamento, atualização meteorológica, lembrete de pickup, etc. (todas as mensagens são automáticas e traduzidas para o idioma do cliente)"
+    },
+    "funcionamento": {
+      "title": "7. Funcionamento da Lógica de Reservas (Evitar Sobreposição)",
+      "impedeSobreposicao": "O sistema impede reservas sobrepostas automaticamente, considerando a duração de cada tour.",
+      "verificaReservas": "Ao escolher data, hora e tour, o sistema verifica todas as reservas já existentes para o dia.",
+      "tempoSuficiente": "Só permite reservar se houver tempo suficiente para o tour escolhido, sem sobrepor outros serviços.",
+      "sugereProximaHora": "Se não houver espaço, o sistema sugere automaticamente a próxima hora disponível.",
+      "consultaCalendario": "O admin pode sempre consultar o calendário para garantir que todos os serviços estão bem distribuídos e sem conflitos."
+    },
+    "suporte": "Se tiver dúvidas ou sugestões, contacte a equipa de suporte TukTuk Milfontes."
+  },
 
   "hero": {
     "title": "Descubra Milfontes com Estilo",
