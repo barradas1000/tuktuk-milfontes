@@ -38,9 +38,9 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const TukTukIcon = L.icon({
   iconUrl: tukTukIconUrl,
-  iconSize: [40, 40],
-  iconAnchor: [20, 40],
-  popupAnchor: [0, -40],
+  iconSize: [64, 64], // aumentado para melhor visibilidade
+  iconAnchor: [32, 64],
+  popupAnchor: [0, -64],
 });
 
 type ConductorStatus = "available" | "busy";
