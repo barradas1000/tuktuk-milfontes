@@ -1,4 +1,76 @@
 import React, { useState } from "react";
+// Componente popup de ativação do GPS via deep link
+const DeepLinkPopup = ({
+  onClose,
+  onActivateGps,
+}: {
+  onClose: () => void;
+  onActivateGps: () => void;
+}) => (
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100vw",
+      height: "100vh",
+      background: "rgba(0,0,0,0.4)",
+      zIndex: 9999,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    }}
+  >
+    <div
+      style={{
+        background: "#fff",
+        borderRadius: 12,
+        padding: 24,
+        maxWidth: 340,
+        boxShadow: "0 2px 16px rgba(0,0,0,0.15)",
+        textAlign: "center",
+      }}
+    >
+      <h2 style={{ marginBottom: 12 }}>🚦 Ativação GPS TukTuk-Milfontes</h2>
+      <p style={{ marginBottom: 18 }}>
+        Para enviar sua localização em tempo real, abra o app GPS do condutor.
+      </p>
+      <a
+        href="tuktukgps://"
+        style={{
+          display: "inline-block",
+          background: "#00796b",
+          color: "#fff",
+          fontWeight: "bold",
+          padding: "12px 24px",
+          borderRadius: 8,
+          textDecoration: "none",
+          fontSize: "1.1em",
+          marginBottom: 12,
+        }}
+        onClick={onActivateGps}
+      >
+        Abrir App GPS
+      </a>
+      <p style={{ fontSize: "0.95em", color: "#555" }}>
+        Se não tiver o app, clique para instalar ou peça suporte.
+      </p>
+      <button
+        onClick={onClose}
+        style={{
+          marginTop: 18,
+          background: "#eee",
+          border: "none",
+          borderRadius: 6,
+          padding: "8px 18px",
+          cursor: "pointer",
+        }}
+      >
+        Fechar
+      </button>
+    </div>
+  </div>
+);
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +98,8 @@ import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 
 const AdminDashboard = () => {
+  const [showPopup, setShowPopup] = useState(false);
+  const [gpsActivated, setGpsActivated] = useState(false);
   const { t } = useTranslation();
   const { getStatistics, reservationsLoading, error, isSupabaseConfigured } =
     useAdminReservations();
@@ -144,8 +218,10 @@ const AdminDashboard = () => {
           <div>
             {/* Statistics Cards - ocultos na aba Disponibilidade */}
             <TabsContent value="reservations" className="mt-0">
+              {/* ...existing code... */}
               {stats && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                  {/* ...existing code... */}
                   <Card className="border-l-4 border-l-blue-500">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">
@@ -162,61 +238,10 @@ const AdminDashboard = () => {
                       </p>
                     </CardContent>
                   </Card>
-
-                  <Card className="border-l-4 border-l-yellow-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Pendentes
-                      </CardTitle>
-                      <AlertCircle className="h-4 w-4 text-yellow-600" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-yellow-600">
-                        {stats.pendingReservations}
-                      </div>
-                      <p className="text-xs text-gray-600">
-                        Aguardam confirmação
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-l-4 border-l-green-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Confirmadas
-                      </CardTitle>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-green-600">
-                        {stats.confirmedReservations}
-                      </div>
-                      <p className="text-xs text-gray-600">
-                        Hoje: {stats.todayReservations}
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-l-4 border-l-purple-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Receita
-                      </CardTitle>
-                      <Euro className="h-4 w-4 text-purple-600" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-purple-600">
-                        €{stats.totalRevenue}
-                      </div>
-                      <p className="text-xs text-gray-600">
-                        Reservas confirmadas
-                      </p>
-                    </CardContent>
-                  </Card>
+                  {/* ...existing code... */}
                 </div>
               )}
-
-              {/* Show message if no stats available - only on reservations tab */}
+              {/* ...existing code... */}
               {!stats && (
                 <Card className="mb-8">
                   <CardContent className="flex items-center justify-center py-8">
@@ -233,13 +258,15 @@ const AdminDashboard = () => {
                   </CardContent>
                 </Card>
               )}
-
+              {/* ...existing code... */}
               <AdminReservationsList />
             </TabsContent>
-
+            {/* ...existing code... */}
             <TabsContent value="analytics" className="mt-0">
+              {/* ...existing code... */}
               {stats && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                  {/* ...existing code... */}
                   <Card className="border-l-4 border-l-blue-500">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">
@@ -256,68 +283,83 @@ const AdminDashboard = () => {
                       </p>
                     </CardContent>
                   </Card>
-
-                  <Card className="border-l-4 border-l-yellow-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Pendentes
-                      </CardTitle>
-                      <AlertCircle className="h-4 w-4 text-yellow-600" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-yellow-600">
-                        {stats.pendingReservations}
-                      </div>
-                      <p className="text-xs text-gray-600">
-                        Aguardam confirmação
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-l-4 border-l-green-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Confirmadas
-                      </CardTitle>
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-green-600">
-                        {stats.confirmedReservations}
-                      </div>
-                      <p className="text-xs text-gray-600">
-                        Hoje: {stats.todayReservations}
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border-l-4 border-l-purple-500">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        Receita
-                      </CardTitle>
-                      <Euro className="h-4 w-4 text-purple-600" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold text-purple-600">
-                        €{stats.totalRevenue}
-                      </div>
-                      <p className="text-xs text-gray-600">
-                        Reservas confirmadas
-                      </p>
-                    </CardContent>
-                  </Card>
+                  {/* ...existing code... */}
                 </div>
               )}
-
+              {/* ...existing code... */}
               <AdminReports />
             </TabsContent>
-
-            {/* Aba Disponibilidade - SEM o grid de estatísticas */}
+            {/* ...existing code... */}
             <TabsContent value="calendar" className="mt-0">
+              <style>{`
+                @keyframes pulseScale {
+                  0% { transform: scale(1); background: #2196f3; }
+                  50% { transform: scale(1.18); background: #00bfff; }
+                  100% { transform: scale(1); background: #2196f3; }
+                }
+              `}</style>
+              {/* Renderização do AdminCalendar, mas o botão de ativação do GPS será exibido logo após o bloco de condutores ativos e WhatsApp responsável */}
               <AdminCalendar
                 selectedDate={selectedDate}
                 onDateSelect={setSelectedDate}
+                renderAfterActiveBlock={({ activeConductors }) => (
+                  <>
+                    {activeConductors &&
+                      activeConductors.length > 0 &&
+                      !gpsActivated && (
+                        <div className="mb-6 flex justify-end">
+                          <button
+                            onClick={() => setShowPopup(true)}
+                            style={{
+                              background: "#2196f3",
+                              color: "#fff",
+                              fontWeight: "bold",
+                              padding: "12px 28px",
+                              borderRadius: 10,
+                              fontSize: "1.08em",
+                              boxShadow: "0 0 16px #00bfff88",
+                              animation: "pulseScale 1.2s infinite",
+                              border: "2px solid #00bfff",
+                              transition: "transform 0.2s, background 0.2s",
+                            }}
+                          >
+                            🚦 Ativar Rastreamento GPS
+                          </button>
+                        </div>
+                      )}
+                    {showPopup && (
+                      <DeepLinkPopup
+                        onClose={() => setShowPopup(false)}
+                        onActivateGps={() => {
+                          setShowPopup(false);
+                          setGpsActivated(true);
+                        }}
+                      />
+                    )}
+                    {gpsActivated && (
+                      <div className="mt-4 px-4 py-2 bg-green-100 border border-green-300 rounded text-green-800 flex items-center gap-2 animate-pulse">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="w-5 h-5 text-green-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 11c0-1.104.896-2 2-2s2 .896 2 2-.896 2-2 2-2-.896-2-2zm0 0V7m0 4v4m0-4H8m4 0h4"
+                          />
+                        </svg>
+                        <span>
+                          Localização em tempo real ativa: o seu dispositivo
+                          está a enviar a posição para o sistema.
+                        </span>
+                      </div>
+                    )}
+                  </>
+                )}
               />
             </TabsContent>
             <TabsContent value="analytics">

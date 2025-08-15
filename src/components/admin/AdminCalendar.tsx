@@ -173,7 +173,17 @@ const FALLBACK_CONDUCTORS = [
   },
 ];
 
-const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
+const AdminCalendar = ({
+  selectedDate,
+  onDateSelect,
+  renderAfterActiveBlock,
+}: AdminCalendarProps & {
+  renderAfterActiveBlock?: (params: {
+    activeConductors: string[];
+  }) => React.ReactNode;
+}) => {
+  // Estado para controlar visibilidade do card informativo
+  const [showCard, setShowCard] = useState(true);
   // --- Hooks de Dados/Serviços ---
   const {
     getReservationsByDate,
@@ -1378,7 +1388,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     {/* Ícone de status de localização */}
                     {status === "green" && (
                       <span title="Localização ativa">
-                        <MapPin className="w-5 h-5 text-green-500" />
+                        <MapPin className="w-5 h-5 text-green-900" />
                       </span>
                     )}
                     {status === "yellow" && (
@@ -1427,22 +1437,16 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
             })}
           </div>
 
-          {/* Mensagem visual de localização em tempo real */}
-          {activeConductors.length === 1 && (
-            <div className="mt-4 px-4 py-2 bg-green-100 border border-green-300 rounded text-green-800 flex items-center gap-2 animate-pulse">
-              <MapPin className="w-5 h-5 text-green-600" />
-              <span>
-                Localização em tempo real ativa: o seu dispositivo está a enviar
-                a posição para o sistema.
-              </span>
-            </div>
-          )}
-
+         
           {/* Exibir o WhatsApp responsável atual */}
           <div className="mt-4 text-base text-purple-900 font-semibold">
             WhatsApp responsável:{" "}
             <span className="text-purple-700">{getCurrentWhatsapp()}</span>
           </div>
+
+          {/* Chama renderAfterActiveBlock, se fornecido */}
+          {renderAfterActiveBlock &&
+            renderAfterActiveBlock({ activeConductors })}
           {/* Bloco de rastreamento em tempo real desabilitado */}
           {/*
   <Card className="mt-6 w-full max-w-md mx-auto bg-blue-50 border-blue-200">
@@ -1470,7 +1474,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                     {conductors.find((c) => c.id === activeConductors[0])?.name}
                   </b>
                 </div>
-                <ToggleTrackingButton conductorId={activeConductors[0]} />
+                <ToggleTrackingButton conductorId={activeConductors[0]} onStartTracking={() => setShowCard(false)} onStopTracking={() => setShowCard(true)} />
               </>
             ) : (
               <>
@@ -1505,7 +1509,7 @@ const AdminCalendar = ({ selectedDate, onDateSelect }: AdminCalendarProps) => {
                         }
                       </b>
                     </div>
-                    <ToggleTrackingButton conductorId={selectedConductorId} />
+                    <ToggleTrackingButton conductorId={selectedConductorId} onStartTracking={() => setShowCard(false)} onStopTracking={() => setShowCard(true)} />
                   </>
                 )}
               </>

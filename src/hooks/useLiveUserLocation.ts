@@ -33,7 +33,7 @@ export function useLiveUserLocation(opts: Options = {}) {
     let cancelled = false;
     (async () => {
       try {
-        // @ts-ignore
+    // @ts-ignore
         const res = await navigator.permissions?.query({
           name: "geolocation" as PermissionName,
         });
