@@ -1,10 +1,14 @@
 import React from "react";
+import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import PassengerMap from "../components/PassengerMap";
 
 const PassengerView: React.FC = () => {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const conductorId = searchParams.get("cid");
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -17,6 +21,11 @@ const PassengerView: React.FC = () => {
             <p className="text-center text-gray-600 mt-2">
               {t("tracking.subtitle")}
             </p>
+            {conductorId && (
+              <p className="text-center text-sm text-blue-600 mt-1">
+                Tracking do condutor: {conductorId}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -30,7 +39,7 @@ const PassengerView: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <PassengerMap />
+            <PassengerMap conductorId={conductorId || undefined} />
           </CardContent>
         </Card>
 

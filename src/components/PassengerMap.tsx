@@ -130,7 +130,11 @@ function MapReady({ onReady }: { onReady: (map: L.Map) => void }) {
   return null;
 }
 
-const PassengerMap: React.FC = () => {
+interface PassengerMapProps {
+  conductorId?: string; // Corresponde ao campo conductor_id na tabela active_conductors
+}
+
+const PassengerMap: React.FC<PassengerMapProps> = ({ conductorId }) => {
   const { t } = useTranslation();
   const [userPosition, setUserPosition] = useState<Coordinates | null>(null);
   const [activeConductors, setActiveConductors] = useState<ConductorLocation[]>(
@@ -214,6 +218,27 @@ const PassengerMap: React.FC = () => {
   }, []);
 
   const handleRecenter = () => setUserInteracted(false);
+  
+  // Focar no TukTuk específico quando conductorId é fornecido
+  useEffect(() => {
+    if (conductorId && mapRef.current && activeConductors.length > 0) {
+      const targetConductor = activeConductors.find(c => c.id === conductorId);
+      if (targetConductor) {
+        mapRef.current!.setView([targetConductor.lat, targetConductor.lng], 16);
+        setUserInteracted(true); // Impedir que o mapa se recentralize automaticamente
+      }
+    }
+  }, [conductorId, activeConductors]);
+  
+  // Verificar se o conductorId corresponde a um conductor ativo
+  useEffect(() => {
+    if (conductorId && activeConductors.length > 0) {
+      const targetConductor = activeConductors.find(c => c.id === conductorId);
+      if (!targetConductor) {
+        console.warn(`Conductor com ID ${conductorId} não encontrado ou não está ativo`);
+      }
+    }
+  }, [conductorId, activeConductors]);
 
   const renderTuktukStatus = () => {
     if (activeConductors.length === 0) {
@@ -491,6 +516,11 @@ const PassengerMap: React.FC = () => {
                     Última atualização:{" "}
                     {new Date(conductor.updatedAt ?? "").toLocaleTimeString()}
                   </p>
+                  {conductor.lastPing && (
+                    <p className="text-xs text-gray-500">
+                      Ping app: {new Date(conductor.lastPing).toLocaleTimeString()}
+                    </p>
+                  )}
                 </div>
               </Popup>
             </TukTukMarker>

@@ -24,6 +24,12 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 function useAllConductorsLocationStatus(conductors, activeConductors) {
   const [statusMap, setStatusMap] = React.useState({});
   React.useEffect(() => {
+    // Desativar completamente o rastreamento de localização
+    // setStatusMap({});
+    // return () => {};
+    
+    // Código original comentado para desativar o rastreamento
+    /*
     const watchers = {};
     conductors.forEach((c) => {
       if (activeConductors.includes(c.id)) {
@@ -65,6 +71,7 @@ function useAllConductorsLocationStatus(conductors, activeConductors) {
           navigator.geolocation.clearWatch(watchId);
       });
     };
+    */
   }, [conductors, activeConductors]);
   return statusMap;
 }

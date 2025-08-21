@@ -17,6 +17,7 @@ export type UseDriverTrackingOpts = {
   minIntervalMs?: number; // default 3000 ms
   minDeltaMeters?: number; // default 8 m
   highAccuracy?: boolean; // default true
+  trackingEnabled?: boolean; // default true - controla se o rastreamento está ativo
 };
 
 export function useDriverTracking(
@@ -28,6 +29,7 @@ export function useDriverTracking(
     minIntervalMs = 3000, // 3 segundos
     minDeltaMeters = 2, // só envia se mover pelo menos 2 metros
     highAccuracy = true,
+    trackingEnabled = true, // por padrão, o rastreamento está ativo
   } = opts;
 
   const watchIdRef = useRef<number | null>(null);
@@ -47,8 +49,8 @@ export function useDriverTracking(
   }, []);
 
   useEffect(() => {
-    // Se desligar ou não tiver id, parar qualquer watch ativo
-    if (!enabled || !conductorId) {
+    // Se desligar, tracking desativado ou não tiver id, parar qualquer watch ativo
+    if (!enabled || !trackingEnabled || !conductorId) {
       if (watchIdRef.current !== null && navigator?.geolocation?.clearWatch) {
         console.log(
           `[useDriverTracking] Limpando watchPosition (ID: ${watchIdRef.current}). Causa: Tracking desativado ou ID do condutor ausente.`
@@ -118,37 +120,51 @@ export function useDriverTracking(
       lastPosRef.current = pos;
       lastSentRef.current = now;
 
+      // [INÍCIO] Envio de coordenadas desativado - Para reativar, descomente todo este bloco
+      // console.log(
+      //   `[useDriverTracking] Enviando localização para active_conductors:`,
+      //   {
+      //     latitude: lat,
+      //     longitude: lng,
+      //     conductorId,
+      //   }
+      // );
+
+      // const { error: updErr } = await supabase.from("active_conductors").upsert(
+      //   {
+      //     conductor_id: conductorId,
+      //     current_latitude: lat,
+      //     current_longitude: lng,
+      //     is_active: true,
+      //     is_available: true, // Ajuste conforme lógica de disponibilidade
+      //     status: "available",
+      //     updated_at: new Date(now).toISOString(),
+      //     last_seen: new Date(now).toISOString(),
+      //   },
+      //   { onConflict: "conductor_id" }
+      // );
+
+      // if (updErr) {
+      //   console.error("[useDriverTracking] Erro ao upsert Supabase:", updErr);
+      //   setError(updErr.message);
+      //   alert("Erro ao enviar localização para Supabase: " + updErr.message);
+      // } else {
+      //   setError(null);
+      //   setLastUpdateAt(now);
+      // }
+      // [FIM] Envio de coordenadas desativado
+
+      // Simular sucesso para manter a funcionalidade da interface
       console.log(
-        `[useDriverTracking] Enviando localização para active_conductors:`,
+        `[useDriverTracking] [SIMULADO] Localização obtida (não enviada para Supabase):`,
         {
           latitude: lat,
           longitude: lng,
           conductorId,
         }
       );
-
-      const { error: updErr } = await supabase.from("active_conductors").upsert(
-        {
-          conductor_id: conductorId,
-          current_latitude: lat,
-          current_longitude: lng,
-          is_active: true,
-          is_available: true, // Ajuste conforme lógica de disponibilidade
-          status: "available",
-          updated_at: new Date(now).toISOString(),
-          last_seen: new Date(now).toISOString(),
-        },
-        { onConflict: "conductor_id" }
-      );
-
-      if (updErr) {
-        console.error("[useDriverTracking] Erro ao upsert Supabase:", updErr);
-        setError(updErr.message);
-        alert("Erro ao enviar localização para Supabase: " + updErr.message);
-      } else {
-        setError(null);
-        setLastUpdateAt(now);
-      }
+      setError(null);
+      setLastUpdateAt(now);
     };
 
     const onError = (e: GeolocationPositionError) => {
