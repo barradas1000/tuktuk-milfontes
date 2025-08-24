@@ -187,6 +187,7 @@ const AdminCalendar = ({
 }: AdminCalendarProps & {
   renderAfterActiveBlock?: (params: {
     activeConductors: string[];
+    activeConductorsWithNames: { id: string; name: string }[];
   }) => React.ReactNode;
 }) => {
   // Estado para controlar visibilidade do card informativo
@@ -1453,7 +1454,10 @@ const AdminCalendar = ({
 
           {/* Chama renderAfterActiveBlock, se fornecido */}
           {renderAfterActiveBlock &&
-            renderAfterActiveBlock({ activeConductors })}
+            renderAfterActiveBlock({
+              activeConductors,
+              activeConductorsWithNames: conductors.filter(c => activeConductors.includes(c.id))
+            })}
           {/* Bloco de rastreamento em tempo real desabilitado */}
           {/*
   <Card className="mt-6 w-full max-w-md mx-auto bg-blue-50 border-blue-200">

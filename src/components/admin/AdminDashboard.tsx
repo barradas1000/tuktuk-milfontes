@@ -4,13 +4,26 @@ const DeepLinkPopup = ({
   onClose,
   onActivateGps,
   conductorId,
+  conductorName,
 }: {
   onClose: () => void;
   onActivateGps: () => void;
   conductorId: string | null;
+  conductorName: string | null;
 }) => {
-  const deepLink = conductorId 
-    ? `tuktukgps://tracking?cid=${conductorId}`
+  // Gerar token de sessão simples (timestamp + random string)
+  const generateSessionToken = () => {
+    const timestamp = Date.now();
+    const randomStr = Math.random().toString(36).substring(2, 10);
+    return `${timestamp}_${randomStr}`;
+  };
+
+  const sessionToken = generateSessionToken();
+  
+  const deepLink = conductorId && conductorName
+    ? `tuktukgps://tracking?conductor_id=${conductorId}&name=${encodeURIComponent(conductorName)}&token=${sessionToken}&timestamp=${Date.now()}`
+    : conductorId
+    ? `tuktukgps://tracking?conductor_id=${conductorId}&token=${sessionToken}&timestamp=${Date.now()}`
     : 'tuktukgps://';
 
   return (
@@ -60,9 +73,13 @@ const DeepLinkPopup = ({
           Abrir App GPS
         </a>
         {conductorId && (
-          <p style={{ fontSize: "0.85em", color: "#00796b", marginBottom: 8 }}>
-            Condutor ID: {conductorId}
-          </p>
+          <div style={{ fontSize: "0.85em", color: "#00796b", marginBottom: 8 }}>
+            <p>Condutor ID: {conductorId}</p>
+            {conductorName && <p>Nome: {conductorName}</p>}
+            <p style={{ fontSize: "0.75em", color: "#666", marginTop: 4 }}>
+              Token de sessão: {sessionToken.substring(0, 12)}...
+            </p>
+          </div>
         )}
         <p style={{ fontSize: "0.95em", color: "#555" }}>
           Se não tiver o app, clique para instalar ou peça suporte.
@@ -315,7 +332,7 @@ const AdminDashboard = () => {
               <AdminCalendar
                 selectedDate={selectedDate}
                 onDateSelect={setSelectedDate}
-                renderAfterActiveBlock={({ activeConductors }) => (
+                renderAfterActiveBlock={({ activeConductors, activeConductorsWithNames }) => (
                   <>
                     {activeConductors &&
                       activeConductors.length > 0 &&
@@ -348,6 +365,7 @@ const AdminDashboard = () => {
                           setGpsActivated(true);
                         }}
                         conductorId={activeConductors.length > 0 ? activeConductors[0] : null}
+                        conductorName={activeConductorsWithNames.length > 0 ? activeConductorsWithNames[0].name : null}
                       />
                     )}
                     {gpsActivated && (
