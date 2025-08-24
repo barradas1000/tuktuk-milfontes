@@ -31,7 +31,7 @@ export const useReservations = () => {
 
   // Fetch reservations for a specific date
   const getReservationsForDate = async (date: string) => {
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from("reservations")
       .select("*")
       .eq("reservation_date", date)
@@ -49,7 +49,7 @@ export const useReservations = () => {
   const { data: availability, isLoading: availabilityLoading } = useQuery({
     queryKey: ["availability"],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("tuk_tuk_availability")
         .select("*");
 
@@ -77,10 +77,10 @@ export const useReservations = () => {
 
     return timeSlots.map((time) => {
       const slotReservations = reservations.filter(
-        (r: any) => r.reservation_time === time && r.status !== "cancelled"
+        (r: Reservation) => r.reservation_time === time && r.status !== "cancelled"
       );
       const reserved = slotReservations.reduce(
-        (sum: number, r: any) => sum + r.number_of_people,
+        (sum: number, r: Reservation) => sum + r.number_of_people,
         0
       );
 
@@ -98,7 +98,7 @@ export const useReservations = () => {
     mutationFn: async (reservationData: Reservation[]) => {
       console.log("Creating reservations:", reservationData);
 
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("reservations")
         .insert(reservationData)
         .select();
@@ -117,11 +117,11 @@ export const useReservations = () => {
       const reservationCount = data?.length || 0;
       const totalPeople =
         data?.reduce(
-          (sum: number, r: any) => sum + (r?.number_of_people || 0),
+          (sum: number, r: Reservation) => sum + (r?.number_of_people || 0),
           0
         ) || 0;
       const totalPrice =
-        data?.reduce((sum: number, r: any) => sum + (r?.total_price || 0), 0) ||
+        data?.reduce((sum: number, r: Reservation) => sum + (r?.total_price || 0), 0) ||
         0;
       const tourType = data?.[0]?.tour_type || "";
       const reservationDate = data?.[0]?.reservation_date || "";
@@ -132,7 +132,7 @@ export const useReservations = () => {
         description: `${reservationCount} reserva(s) para ${totalPeople} pessoa(s) - €${totalPrice}`,
       });
     },
-    onError: (error: any) => {
+    onError: (error: Error) => {
       console.error("Error creating reservation:", error);
       toast({
         title: "Erro ao criar reserva",
@@ -146,7 +146,7 @@ export const useReservations = () => {
   const { data: tourTypes, isLoading: tourTypesLoading } = useQuery({
     queryKey: ["tourTypes"],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("tour_types")
         .select("*")
         .eq("is_active", true)

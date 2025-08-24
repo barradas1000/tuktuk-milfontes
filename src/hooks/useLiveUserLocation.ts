@@ -33,7 +33,7 @@ export function useLiveUserLocation(opts: Options = {}) {
     let cancelled = false;
     (async () => {
       try {
-    // @ts-ignore
+    // @ts-expect-error: clearWatch is not available in all browsers
         const res = await navigator.permissions?.query({
           name: "geolocation" as PermissionName,
         });

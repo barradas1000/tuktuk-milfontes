@@ -3,74 +3,87 @@ import React, { useState } from "react";
 const DeepLinkPopup = ({
   onClose,
   onActivateGps,
+  conductorId,
 }: {
   onClose: () => void;
   onActivateGps: () => void;
-}) => (
-  <div
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100vw",
-      height: "100vh",
-      background: "rgba(0,0,0,0.4)",
-      zIndex: 9999,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}
-  >
+  conductorId: string | null;
+}) => {
+  const deepLink = conductorId 
+    ? `tuktukgps://tracking?cid=${conductorId}`
+    : 'tuktukgps://';
+
+  return (
     <div
       style={{
-        background: "#fff",
-        borderRadius: 12,
-        padding: 24,
-        maxWidth: 340,
-        boxShadow: "0 2px 16px rgba(0,0,0,0.15)",
-        textAlign: "center",
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100vw",
+        height: "100vh",
+        background: "rgba(0,0,0,0.4)",
+        zIndex: 9999,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <h2 style={{ marginBottom: 12 }}>🚦 Ativação GPS TukTuk-Milfontes</h2>
-      <p style={{ marginBottom: 18 }}>
-        Para enviar sua localização em tempo real, abra o app GPS do condutor.
-      </p>
-      <a
-        href="tuktukgps://"
+      <div
         style={{
-          display: "inline-block",
-          background: "#00796b",
-          color: "#fff",
-          fontWeight: "bold",
-          padding: "12px 24px",
-          borderRadius: 8,
-          textDecoration: "none",
-          fontSize: "1.1em",
-          marginBottom: 12,
-        }}
-        onClick={onActivateGps}
-      >
-        Abrir App GPS
-      </a>
-      <p style={{ fontSize: "0.95em", color: "#555" }}>
-        Se não tiver o app, clique para instalar ou peça suporte.
-      </p>
-      <button
-        onClick={onClose}
-        style={{
-          marginTop: 18,
-          background: "#eee",
-          border: "none",
-          borderRadius: 6,
-          padding: "8px 18px",
-          cursor: "pointer",
+          background: "#fff",
+          borderRadius: 12,
+          padding: 24,
+          maxWidth: 340,
+          boxShadow: "0 2px 16px rgba(0,0,0,0.15)",
+          textAlign: "center",
         }}
       >
-        Fechar
-      </button>
+        <h2 style={{ marginBottom: 12 }}>🚦 Ativação GPS TukTuk-Milfontes</h2>
+        <p style={{ marginBottom: 18 }}>
+          Para enviar sua localização em tempo real, abra o app GPS do condutor.
+        </p>
+        <a
+          href={deepLink}
+          style={{
+            display: "inline-block",
+            background: "#00796b",
+            color: "#fff",
+            fontWeight: "bold",
+            padding: "12px 24px",
+            borderRadius: 8,
+            textDecoration: "none",
+            fontSize: "1.1em",
+            marginBottom: 12,
+          }}
+          onClick={onActivateGps}
+        >
+          Abrir App GPS
+        </a>
+        {conductorId && (
+          <p style={{ fontSize: "0.85em", color: "#00796b", marginBottom: 8 }}>
+            Condutor ID: {conductorId}
+          </p>
+        )}
+        <p style={{ fontSize: "0.95em", color: "#555" }}>
+          Se não tiver o app, clique para instalar ou peça suporte.
+        </p>
+        <button
+          onClick={onClose}
+          style={{
+            marginTop: 18,
+            background: "#eee",
+            border: "none",
+            borderRadius: 6,
+            padding: "8px 18px",
+            cursor: "pointer",
+          }}
+        >
+          Fechar
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -334,6 +347,7 @@ const AdminDashboard = () => {
                           setShowPopup(false);
                           setGpsActivated(true);
                         }}
+                        conductorId={activeConductors.length > 0 ? activeConductors[0] : null}
                       />
                     )}
                     {gpsActivated && (

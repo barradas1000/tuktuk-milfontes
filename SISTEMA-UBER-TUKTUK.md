@@ -26,17 +26,7 @@ interface ActiveConductorRow {
 - Esta interface garante que o frontend manipula apenas dados válidos e tipados, alinhados com o schema do Supabase.
 
 
-### 2. Fluxo de Ativação/Desativação do Tracking
 
-**Comportamento Padrão Consolidado:**
-
-- **Ativar Tracking**:
-  - O botão (`ToggleTrackingButton`) SEMPRE obtém a localização atual via `navigator.geolocation.getCurrentPosition`.
-  - Faz `upsert` em `active_conductors` incluindo obrigatoriamente:
-    - `conductor_id`, `is_active: true`, `is_available: true`, `current_latitude`, `current_longitude`, `accuracy`, `updated_at`.
-  - Isso garante que o TukTuk apareça imediatamente no mapa após ativação, sem depender do primeiro update do watchPosition.
-  - Em seguida, inicia envio periódico de localização via `useDriverTracking` (com throttling: só envia se mover >8m ou após 3s).
-  - Sincroniza estado via canal realtime (`postgres_changes`) e dispara evento customizado para UI.
 
 - **Desativar Tracking**:
   - Faz `update` em `active_conductors` com:

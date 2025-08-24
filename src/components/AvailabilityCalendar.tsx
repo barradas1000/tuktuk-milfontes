@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -44,7 +44,7 @@ const AvailabilityCalendar = () => {
   const currentLocale = localeMap[i18n.language] || pt;
 
   // Buscar disponibilidade real para hoje
-  const fetchTodayAvailability = async () => {
+  const fetchTodayAvailability = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -102,12 +102,12 @@ const AvailabilityCalendar = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [today]);
 
   // Carregar dados na montagem do componente
   useEffect(() => {
     fetchTodayAvailability();
-  }, []);
+  }, [fetchTodayAvailability]);
 
   // Atualizar a cada 30 segundos para manter dados frescos
   useEffect(() => {
@@ -116,7 +116,7 @@ const AvailabilityCalendar = () => {
     }, 30000); // 30 segundos
 
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchTodayAvailability]);
 
   // Filtrar horários por período
   const morningSlots = availableSlots

@@ -191,7 +191,7 @@ export function useDriverTracking(
         watchIdRef.current = null;
       }
     };
-  }, [enabled, conductorId, minIntervalMs, minDeltaMeters, highAccuracy]);
+  }, [enabled, conductorId, minIntervalMs, minDeltaMeters, highAccuracy, trackingEnabled]);
 
   return { error, lastUpdateAt };
 }
