@@ -112,11 +112,12 @@ const AdminTuktukMap: React.FC = () => {
       if (!error && data) {
         setActiveConductors(
           data
-            .filter(
-              (d: ActiveConductorSupabase) =>
-                typeof d.current_latitude === "number" &&
-                typeof d.current_longitude === "number"
-            )
+            .filter((d: ActiveConductorSupabase) => {
+              const hasCoords = typeof d.current_latitude === "number" && typeof d.current_longitude === "number";
+              const lastUpdate = d.updated_at ? new Date(d.updated_at).getTime() : 0;
+              const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+              return hasCoords && lastUpdate > fiveMinutesAgo;
+            })
             .map((d: ActiveConductorSupabase) => ({
               id: d.conductor_id,
               lat: d.current_latitude,

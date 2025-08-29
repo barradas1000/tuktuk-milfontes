@@ -1252,12 +1252,12 @@ const AdminCalendar = ({
     loadBlockedPeriods();
     loadActiveConductors();
 
-    // Subscrição realtime para updates na tabela conductors
+    // Subscrição realtime para updates na tabela active_conductors
     conductorsChannel = supabase
-      .channel("conductors_realtime")
+      .channel("active_conductors_realtime")
       .on(
         "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "conductors" },
+        { event: "*", schema: "public", table: "active_conductors" },
         async (payload) => {
           const activeIds = await fetchActiveConductors();
           setActiveConductors(activeIds);

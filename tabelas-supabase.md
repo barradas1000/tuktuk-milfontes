@@ -1,273 +1,572 @@
-# Estrutura das Tabelas no Supabase - Projeto TukTuk Milfontes
-
-## Tabela: reservations
-
-Armazena todas as reservas de passeios dos clientes.
-
-| Coluna                | Tipo          | Obrigatório | Descrição                                        |
-| --------------------- | ------------- | ----------- | ------------------------------------------------ |
-| id                    | uuid          | SIM         | Identificador único (chave primária)             |
-| customer_name         | varchar(255)  | SIM         | Nome do cliente                                  |
-| customer_email        | varchar(255)  | SIM         | Email do cliente                                 |
-| customer_phone        | varchar(20)   | SIM         | Telefone do cliente                              |
-| reservation_date      | date          | SIM         | Data da reserva                                  |
-| reservation_time      | time          | SIM         | Hora da reserva                                  |
-| number_of_people      | integer       | SIM         | Número de pessoas (1-6)                          |
-| tour_type             | varchar(100)  | SIM         | Tipo de passeio                                  |
-| special_requests      | text          | NÃO         | Pedidos especiais do cliente                     |
-| status                | varchar(50)   | NÃO         | Status (pending/confirmed/cancelled/completed)   |
-| total_price           | decimal(10,2) | NÃO         | Preço total da reserva                           |
-| assigned_conductor_id | uuid          | NÃO         | Condutor atribuído (FK para conductors.id)       |
-| created_at            | timestamptz   | NÃO         | Data de criação                                  |
-| updated_at            | timestamptz   | NÃO         | Data de atualização (atualizada automaticamente) |
-
----
-
-## Tabela: tuk_tuk_availability
-
-Controla a disponibilidade dos tuk-tuks por data e horários.
-
-| Coluna         | Tipo        | Obrigatório | Descrição                            |
-| -------------- | ----------- | ----------- | ------------------------------------ |
-| id             | uuid        | SIM         | Identificador único (chave primária) |
-| tuk_tuk_id     | varchar(50) | SIM         | Identificador do tuk-tuk             |
-| available_date | date        | SIM         | Data disponível                      |
-| time_slots     | jsonb       | SIM         | Horários disponíveis em formato JSON |
-| max_capacity   | integer     | NÃO         | Capacidade máxima (padrão: 4)        |
-| created_at     | timestamptz | NÃO         | Data de criação                      |
-
-**Constraint:** UNIQUE(tuk_tuk_id, available_date)
-
----
-
-## Tabela: tour_types
-
-Define os tipos de passeios disponíveis e seus preços.
-
-| Coluna           | Tipo          | Obrigatório | Descrição                            |
-| ---------------- | ------------- | ----------- | ------------------------------------ |
-| id               | uuid          | SIM         | Identificador único (chave primária) |
-| name             | varchar(100)  | SIM         | Nome do passeio (único)              |
-| description      | text          | NÃO         | Descrição do passeio                 |
-| duration_minutes | integer       | SIM         | Duração em minutos                   |
-| base_price       | decimal(10,2) | SIM         | Preço base                           |
-| max_people       | integer       | NÃO         | Máximo de pessoas (padrão: 4)        |
-| is_active        | boolean       | NÃO         | Ativo/inativo (padrão: true)         |
-| created_at       | timestamptz   | NÃO         | Data de criação                      |
-
-### Passeios Pré-configurados:
-
-- **Passeio panorâmico pela vila** (60min, €10, máx 4 pessoas)
-- **Vila Nova de Milfontes → Praia das Furnas** (90min, €14, máx 4 pessoas)
-- **Travessia pela ponte** (45min, €10, máx 4 pessoas)
-- **Pôr-do-Sol Romântico** (120min, €25, máx 2 pessoas)
-- **Passeio noturno** (90min, €8, máx 4 pessoas)
-- **Rota dos Pescadores** (75min, €10, máx 4 pessoas)
-
----
-
-## Tabela: profiles
-
-Armazena perfis de utilizadores do sistema (ligada ao auth.users do Supabase). Cada registro representa um utilizador autenticado, podendo ser cliente, condutor ou administrador. A tabela é central para autenticação, autorização e gestão de permissões.
-
-| Coluna       | Tipo        | Obrigatório | Descrição detalhada                                                            |
-| ------------ | ----------- | ----------- | ------------------------------------------------------------------------------ |
-| id           | uuid        | SIM         | Identificador único do perfil. Igual ao id do utilizador no Supabase Auth.     |
-| email        | text        | SIM         | Email do utilizador. Usado para login, comunicação e identificação.            |
-| full_name    | text        | NÃO         | Nome completo do utilizador. Exibido na interface e usado para personalização. |
-| role         | text        | SIM         | Papel do utilizador: 'admin', 'condutor', 'user'. Define permissões e acesso.  |
-| admin_level  | text        | NÃO         | Nível administrativo: 'super_admin', 'admin_local', etc. (apenas para admins). |
-| region       | text        | NÃO         | Região administrativa do utilizador/admin.                                     |
-| permissions  | jsonb       | NÃO         | Permissões granulares (ex: can_create_admins, can_view_audit_logs, etc).       |
-| conductor_id | uuid        | NÃO         | Referência para conductors.id (se for condutor).                               |
-| created_at   | timestamptz | SIM         | Data de criação do perfil.                                                     |
-| updated_at   | timestamptz | NÃO         | Data da última atualização do perfil.                                          |
-| created_by   | uuid        | NÃO         | Usuário que criou este perfil (útil para admins).                              |
-| zone         | text        | NÃO         | Zona geográfica ou operacional (se aplicável).                                 |
-
-### Exemplo de dados reais (consulta MCP server):
+# Documentação das Tabelas do Supabase
 
-- **Admin:**
+Este documento fornece uma visão geral completa de todas as tabelas no banco de dados Supabase, organizadas por esquema. Inclui detalhes sobre colunas, chaves primárias, chaves estrangeiras e políticas de segurança.
 
-  - id: c2b84b4e-ecbf-47d1-adc0-f3d7549829b3
-  - email: carlosbarradas111@gmail.com
-  - full_name: Carlos Barradas
-  - role: admin
-  - admin_level: super_admin
-  - region: milfontes
-  - permissions: { can_create_admins, can_view_audit_logs, can_delete_conductors, can_manage_all_conductors }
+## Esquema: auth
 
-- **Condutor:**
+### Tabela: audit_log_entries
 
-  - id: c4c9a172-92c2-410e-a671-56b443fc093d
-  - email: sonia.santos.scps82@gmail.com
-  - full_name: Sónia Cristina Pinto dos Santos Carias
-  - role: condutor
-  - admin_level: admin_local
-  - region: milfontes
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| instance_id | uuid | YES | null | - |
+| id | uuid | NO | null | - |
+| payload | json | YES | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| ip_address | character varying | NO | ''::character varying | - |
 
-- **Condutor:**
-  - id: e4b3296c-13eb-4faa-aead-e246ddb2bf66
-  - email: diogo.carias@outlook.pt
-  - full_name: Diogo Miguel da Conceição silva Carias
-  - role: condutor
-  - admin_level: admin_local
-  - region: milfontes
+**Chave Primária:** id
 
-#### Utilidade geral da tabela:
+**Chaves Estrangeiras:** Nenhuma
 
-- Centraliza dados de autenticação e papéis dos utilizadores.
-- Permite controle granular de permissões e acesso por região/nível.
-- Relaciona condutores ao perfil autenticado.
-- Suporta auditoria e gestão administrativa avançada.
+**Políticas:** Nenhuma
 
----
+### Tabela: flow_state
 
-## Tabela: conductors
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| user_id | uuid | YES | null | - |
+| auth_code | text | NO | null | - |
+| code_challenge_method | USER-DEFINED | NO | null | - |
+| code_challenge | text | NO | null | - |
+| provider_type | text | NO | null | - |
+| provider_access_token | text | YES | null | - |
+| provider_refresh_token | text | YES | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+| authentication_method | text | NO | null | - |
+| auth_code_issued_at | timestamp with time zone | YES | null | - |
 
-Armazena os condutores (motoristas) disponíveis para o serviço.
+**Chave Primária:** id
 
-| Coluna     | Tipo        | Obrigatório | Descrição                            |
-| ---------- | ----------- | ----------- | ------------------------------------ |
-| id         | uuid        | SIM         | Identificador único (chave primária) |
-| name       | text        | SIM         | Nome do condutor                     |
-| whatsapp   | text        | SIM         | Número do WhatsApp internacional     |
-| is_active  | boolean     | NÃO         | Indica se está ativo (padrão: true)  |
-| created_at | timestamptz | NÃO         | Data de criação                      |
-| updated_at | timestamptz | NÃO         | Data de atualização                  |
+**Chaves Estrangeiras:** Nenhuma
 
-### Condutores Pré-configurados:
+**Políticas:** Nenhuma
 
-- **Condutor 1** (ID: 550e8400-e29b-41d4-a716-446655440001, WhatsApp: 351963496320)
-- **Condutor 2** (ID: 550e8400-e29b-41d4-a716-446655440002, WhatsApp: 351968784043)
+### Tabela: identities
 
----
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| provider_id | text | NO | null | - |
+| user_id | uuid | NO | null | - |
+| identity_data | jsonb | NO | null | - |
+| provider | text | NO | null | - |
+| last_sign_in_at | timestamp with time zone | YES | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+| email | text | YES | null | Auth: Email is a generated column that references the optional email property in the identity_data |
+| id | uuid | NO | gen_random_uuid() | - |
 
-## Tabela: active_conductors
+**Chave Primária:** id
 
-Controla quais condutores estão ativos no momento.
+**Chaves Estrangeiras:** Nenhuma
 
-| Coluna         | Tipo        | Obrigatório | Descrição                                 |
-| -------------- | ----------- | ----------- | ----------------------------------------- |
-| id             | uuid        | SIM         | Identificador único (chave primária)      |
-| conductor_id   | uuid        | SIM         | Referência ao id do condutor (conductors) |
-| is_active      | boolean     | NÃO         | Indica se está ativo (padrão: true)       |
-| activated_at   | timestamptz | NÃO         | Data/hora de ativação                     |
-| deactivated_at | timestamptz | NÃO         | Data/hora de desativação                  |
-| created_at     | timestamptz | NÃO         | Data de criação                           |
+**Políticas:** Nenhuma
 
----
+### Tabela: instances
 
-## Tabela: blocked_periods
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| uuid | uuid | YES | null | - |
+| raw_base_config | text | YES | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+
+**Chave Primária:** id
 
-Armazena períodos bloqueados (dias ou horários específicos).
+**Chaves Estrangeiras:** Nenhuma
 
-| Coluna     | Tipo        | Obrigatório | Descrição                              |
-| ---------- | ----------- | ----------- | -------------------------------------- |
-| id         | uuid        | SIM         | Identificador único (chave primária)   |
-| date       | text        | SIM         | Data bloqueada (formato yyyy-MM-dd)    |
-| start_time | text        | NÃO         | Hora inicial bloqueada (formato HH:mm) |
-| end_time   | text        | NÃO         | Hora final bloqueada (formato HH:mm)   |
-| reason     | text        | NÃO         | Motivo do bloqueio                     |
-| created_by | text        | SIM         | Usuário/admin que criou o bloqueio     |
-| created_at | timestamptz | NÃO         | Data de criação                        |
+**Políticas:** Nenhuma
 
----
+### Tabela: mfa_amr_claims
 
-## Funcionalidades Automáticas
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| session_id | uuid | NO | null | - |
+| created_at | timestamp with time zone | NO | null | - |
+| updated_at | timestamp with time zone | NO | null | - |
+| authentication_method | text | NO | null | - |
+| id | uuid | NO | null | - |
 
-### Triggers e Funções
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+### Tabela: mfa_challenges
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| factor_id | uuid | NO | null | - |
+| created_at | timestamp with time zone | NO | null | - |
+| verified_at | timestamp with time zone | YES | null | - |
+| ip_address | inet | NO | null | - |
+| otp_code | text | YES | null | - |
+| web_authn_session_data | jsonb | YES | null | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+### Tabela: mfa_factors
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| user_id | uuid | NO | null | - |
+| friendly_name | text | YES | null | - |
+| factor_type | USER-DEFINED | NO | null | - |
+| status | USER-DEFINED | NO | null | - |
+| created_at | timestamp with time zone | NO | null | - |
+| updated_at | timestamp with time zone | NO | null | - |
+| secret | text | YES | null | - |
+| phone | text | YES | null | - |
+| last_challenged_at | timestamp with time zone | YES | null | - |
+| web_authn_credential | jsonb | YES | null | - |
+| web_authn_aaguid | uuid | YES | null | - |
 
-- **update_updated_at_column()**: Função que atualiza automaticamente o campo `updated_at`
-- **handle_new_user()**: Função que cria automaticamente um perfil quando um novo utilizador se regista
-- **Trigger on_auth_user_created**: Executa a função handle_new_user após inserção em auth.users
+**Chave Primária:** id
 
-### Row Level Security (RLS)
+**Chaves Estrangeiras:** Nenhuma
 
-Todas as tabelas têm RLS ativado com políticas específicas:
+**Políticas:** Nenhuma
 
-#### Administradores (role = 'admin'):
+### Tabela: one_time_tokens
 
-- Acesso completo a todas as tabelas (SELECT, INSERT, UPDATE, DELETE)
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| user_id | uuid | NO | null | - |
+| token_type | USER-DEFINED | NO | null | - |
+| token_hash | text | NO | null | - |
+| relates_to | text | NO | null | - |
+| created_at | timestamp without time zone | NO | now() | - |
+| updated_at | timestamp without time zone | NO | now() | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
 
-#### Condutores (role = 'condutor'):
+### Tabela: refresh_tokens
 
-- **conductors**: Podem ver apenas o seu próprio perfil
-- **active_conductors**: Podem gerir apenas o seu próprio status ativo
-- **blocked_periods**: Podem gerir apenas os seus próprios períodos bloqueados
-- **reservations**: Podem ver apenas reservas atribuídas a eles
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| instance_id | uuid | YES | null | - |
+| id | bigint | NO | nextval('auth.refresh_tokens_id_seq'::regclass) | - |
+| token | character varying | YES | null | - |
+| user_id | character varying | YES | null | - |
+| revoked | boolean | YES | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+| parent | character varying | YES | null | - |
+| session_id | uuid | YES | null | - |
 
-#### Utilizadores (role = 'user'):
+**Chave Primária:** id
 
-- **profiles**: Podem ver e atualizar apenas o seu próprio perfil
-- Acesso limitado às outras tabelas conforme necessário
+**Chaves Estrangeiras:** Nenhuma
 
----
+**Políticas:** Nenhuma
 
-## Configuração do Projeto
+### Tabela: saml_providers
 
-### URLs e Chaves:
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| sso_provider_id | uuid | NO | null | - |
+| entity_id | text | NO | null | - |
+| metadata_xml | text | NO | null | - |
+| metadata_url | text | YES | null | - |
+| attribute_mapping | jsonb | YES | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+| name_id_format | text | YES | null | - |
 
-- **Supabase URL**: https://cqnahwnnqzraqcslljaz.supabase.co
-- **Project ID**: cqnahwnnqzraqcslljaz
-- **Dashboard**: https://supabase.com/dashboard/project/cqnahwnnqzraqcslljaz
+**Chave Primária:** id
 
-### Administradores Autorizados:
+**Chaves Estrangeiras:** Nenhuma
 
-- sonia.santos.scps82@gmail.com
-- diogo.carias@outlook.pt
-- carlosbarradas111@gmail.com
+**Políticas:** Nenhuma
 
----
+### Tabela: saml_relay_states
 
-## Observações Importantes
-
-- **Sistema de Produção**: Todas as tabelas estão configuradas para ambiente de produção
-- **Segurança**: RLS implementado com políticas robustas para diferentes tipos de utilizadores
-- **Integridade**: Chaves estrangeiras e constraints implementadas para manter consistência
-- **Auditoria**: Campos created_at e updated_at em todas as tabelas principais
-- **Flexibilidade**: Sistema preparado para múltiplos condutores e tipos de passeios
-
----
-
-**Sistema completo e pronto para produção!**
-
----
-
-## Fluxo de Autenticação e Uso da Tabela profiles
-
-1. **Signup/Login:**
-
-   - O utilizador se registra ou faz login via Supabase Auth (email/senha).
-   - Ao criar conta, um registro correspondente é criado na tabela `profiles` com o mesmo UUID do Auth.
-   - Campos como `email`, `full_name` e `role` são preenchidos conforme o tipo de utilizador.
-
-2. **Carregamento do Perfil:**
-
-   - Após login, o sistema busca o perfil do utilizador na tabela `profiles` usando o id autenticado.
-   - O campo `role` define o acesso: 'admin' (painel administrativo), 'condutor' (dashboard condutor), 'user' (cliente).
-   - Para condutores, o campo `conductor_id` referencia o registro na tabela `conductors`.
-
-3. **Autorização e Permissões:**
-
-   - O campo `admin_level` diferencia super admins de admins locais.
-   - O campo `region` restringe ou expande o acesso administrativo por área geográfica.
-   - O campo `permissions` (jsonb) permite granularidade: ex. admins podem ter permissões específicas como criar outros admins, visualizar logs, etc.
-
-4. **Gestão e Auditoria:**
-
-   - O campo `created_by` registra quem criou o perfil (útil para rastreamento administrativo).
-   - O campo `zone` pode ser usado para segmentação operacional ou geográfica.
-   - Datas de criação e atualização permitem auditoria e controle de alterações.
-
-5. **Fluxo de Navegação:**
-
-   - Após autenticação, o sistema verifica o papel do utilizador e direciona para a interface correta:
-     - Admin: acesso total ao backoffice, gestão de condutores, reservas e auditoria.
-     - Condutor: acesso ao dashboard próprio, ativação/desativação de status, visualização de reservas atribuídas.
-     - Cliente: acesso ao mapa, reservas e perfil pessoal.
-
-6. **Políticas de Segurança (RLS):**
-   - Cada utilizador só pode ver e editar seu próprio perfil, exceto admins que podem gerir todos.
-   - Condutores só veem dados próprios e reservas atribuídas.
-   - Clientes só veem dados próprios e informações públicas.
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| sso_provider_id | uuid | NO | null | - |
+| request_id | text | NO | null | - |
+| for_email | text | YES | null | - |
+| redirect_to | text | YES | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+| flow_state_id | uuid | YES | null | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+### Tabela: schema_migrations
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| version | character varying | NO | null | - |
+
+**Chave Primária:** Nenhuma
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+### Tabela: sessions
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| user_id | uuid | NO | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+| factor_id | uuid | YES | null | - |
+| aal | USER-DEFINED | YES | null | - |
+| not_after | timestamp with time zone | YES | null | Auth: Not after is a nullable column that contains a timestamp after which the session should be regarded as expired. |
+| refreshed_at | timestamp without time zone | YES | null | - |
+| user_agent | text | YES | null | - |
+| ip | inet | YES | null | - |
+| tag | text | YES | null | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+### Tabela: sso_domains
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| sso_provider_id | uuid | NO | null | - |
+| domain | text | NO | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+### Tabela: sso_providers
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | null | - |
+| resource_id | text | YES | null | Auth: Uniquely identifies a SSO provider according to a user-chosen resource ID (case insensitive), useful in infrastructure as code. |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+| disabled | boolean | YES | null | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+### Tabela: users
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| instance_id | uuid | YES | null | - |
+| id | uuid | NO | null | - |
+| aud | character varying | YES | null | - |
+| role | character varying | YES | null | - |
+| email | character varying | YES | null | - |
+| encrypted_password | character varying | YES | null | - |
+| email_confirmed_at | timestamp with time zone | YES | null | - |
+| invited_at | timestamp with time zone | YES | null | - |
+| confirmation_token | character varying | YES | null | - |
+| confirmation_sent_at | timestamp with time zone | YES | null | - |
+| recovery_token | character varying | YES | null | - |
+| recovery_sent_at | timestamp with time zone | YES | null | - |
+| email_change_token_new | character varying | YES | null | - |
+| email_change | character varying | YES | null | - |
+| email_change_sent_at | timestamp with time zone | YES | null | - |
+| last_sign_in_at | timestamp with time zone | YES | null | - |
+| raw_app_meta_data | jsonb | YES | null | - |
+| raw_user_meta_data | jsonb | YES | null | - |
+| is_super_admin | boolean | YES | null | - |
+| created_at | timestamp with time zone | YES | null | - |
+| updated_at | timestamp with time zone | YES | null | - |
+| phone | text | YES | NULL::character varying | - |
+| phone_confirmed_at | timestamp with time zone | YES | null | - |
+| phone_change | text | YES | ''::character varying | - |
+| phone_change_token | character varying | YES | ''::character varying | - |
+| phone_change_sent_at | timestamp with time zone | YES | null | - |
+| confirmed_at | timestamp with time zone | YES | null | - |
+| email_change_token_current | character varying | YES | ''::character varying | - |
+| email_change_confirm_status | smallint | YES | 0 | - |
+| banned_until | timestamp with time zone | YES | null | - |
+| reauthentication_token | character varying | YES | ''::character varying | - |
+| reauthentication_sent_at | timestamp with time zone | YES | null | - |
+| is_sso_user | boolean | NO | false | Auth: Set this column to true when the account comes from SSO. These accounts can have duplicate emails. |
+| deleted_at | timestamp with time zone | YES | null | - |
+| is_anonymous | boolean | NO | false | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+## Esquema: extensions
+
+### Tabela: pg_stat_statements
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| userid | oid | YES | null | - |
+| dbid | oid | YES | null | - |
+| toplevel | boolean | YES | null | - |
+| queryid | bigint | YES | null | - |
+| query | text | YES | null | - |
+| plans | bigint | YES | null | - |
+| total_plan_time | double precision | YES | null | - |
+| min_plan_time | double precision | YES | null | - |
+| max_plan_time | double precision | YES | null | - |
+| mean_plan_time | double precision | YES | null | - |
+| stddev_plan_time | double precision | YES | null | - |
+| calls | bigint | YES | null | - |
+| total_exec_time | double precision | YES | null | - |
+| min_exec_time | double precision | YES | null | - |
+| max_exec_time | double precision | YES | null | - |
+| mean_exec_time | double precision | YES | null | - |
+| stddev_exec_time | double precision | YES | null | - |
+| rows | bigint | YES | null | - |
+| shared_blks_hit | bigint | YES | null | - |
+| shared_blks_read | bigint | YES | null | - |
+| shared_blks_dirtied | bigint | YES | null | - |
+| shared_blks_written | bigint | YES | null | - |
+| local_blks_hit | bigint | YES | null | - |
+| local_blks_read | bigint | YES | null | - |
+| local_blks_dirtied | bigint | YES | null | - |
+| local_blks_written | bigint | YES | null | - |
+| temp_blks_read | bigint | YES | null | - |
+| temp_blks_written | bigint | YES | null | - |
+| shared_blk_read_time | double precision | YES | null | - |
+| shared_blk_write_time | double precision | YES | null | - |
+| local_blk_read_time | double precision | YES | null | - |
+| local_blk_write_time | double precision | YES | null | - |
+| temp_blk_read_time | double precision | YES | null | - |
+| temp_blk_write_time | double precision | YES | null | - |
+| wal_records | bigint | YES | null | - |
+| wal_fpi | bigint | YES | null | - |
+| wal_bytes | numeric | YES | null | - |
+| jit_functions | bigint | YES | null | - |
+| jit_generation_time | double precision | YES | null | - |
+| jit_inlining_count | bigint | YES | null | - |
+| jit_inlining_time | double precision | YES | null | - |
+| jit_optimization_count | bigint | YES | null | - |
+| jit_optimization_time | double precision | YES | null | - |
+| jit_emission_count | bigint | YES | null | - |
+| jit_emission_time | double precision | YES | null | - |
+| jit_deform_count | bigint | YES | null | - |
+| jit_deform_time | double precision | YES | null | - |
+| stats_since | timestamp with time zone | YES | null | - |
+| minmax_stats_since | timestamp with time zone | YES | null | - |
+
+**Chave Primária:** Nenhuma
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+### Tabela: pg_stat_statements_info
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| dealloc | bigint | YES | null | - |
+| stats_reset | timestamp with time zone | YES | null | - |
+
+**Chave Primária:** Nenhuma
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:** Nenhuma
+
+## Esquema: public
+
+### Tabela: active_conductors
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | uuid_generate_v4() | - |
+| conductor_id | uuid | NO | null | - |
+| session_start | timestamp with time zone | NO | now() | - |
+| session_end | timestamp with time zone | YES | null | - |
+| last_ping | timestamp with time zone | NO | now() | - |
+| is_available | boolean | NO | true | - |
+| current_latitude | double precision | NO | null | - |
+| current_longitude | double precision | NO | null | - |
+| updated_at | timestamp with time zone | NO | now() | - |
+| occupied_until | timestamp with time zone | YES | null | - |
+| is_active | boolean | NO | true | - |
+| status | USER-DEFINED | NO | 'available'::conductor_status | - |
+| accuracy | numeric | YES | null | - |
+| last_seen | timestamp with time zone | YES | null | - |
+| name | text | YES | null | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:**
+- conductor_id → public.conductors (id)
+
+**Políticas:**
+- Driver inserts only their own position
+- Public read access to active conductors
+- Admins manage all active conductors
+- Driver updates only their own position
+
+### Tabela: activity_logs
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | uuid_generate_v4() | - |
+| user_id | uuid | YES | null | - |
+| action | text | NO | null | - |
+| resource_type | text | NO | null | - |
+| resource_id | text | YES | null | - |
+| old_values | jsonb | YES | null | - |
+| new_values | jsonb | YES | null | - |
+| ip_address | inet | YES | null | - |
+| user_agent | text | YES | null | - |
+| timestamp | timestamp with time zone | YES | now() | - |
+| session_id | text | YES | null | - |
+| additional_data | jsonb | YES | null | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:**
+- Allow admins to view all activity logs
+- Allow authenticated users to insert activity logs
+- Allow users to view their own activity logs
+
+### Tabela: blocked_periods
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | uuid_generate_v4() | - |
+| date | date | NO | null | - |
+| start_time | time without time zone | YES | null | - |
+| end_time | time without time zone | YES | null | - |
+| reason | text | YES | null | - |
+| created_by | text | NO | null | - |
+| created_at | timestamp with time zone | YES | now() | - |
+| createdBy | text | YES | null | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:**
+- Allow authenticated manage blocked_periods
+
+### Tabela: conductor_applications
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | uuid_generate_v4() | - |
+| full_name | text | NO | null | - |
+| email | text | NO | null | - |
+| phone | text | NO | null | - |
+| whatsapp | text | YES | null | - |
+| experience_years | integer | YES | null | - |
+| driver_license_number | text | YES | null | - |
+| driver_license_expiry | date | YES | null | - |
+| has_own_vehicle | boolean | YES | false | - |
+| vehicle_details | jsonb | YES | null | - |
+| availability_hours | jsonb | YES | null | - |
+| preferred_zones | ARRAY | YES | null | - |
+| status | text | YES | 'pending'::text | - |
+| submitted_at | timestamp with time zone | YES | now() | - |
+| reviewed_at | timestamp with time zone | YES | null | - |
+| reviewed_by | uuid | YES | null | - |
+| review_notes | text | YES | null | - |
+| documents | jsonb | YES | null | - |
+| created_at | timestamp with time zone | YES | now() | - |
+| updated_at | timestamp with time zone | YES | now() | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:** Nenhuma
+
+**Políticas:**
+- Allow admins to manage conductor applications
+- Allow users to view their own applications
+
+### Tabela: conductor_locations
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | uuid_generate_v4() | - |
+| conductor_id | uuid | YES | null | - |
+| latitude | double precision | NO | null | - |
+| longitude | double precision | NO | null | - |
+| accuracy | double precision | YES | null | - |
+| altitude | double precision | YES | null | - |
+| heading | double precision | YES | null | - |
+| speed | double precision | YES | null | - |
+| timestamp | timestamp with time zone | YES | now() | - |
+| is_active | boolean | YES | true | - |
+| created_at | timestamp with time zone | YES | now() | - |
+
+**Chave Primária:** id
+
+**Chaves Estrangeiras:**
+- conductor_id → public.conductors (id)
+
+**Políticas:**
+- Allow authenticated users to view active conductor locations
+- Allow conductors to manage their own locations
+- Allow admins to view all conductor locations
+
+### Tabela: conductor_status_audit
+
+**Colunas:**
+| Nome da Coluna | Tipo de Dados | Pode ser Nulo | Valor Padrão | Descrição |
+|----------------|---------------|---------------|--------------|-----------|
+| id | uuid | NO | uuid_generate_v4() | - |
+| conductor_id | uuid | YES | null | - |
+| old_status | text | YES | null | - |
+| new_status |

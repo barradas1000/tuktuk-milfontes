@@ -21,9 +21,9 @@ const DeepLinkPopup = ({
   const sessionToken = generateSessionToken();
   
   const deepLink = conductorId && conductorName
-    ? `tuktukgps://tracking?conductor_id=${conductorId}&name=${encodeURIComponent(conductorName)}&token=${sessionToken}&timestamp=${Date.now()}`
+    ? `tuktukgps://tracking?cid=${conductorId}&name=${encodeURIComponent(conductorName)}&token=${sessionToken}&timestamp=${Date.now()}`
     : conductorId
-    ? `tuktukgps://tracking?conductor_id=${conductorId}&token=${sessionToken}&timestamp=${Date.now()}`
+    ? `tuktukgps://tracking?cid=${conductorId}&token=${sessionToken}&timestamp=${Date.now()}`
     : 'tuktukgps://';
 
   return (
@@ -293,6 +293,18 @@ const AdminDashboard = () => {
             </TabsContent>
             {/* ...existing code... */}
             <TabsContent value="analytics" className="mt-0">
+              {/* Botão para acessar histórico */}
+              <div className="mb-6 flex justify-end">
+                <Button 
+                  onClick={() => window.open('http://localhost:8081/admin/historico', '_blank')}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Database className="h-4 w-4" />
+                  Ver Histórico de Viagens
+                </Button>
+              </div>
+              
               {/* ...existing code... */}
               {stats && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">

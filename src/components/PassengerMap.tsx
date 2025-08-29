@@ -296,13 +296,19 @@ const PassengerMap: React.FC<PassengerMapProps> = ({ conductorId }) => {
     let activeChannel: RealtimeChannel | null = null;
 
     const load = async () => {
+      let query = supabase
+        .from("active_conductors")
+        .select(
+          "conductor_id, current_latitude, current_longitude, is_available, occupied_until, updated_at, accuracy"
+        )
+        .eq("is_active", true);
+
+      if (conductorId) {
+        query = query.eq("conductor_id", conductorId);
+      }
+
       try {
-        const { data, error } = await supabase
-          .from("active_conductors")
-          .select(
-            "conductor_id, current_latitude, current_longitude, is_available, occupied_until, updated_at, accuracy"
-          )
-          .eq("is_active", true);
+        const { data, error } = await query;
         if (error || !data) {
           console.error("[PassengerMap] Erro na query inicial:", error);
           setActiveConductors([]);
@@ -311,14 +317,31 @@ const PassengerMap: React.FC<PassengerMapProps> = ({ conductorId }) => {
             "[PassengerMap] Dados carregados da query inicial:",
             data
           );
+          const conductorIds = data.map((d) => d.conductor_id);
+          const { data: conductorNames, error: namesError } = await supabase
+            .from("conductors")
+            .select("id, name")
+            .in("id", conductorIds);
+
+          if (namesError) {
+            console.error("[PassengerMap] Erro ao buscar nomes:", namesError);
+          }
+
+          const namesMap = new Map(
+            conductorNames?.map((c) => [c.id, c.name])
+          );
+
           const enriched = (data as ActiveConductorRow[])
             .map((d) => {
               const lat = d.current_latitude;
               const lng = d.current_longitude;
               const accuracy = d.accuracy ?? Infinity;
-              if (!isValidCoordinate(lat, lng) || accuracy > 50) {
+              const lastUpdate = d.updated_at ? new Date(d.updated_at).getTime() : 0;
+              const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+
+              if (!isValidCoordinate(lat, lng) || accuracy > 50 || lastUpdate < fiveMinutesAgo) {
                 console.warn(
-                  "[PassengerMap] Registro ignorado por coordenadas inválidas ou baixa precisão:",
+                  "[PassengerMap] Registro ignorado por coordenadas inválidas, baixa precisão ou desatualizado:",
                   d
                 );
                 return null;
@@ -327,7 +350,7 @@ const PassengerMap: React.FC<PassengerMapProps> = ({ conductorId }) => {
                 id: d.conductor_id,
                 lat: lat as number,
                 lng: lng as number,
-                name: "TukTuk",
+                name: namesMap.get(d.conductor_id) || "TukTuk",
                 status: d.is_available ? "available" : "busy",
                 occupiedUntil: d.occupied_until ?? null,
                 updatedAt: d.updated_at ?? new Date().toISOString(),
@@ -354,7 +377,7 @@ const PassengerMap: React.FC<PassengerMapProps> = ({ conductorId }) => {
           schema: "public",
           table: "active_conductors",
         },
-        (payload) => {
+        async (payload) => {
           console.log(
             "[PassengerMap] Realtime event on active_conductors:",
             payload
@@ -405,11 +428,17 @@ const PassengerMap: React.FC<PassengerMapProps> = ({ conductorId }) => {
               return;
             }
 
+            const { data: conductorName, error: nameError } = await supabase
+              .from("conductors")
+              .select("name")
+              .eq("id", newData.conductor_id)
+              .single();
+
             const updatedConductor: ConductorLocation = {
               id: newData.conductor_id,
               lat: lat as number,
               lng: lng as number,
-              name: "TukTuk", // O nome é estático, pode ser melhorado com um JOIN no load inicial
+              name: nameError ? "TukTuk" : conductorName.name,
               status: newData.is_available ? "available" : "busy",
               occupiedUntil: newData.occupied_until ?? null,
               updatedAt: newData.updated_at ?? new Date().toISOString(),
