@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { format, eachDayOfInterval, isAfter } from "date-fns";
 import { pt } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
+import { safeParseDate, isValidDate } from "../../utils/dateUtils";
 
 import {
   Clock,
@@ -180,6 +181,8 @@ const FALLBACK_CONDUCTORS = [
   },
 ];
 
+const isValidDate = (date: any): date is Date => date instanceof Date && !isNaN(date.getTime());
+
 const AdminCalendar = ({
   selectedDate,
   onDateSelect,
@@ -203,15 +206,17 @@ const AdminCalendar = ({
   const { t } = useTranslation();
 
   // --- Estados do Componente ---
-  const [calendarDate, setCalendarDate] = useState<Date>(
-    new Date(selectedDate)
-  );
+  const [calendarDate, setCalendarDate] = useState<Date>(() => {
+    const date = safeParseDate(selectedDate);
+    return date || new Date();
+  });
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [quickViewDate, setQuickViewDate] = useState<Date | null>(null);
 
   // Estados relacionados a bloqueios
   const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
   const [blockedPeriodsLoading, setBlockedPeriodsLoading] = useState(true);
+  const [isLoadingBlockedPeriods, setIsLoadingBlockedPeriods] = useState(true);
   const [blockModalOpen, setBlockModalOpen] = useState(false);
   const [blockDate, setBlockDate] = useState<Date | null>(null); // Data atualmente selecionada para bloquear/desbloquear
   const [blockTab, setBlockTab] = useState<"day" | "hour" | null>("day"); // Aba ativa no modal de bloqueio
@@ -600,13 +605,19 @@ const AdminCalendar = ({
    */
   const getDayStatus = useCallback(
     (date: Date) => {
-      const dateString = format(date, "yyyy-MM-dd");
-      if (inactiveDays.includes(dateString)) return "inactive";
-      const reservas = getReservationsByDate(dateString);
-      if (reservas.length === 0) return "empty";
-      if (reservas.length <= 2) return "low";
-      if (reservas.length <= 4) return "medium";
-      return "full";
+      if (!isValidDate(date)) return "inactive";
+      try {
+        const dateString = format(date, "yyyy-MM-dd");
+        if (inactiveDays.includes(dateString)) return "inactive";
+        const reservas = getReservationsByDate(dateString) || [];
+        if (reservas.length === 0) return "empty";
+        if (reservas.length <= 2) return "low";
+        if (reservas.length <= 4) return "medium";
+        return "full";
+      } catch (error) {
+        console.error("Error formatting date in getDayStatus:", date, error);
+        return "inactive";
+      }
     },
     [getReservationsByDate, inactiveDays]
   );
@@ -618,6 +629,7 @@ const AdminCalendar = ({
    */
   const isDayBlocked = useCallback(
     (date: Date) => {
+      if (!isValidDate(date)) return true;
       const dateString = format(date, "yyyy-MM-dd");
       return blockedPeriods.some(
         (b) => b.date === dateString && !b.startTime && !b.endTime
@@ -1126,13 +1138,12 @@ const AdminCalendar = ({
   // --- Modificadores do DayPicker (Memorizados para evitar recriação desnecessária) ---
   const modifiers = useMemo(
     () => ({
-      inactive: (date: Date) => getDayStatus(date) === "inactive",
-      empty: (date: Date) => getDayStatus(date) === "empty",
-      low: (date: Date) => getDayStatus(date) === "low",
-      medium: (date: Date) => getDayStatus(date) === "medium",
-      full: (date: Date) => getDayStatus(date) === "full",
-      // Adicionar um modificador para dias bloqueados
-      blocked: isDayBlocked,
+      inactive: (date: Date) => !isValidDate(date) || getDayStatus(date) === "inactive",
+      empty: (date: Date) => !isValidDate(date) || getDayStatus(date) === "empty",
+      low: (date: Date) => !isValidDate(date) || getDayStatus(date) === "low",
+      medium: (date: Date) => !isValidDate(date) || getDayStatus(date) === "medium",
+      full: (date: Date) => !isValidDate(date) || getDayStatus(date) === "full",
+      blocked: (date: Date) => !isValidDate(date) || isDayBlocked(date),
     }),
     [getDayStatus, isDayBlocked]
   );
@@ -1171,66 +1182,28 @@ const AdminCalendar = ({
   useEffect(() => {
     const loadDataForDate = async () => {
       try {
-        // Recarregar bloqueios para garantir dados atualizados
+        setIsLoadingBlockedPeriods(true);
         const data = await fetchBlockedPeriods();
-        setBlockedPeriods(data);
+        setBlockedPeriods(data.map(b => ({
+          ...b,
+          createdAt: safeParseDate(b.createdAt),
+          date: safeParseDate(b.date),
+          startTime: safeParseDate(b.startTime),
+          endTime: safeParseDate(b.endTime),
+        })));
       } catch (error) {
         console.error("Error loading data for date:", error);
+      } finally {
+        setIsLoadingBlockedPeriods(false);
       }
     };
 
     loadDataForDate();
   }, [calendarDate]);
 
-  // Recarregar dados do Supabase quando a data do calendário mudar
-  useEffect(() => {
-    const loadBlockedPeriods = async () => {
-      try {
-        setBlockedPeriodsLoading(true);
-        const data = await fetchBlockedPeriods();
-        setBlockedPeriods(data);
-      } catch (error) {
-        console.error("Error loading blocked periods:", error);
-      } finally {
-        setBlockedPeriodsLoading(false);
-      }
-    };
-
-    const loadActiveConductors = async () => {
-      try {
-        setConductorsLoading(true);
-        const activeIds = await fetchActiveConductors();
-        setActiveConductors(activeIds);
-        const conductorsData = await fetchConductors();
-        if (conductorsData.length > 0) {
-          setConductors(conductorsData);
-        }
-      } catch (error) {
-        console.error("Error loading active conductors:", error);
-        setActiveConductors(["condutor2"]); // fallback
-      } finally {
-        setConductorsLoading(false);
-      }
-    };
-
-    loadBlockedPeriods();
-    loadActiveConductors();
-  }, [calendarDate]);
-
   // Recarregar dados do Supabase e subscrever realtime
   useEffect(() => {
     let conductorsChannel: RealtimeChannel | null = null;
-    const loadBlockedPeriods = async () => {
-      try {
-        setBlockedPeriodsLoading(true);
-        const data = await fetchBlockedPeriods();
-        setBlockedPeriods(data);
-      } catch (error) {
-        console.error("Error loading blocked periods:", error);
-      } finally {
-        setBlockedPeriodsLoading(false);
-      }
-    };
 
     const loadActiveConductors = async () => {
       try {
@@ -1249,7 +1222,6 @@ const AdminCalendar = ({
       }
     };
 
-    loadBlockedPeriods();
     loadActiveConductors();
 
     // Subscrição realtime para updates na tabela active_conductors
@@ -1258,9 +1230,8 @@ const AdminCalendar = ({
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "active_conductors" },
-        async (payload) => {
-          const activeIds = await fetchActiveConductors();
-          setActiveConductors(activeIds);
+        (payload) => {
+          loadActiveConductors();
         }
       )
       .subscribe();
@@ -1826,9 +1797,15 @@ const AdminCalendar = ({
             <>
               {/* Removido bloco dos botões de bloqueio/desbloqueio */}
               <div className="rounded-2xl shadow-xl bg-white p-2">
+                {console.log("DayPicker props:", {
+                  selected: calendarDate,
+                  defaultMonth: calendarDate,
+                  blockedPeriods: blockedPeriods,
+                })}
                 <DayPicker
                   mode="single"
                   selected={calendarDate}
+                  defaultMonth={calendarDate}
                   onSelect={handleDayClick}
                   className="rounded-2xl border-0"
                   locale={pt}
@@ -1836,54 +1813,67 @@ const AdminCalendar = ({
                   modifiersClassNames={modifiersClassNames}
                   components={{
                     Day: (props) => {
-                      const status = getDayStatus(props.date);
-                      const isSelected =
-                        format(props.date, "yyyy-MM-dd") ===
-                        format(calendarDate, "yyyy-MM-dd");
-                      const isToday =
-                        format(props.date, "yyyy-MM-dd") ===
-                        format(new Date(), "yyyy-MM-dd");
-                      const blocked = isDayBlocked(props.date);
+                      // O react-day-picker pode passar undefined aqui
+                      if (!props?.date) {
+                        return <td className="text-gray-300"> </td>; // célula vazia
+                      }
+
+                      const date = new Date(props.date);
+                      if (isNaN(date.getTime())) {
+                        console.warn("Data inválida no componente Day:", props.date);
+                        return <td className="text-red-500">X</td>;
+                      }
+
+                      const status = getDayStatus(date);
+                      const isSelected = isValidDate(date) && isValidDate(calendarDate)
+                        ? format(date, "yyyy-MM-dd") === format(calendarDate, "yyyy-MM-dd")
+                        : false;
+                      const isToday = isValidDate(date)
+                        ? format(date, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")
+                        : false;
+                      const blocked = isValidDate(date) ? isDayBlocked(date) : true;
                       const textColor = blocked ? "text-gray-400" : "text-black";
 
                       return (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button
-                              type="button"
-                              className={
-                                `h-10 w-10 flex items-center justify-center rounded-full transition-all duration-150 ` +
-                                (isSelected
-                                  ? "ring-2 ring-blue-500 bg-blue-100 font-bold "
-                                  : "") +
-                                (isToday
-                                  ? "ring-2 ring-purple-600 ring-offset-2 "
-                                  : "") +
-                                (blocked
-                                  ? "bg-gray-300 cursor-pointer hover:bg-gray-400 "
-                                  : modifiersClassNames[
-                                      status as keyof typeof modifiersClassNames
-                                    ] + " ") +
-                                textColor +
-                                " hover:scale-110 hover:shadow-lg focus:outline-none"
-                              }
-                              onClick={() => handleDayClick(props.date)}
-                            >
-                              {blocked ? (
-                                <Lock className="w-4 h-4" />
-                              ) : (
-                                props.date.getDate()
-                              )}
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            {blocked
-                              ? `${getDayBlockReason(
-                                  props.date
-                                )} - Clique para desbloquear`
-                              : `${getDayLabel(status)} - Clique para bloquear`}
-                          </TooltipContent>
-                        </Tooltip>
+                        <td className="rdp-cell">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <button
+                                type="button"
+                                className={
+                                  `h-10 w-10 flex items-center justify-center rounded-full transition-all duration-150 ` +
+                                  (isSelected
+                                    ? "ring-2 ring-blue-500 bg-blue-100 font-bold "
+                                    : "") +
+                                  (isToday
+                                    ? "ring-2 ring-purple-600 ring-offset-2 "
+                                    : "") +
+                                  (blocked
+                                    ? "bg-gray-300 cursor-pointer hover:bg-gray-400 "
+                                    : modifiersClassNames[
+                                        status as keyof typeof modifiersClassNames
+                                      ] + " ") +
+                                  textColor +
+                                  " hover:scale-110 hover:shadow-lg focus:outline-none"
+                                }
+                                onClick={() => isValidDate(date) && handleDayClick(date)}
+                              >
+                                {blocked ? (
+                                  <Lock className="w-4 h-4" />
+                                ) : (
+                                  date.getDate()
+                                )}
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              {blocked
+                                ? `${getDayBlockReason(
+                                    date
+                                  )} - Clique para desbloquear`
+                                : `${getDayLabel(status)} - Clique para bloquear`}
+                            </TooltipContent>
+                          </Tooltip>
+                        </td>
                       );
                     },
                   }}

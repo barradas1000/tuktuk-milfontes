@@ -23,6 +23,7 @@ import { Coordinates } from "../utils/locationUtils";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 import { RealtimeChannel } from "@supabase/supabase-js";
+import { safeParseDate, isValidDate } from "../utils/dateUtils";
 
 // Corrigir ícones do Leaflet
 import iconUrl from "leaflet/dist/images/marker-icon.png";
@@ -352,8 +353,8 @@ const PassengerMap: React.FC<PassengerMapProps> = ({ conductorId }) => {
                 lng: lng as number,
                 name: namesMap.get(d.conductor_id) || "TukTuk",
                 status: d.is_available ? "available" : "busy",
-                occupiedUntil: d.occupied_until ?? null,
-                updatedAt: d.updated_at ?? new Date().toISOString(),
+                occupiedUntil: safeParseDate(d.occupied_until),
+                updatedAt: safeParseDate(d.updated_at) as any,
               };
             })
             .filter(Boolean) as ConductorLocation[];
@@ -440,8 +441,8 @@ const PassengerMap: React.FC<PassengerMapProps> = ({ conductorId }) => {
               lng: lng as number,
               name: nameError ? "TukTuk" : conductorName.name,
               status: newData.is_available ? "available" : "busy",
-              occupiedUntil: newData.occupied_until ?? null,
-              updatedAt: newData.updated_at ?? new Date().toISOString(),
+              occupiedUntil: safeParseDate(newData.occupied_until),
+              updatedAt: safeParseDate(newData.updated_at) as any,
             };
 
             // Atualiza ou adiciona o condutor na lista

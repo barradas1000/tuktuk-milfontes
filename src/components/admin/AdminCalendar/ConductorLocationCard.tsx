@@ -45,7 +45,7 @@ const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
         .select("current_latitude, current_longitude, accuracy, is_active, last_ping, status, is_available")
         .eq("conductor_id", conductorId)
         .single();
-      if (!error && data && data.is_active) {
+      if (!error && data && data.is_active && typeof data.current_latitude === 'number' && typeof data.current_longitude === 'number') {
         setLocation({
           latitude: data.current_latitude,
           longitude: data.current_longitude,
@@ -71,7 +71,7 @@ const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
           table: "active_conductors",
         } as const,
         (payload: { new?: ConductorLocationPayload }) => {
-          if (payload.new && payload.new.is_active) {
+          if (payload.new && payload.new.is_active && typeof payload.new.current_latitude === 'number' && typeof payload.new.current_longitude === 'number') {
             setLocation({
               latitude: payload.new.current_latitude,
               longitude: payload.new.current_longitude,

@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { AdminReservation, BlockedPeriod } from "@/types/adminReservations";
+import { safeParseDate } from "../utils/dateUtils";
 
 // Tipos auxiliares para dados do banco
 interface Conductor {
@@ -93,7 +94,7 @@ export const fetchTuktukStatus = async (
 
     return {
       status: status,
-      occupied_until: data.occupied_until,
+      occupied_until: safeParseDate(data.occupied_until),
     };
   } catch (error) {
     console.error("Erro ao buscar status do TukTuk:", error);
@@ -306,12 +307,12 @@ export const fetchBlockedPeriods = async (): Promise<BlockedPeriod[]> => {
     return (
       (data as DBBlockedPeriodRow[] | null)?.map((item) => ({
         id: item.id,
-        date: item.date,
-        startTime: item.start_time,
-        endTime: item.end_time,
+        date: safeParseDate(item.date) as any,
+        startTime: safeParseDate(item.start_time) as any,
+        endTime: safeParseDate(item.end_time) as any,
         reason: item.reason,
         createdBy: item.created_by,
-        createdAt: item.created_at,
+        createdAt: safeParseDate(item.created_at) as any,
       })) || []
     );
   } catch (error) {
