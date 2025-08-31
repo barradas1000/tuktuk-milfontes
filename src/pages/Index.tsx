@@ -188,6 +188,7 @@ const Index = () => {
                 {t("hero.title")}
               </span>
 
+
               <span className="block text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-amber-400 !leading-tight">
                 {t("hero.subtitle")} <br />
               </span>
