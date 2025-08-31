@@ -35,11 +35,10 @@ import {
   getWhatsappLink,
   useSyncActiveConductors,
 } from "@/utils/calendarUtils";
-import { getAvailabilityWithBlocks } from "@/utils/reservationUtils";
 import { safeParseDate } from "@/utils/dateUtils";
+import { getAvailabilityWithBlocks } from "@/utils/reservationUtils";
 
 export const useAdminCalendar = (selectedDate: string, onDateSelect: (date: string) => void) => {
-  console.log("useAdminCalendar hook started");
   const [showCard, setShowCard] = useState(true);
   const {
     getReservationsByDate,
@@ -58,7 +57,6 @@ export const useAdminCalendar = (selectedDate: string, onDateSelect: (date: stri
 
   const [calendarDate, setCalendarDate] = useState<Date>(() => {
     const date = safeParseDate(selectedDate);
-    console.log("Initializing calendarDate with:", date);
     return date || new Date();
   });
   const [quickViewOpen, setQuickViewOpen] = useState(false);
@@ -126,13 +124,11 @@ export const useAdminCalendar = (selectedDate: string, onDateSelect: (date: stri
   const [occupiedUntil, setOccupiedUntil] = useState<Date | null>(null);
 
   useEffect(() => {
-    console.log("useEffect for conductor status running");
     const activeConductorsFromHook = conductors.filter(c => c.is_active);
     if (activeConductorsFromHook.length === 1) {
       const conductorId = activeConductorsFromHook[0].id;
       fetchTuktukStatus(conductorId).then((data) => {
         if (data) {
-          console.log("Tuktuk status fetched:", data);
           setTuktukStatus(data.status || "available");
           setOccupiedUntil(
             data.occupied_until ? new Date(data.occupied_until) : null
@@ -698,12 +694,10 @@ export const useAdminCalendar = (selectedDate: string, onDateSelect: (date: stri
   }, [selectedDate]);
 
   useEffect(() => {
-    console.log("useEffect for loading data running, calendarDate:", calendarDate);
     const loadDataForDate = async () => {
       try {
         setIsLoadingBlockedPeriods(true);
         const data = await fetchBlockedPeriods();
-        console.log("Fetched blocked periods:", data);
         setBlockedPeriods(data.map(b => ({
           ...b,
           createdAt: safeParseDate(b.createdAt),
@@ -782,13 +776,11 @@ export const useAdminCalendar = (selectedDate: string, onDateSelect: (date: stri
     [calendarDate, getReservationsByDate]
   );
   const availabilitySlots = useMemo(() => {
-    console.log("useMemo for availabilitySlots running");
     const slots = getAvailabilityWithBlocks(
       selectedDateReservations,
       blockedPeriods,
       format(calendarDate, "yyyy-MM-dd")
     );
-    console.log("Calculated availability slots:", slots);
     return slots;
   }, [selectedDateReservations, blockedPeriods, calendarDate]);
 
@@ -917,7 +909,7 @@ export const useAdminCalendar = (selectedDate: string, onDateSelect: (date: stri
     setBlockFilterDate,
     blockFilterType,
     setBlockFilterType,
-    isCleaningDuplicates,
+isCleaningDuplicates,
     setIsCleaningDuplicates,
     sliderDays,
     setSliderDays,

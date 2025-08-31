@@ -494,7 +494,13 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     console.error("Error cleaning duplicate blocked periods:", error);
     throw error;
   }
-};
-
-// Verificar se existem registros na tabela active_conductors
-console.log("Verificando registros ativos...");
+  };
+  
+  // Fetch inactive days (currently mock data, TODO: implement based on database)
+  export const fetchInactiveDays = async (): Promise<string[]> => {
+    // For now, return empty array. In future, fetch from a table if exists.
+    return [];
+  };
+  
+  // Verificar se existem registros na tabela active_conductors
+  console.log("Verificando registros ativos...");

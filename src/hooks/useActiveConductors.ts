@@ -17,6 +17,7 @@ export const useActiveConductors = () => {
   const [conductors, setConductors] = useState<ActiveConductor[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activatedConductor, setActivatedConductor] = useState<{ id: string; name: string | null } | null>(null);
 
   useEffect(() => {
     // 1. Função para buscar os dados iniciais
@@ -74,15 +75,6 @@ export const useActiveConductors = () => {
   const updateConductorStatus = async (conductorId: string, newStatus: boolean) => {
     console.log('Tentando atualizar condutor:', conductorId, 'para status:', newStatus);
     
-    // Atualização otimista do estado local para feedback imediato
-    setConductors(prevConductors =>
-      prevConductors.map(conductor =>
-        conductor.id === conductorId
-          ? { ...conductor, is_active: newStatus }
-          : conductor
-      )
-    );
-    
     const { data, error } = await supabase
       .from('active_conductors')
       .update({ is_active: newStatus, updated_at: new Date().toISOString() })
@@ -94,20 +86,31 @@ export const useActiveConductors = () => {
     if (error) {
       console.error('Erro ao atualizar status:', error.message);
       setError(error.message);
-      // Reverter a atualização otimista em caso de erro
-      setConductors(prevConductors =>
-        prevConductors.map(conductor =>
-          conductor.id === conductorId
-            ? { ...conductor, is_active: !newStatus } // Reverte para o estado anterior
-            : conductor
-        )
-      );
       return false;
     }
     
     console.log('Atualização bem-sucedida:', data);
+
+    // Se o status foi ativado, definir o condutor ativado para mostrar o popup
+    if (newStatus) {
+      const conductor = conductors.find(c => c.id === conductorId);
+      if (conductor) {
+        setActivatedConductor({ id: conductorId, name: conductor.name });
+      }
+    } else {
+      // Se foi desativado, limpar o condutor ativado se era este
+      if (activatedConductor && activatedConductor.id === conductorId) {
+        setActivatedConductor(null);
+      }
+    }
+    
     return true;
   };
 
-  return { conductors, loading, error, updateConductorStatus };
+  // Função para limpar o condutor ativado (usado ao fechar o popup)
+  const clearActivatedConductor = () => {
+    setActivatedConductor(null);
+  };
+
+  return { conductors, loading, error, updateConductorStatus, activatedConductor, clearActivatedConductor };
 };

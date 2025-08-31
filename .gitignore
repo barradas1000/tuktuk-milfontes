@@ -49,6 +49,9 @@ supabase/.branches/
 !README.md
 !DEPLOY-*.md
 
+# Documentation directory
+DOC_MD/
+
 # Development scripts
 scripts/
 test-interpolation.js

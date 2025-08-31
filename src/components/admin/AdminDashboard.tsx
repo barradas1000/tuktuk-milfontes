@@ -12,19 +12,10 @@ const DeepLinkPopup = ({
   conductorId: string | null;
   conductorName: string | null;
 }) => {
-  // Gerar token de sessão simples (timestamp + random string)
-  const generateSessionToken = () => {
-    const timestamp = Date.now();
-    const randomStr = Math.random().toString(36).substring(2, 10);
-    return `${timestamp}_${randomStr}`;
-  };
-
-  const sessionToken = generateSessionToken();
-  
   const deepLink = conductorId && conductorName
-    ? `tuktukgps://tracking?cid=${conductorId}&name=${encodeURIComponent(conductorName)}&token=${sessionToken}&timestamp=${Date.now()}`
+    ? `tuktukgps://tracking?cid=${conductorId}&name=${encodeURIComponent(conductorName)}`
     : conductorId
-    ? `tuktukgps://tracking?cid=${conductorId}&token=${sessionToken}&timestamp=${Date.now()}`
+    ? `tuktukgps://tracking?cid=${conductorId}`
     : 'tuktukgps://';
 
   return (
@@ -77,9 +68,6 @@ const DeepLinkPopup = ({
           <div style={{ fontSize: "0.85em", color: "#00796b", marginBottom: 8 }}>
             <p>Condutor ID: {conductorId}</p>
             {conductorName && <p>Nome: {conductorName}</p>}
-            <p style={{ fontSize: "0.75em", color: "#666", marginTop: 4 }}>
-              Token de sessão: {sessionToken.substring(0, 12)}...
-            </p>
           </div>
         )}
         <p style={{ fontSize: "0.95em", color: "#555" }}>
