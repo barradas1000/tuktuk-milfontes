@@ -43,18 +43,26 @@ lerna-debug.log*
 supabase/.temp/
 supabase/.output/
 supabase/.branches/
+SUPABASE-TABELAS-ATUAIS.txt
 
 # Documentation files (development only)
 *.md
 !README.md
 !DEPLOY-*.md
 
-# Documentation directory
+# Documentation directories
 DOC_MD/
+DICAS/
+arquivado/
 
 # Development scripts
 scripts/
 test-interpolation.js
+check-*.js
+test-*.js
+test-*.ts
+update-*.js
+env-check.ts
 
 # Sistema
 .DS_Store
@@ -125,4 +133,3 @@ storybook-static/
 
 # Test artifacts (remoção de componentes de teste)
 src/components/TestRealtime.tsx
-
