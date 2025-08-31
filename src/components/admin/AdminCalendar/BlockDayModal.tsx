@@ -1,40 +1,32 @@
-import React from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Button,
-} from "@/components/ui/dialog";
+// /components/AdminCalendar/BlockDayModal.tsx
+import React from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Lock } from "lucide-react";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 interface BlockDayModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen: boolean;
+  onOpenChange: (isOpen: boolean) => void;
   blockDate: Date | null;
   blockDayReason: string;
   setBlockDayReason: (reason: string) => void;
-  onBlockDay: (date: Date, reason: string) => void;
+  onConfirm: () => void;
 }
 
-/**
- * Modal para bloquear um dia inteiro no calendário do admin.
- * Permite informar o motivo do bloqueio e confirma a ação.
- */
-const BlockDayModal: React.FC<BlockDayModalProps> = ({
-  open,
+const BlockDayModal = ({
+  isOpen,
   onOpenChange,
   blockDate,
   blockDayReason,
   setBlockDayReason,
-  onBlockDay,
-}) => {
+  onConfirm,
+}: BlockDayModalProps) => {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -75,22 +67,20 @@ const BlockDayModal: React.FC<BlockDayModalProps> = ({
             <ul className="text-sm text-yellow-700 mt-1 list-disc list-inside">
               <li>Não será possível fazer novas reservas</li>
               <li>Reservas existentes continuarão válidas</li>
-              <li>O dia ficará marcado como indisponível no calendário</li>
+              <li>
+                O dia ficará marcado como indisponível no calendário
+              </li>
             </ul>
           </div>
 
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
-            <Button
-              onClick={() => {
-                if (blockDate) {
-                  onBlockDay(blockDate, blockDayReason);
-                }
-              }}
-              disabled={!blockDate}
-            >
+            <Button onClick={onConfirm}>
               Confirmar Bloqueio
             </Button>
           </div>

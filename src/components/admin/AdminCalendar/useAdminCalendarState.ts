@@ -112,8 +112,7 @@ export function useAdminCalendarState() {
     blockHourEnd,
     setBlockHourEnd,
     blockTimeReason,
-    setBlockTimeReason,
-    inactiveDays,
+    setBlockTimeReason
     blockDayModalOpen,
     setBlockDayModalOpen,
     blockHourModalOpen,

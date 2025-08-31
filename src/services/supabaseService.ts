@@ -82,10 +82,16 @@ export const fetchTuktukStatus = async (
       .from("active_conductors")
       .select("is_available, occupied_until")
       .eq("conductor_id", conductorId)
-      .single();
+      .maybeSingle(); // Use maybeSingle instead of single to handle no rows
 
     if (error) {
       console.error("Erro ao buscar status do TukTuk:", error);
+      return null;
+    }
+
+    // If no data found, return null
+    if (!data) {
+      console.log("Nenhum registro encontrado para o condutor:", conductorId);
       return null;
     }
 
@@ -94,7 +100,7 @@ export const fetchTuktukStatus = async (
 
     return {
       status: status,
-      occupied_until: safeParseDate(data.occupied_until),
+      occupied_until: data.occupied_until ? new Date(data.occupied_until).toISOString() : null,
     };
   } catch (error) {
     console.error("Erro ao buscar status do TukTuk:", error);
@@ -307,12 +313,12 @@ export const fetchBlockedPeriods = async (): Promise<BlockedPeriod[]> => {
     return (
       (data as DBBlockedPeriodRow[] | null)?.map((item) => ({
         id: item.id,
-        date: safeParseDate(item.date) as any,
-        startTime: safeParseDate(item.start_time) as any,
-        endTime: safeParseDate(item.end_time) as any,
-        reason: item.reason,
+        date: item.date, // Keep as string
+        startTime: item.start_time || undefined, // Keep as string or undefined
+        endTime: item.end_time || undefined, // Keep as string or undefined
+        reason: item.reason || undefined,
         createdBy: item.created_by,
-        createdAt: safeParseDate(item.created_at) as any,
+        createdAt: item.created_at || undefined, // Keep as string or undefined
       })) || []
     );
   } catch (error) {

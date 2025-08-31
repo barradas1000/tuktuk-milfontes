@@ -158,22 +158,10 @@ const Auth = () => {
         return;
       }
 
-      // Verifica se o utilizador já tem conta criada no Supabase Auth
-      const { data, error: fetchError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", email)
-        .single();
-
-      if (fetchError || !data) {
-        setError(
-          "Este email ainda não criou a sua conta de acesso, crie primeiro a sua conta "
-        );
-        setIsResettingPassword(false);
-        return;
-      }
-
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      // A verificação manual na tabela 'profiles' foi removida.
+      // A função resetPasswordForEmail do Supabase já lida com o caso de o email não existir,
+      // não enviando o email mas sem expor se a conta existe ou não, o que é uma boa prática de segurança.
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: "https://tuktuk-milfontes.vercel.app/reset-password",
       });
 

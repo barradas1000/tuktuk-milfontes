@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useActiveConductors } from "@/hooks/useActiveConductors";
 // Componente popup de ativação do GPS via deep link
 const DeepLinkPopup = ({
   onClose,

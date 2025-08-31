@@ -87,20 +87,51 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signUp = async (email: string, password: string, fullName: string) => {
-    // Verifica se o email está na whitelist
-    if (!allowedAdmins.includes(email.trim().toLowerCase())) {
+    const trimmedEmail = email.trim().toLowerCase();
+
+    // 1. Verifica se o email está na whitelist
+    if (!allowedAdmins.includes(trimmedEmail)) {
       return {
         error: {
           message: "Email não autorizado para registo de administrador.",
         },
       };
     }
-    console.log("Attempting sign up for:", email);
+
+    // 2. Verifica se o email já existe na tabela 'profiles' (que espelha a 'auth.users')
+    try {
+      const { data: existingProfile, error: fetchError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", trimmedEmail)
+        .single();
+
+      if (fetchError && fetchError.code !== 'PGRST116') { // PGRST116 = 'No rows found'
+        // Erro inesperado ao consultar a base de dados
+        console.error("Erro ao verificar perfil existente:", fetchError);
+        return { error: { message: "Ocorreu um erro ao verificar o email. Tente novamente." } };
+      }
+      
+      if (existingProfile) {
+        // Se o perfil já existe, o utilizador já está registado
+        return {
+          error: {
+            message: "Este email já está registado. Por favor, faça login ou recupere a senha.",
+          },
+        };
+      }
+    } catch (dbError) {
+        console.error("Exceção ao verificar perfil:", dbError);
+        return { error: { message: "Ocorreu um erro na base de dados. Tente novamente." } };
+    }
+
+
+    console.log("Attempting sign up for:", trimmedEmail);
     // Redirecionamento fixo para produção
     const redirectUrl = "https://tuktuk-milfontes.vercel.app/login";
 
     const { error } = await supabase.auth.signUp({
-      email,
+      email: trimmedEmail,
       password,
       options: {
         emailRedirectTo: redirectUrl,
@@ -119,7 +150,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setProfile(null);
   };
 
-  const isAdmin = profile?.role === "admin";
+  const isAdmin = profile?.role === "admin" || profile?.role === "super_admin" || (user?.email && allowedAdmins.includes(user.email));
 
   const value = {
     user,
