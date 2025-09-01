@@ -23,8 +23,8 @@ const ActiveConductorsPanel: React.FC<ActiveConductorsPanelProps> = ({
   renderAfterActiveBlock,
 }) => {
   const activeConductors = conductors.filter(c => c.is_active);
-  const activeConductorIds = activeConductors.map(c => c.id);
-  const activeConductorsWithNames = activeConductors.map(c => ({ id: c.id, name: c.name || '' }));
+  const activeConductorIds = activeConductors.map(c => c.conductor_id);
+  const activeConductorsWithNames = activeConductors.map(c => ({ id: c.conductor_id, name: c.name || '' }));
 
   return (
     <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex flex-col gap-3 items-center shadow-md">
