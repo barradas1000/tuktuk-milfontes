@@ -178,12 +178,65 @@ const AdminCalendar: React.FC<AdminCalendarProps> = ({
 
       {/* Modais e cards adicionais */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <QuickViewModal isOpen={false} onOpenChange={() => {}} quickViewDate={calendarDate} getReservationsByDate={() => []} getStatusBadge={getStatusBadge} getTourDisplayName={getTourDisplayName} />
-        <BlockDayModal isOpen={blockDayModalOpen} onOpenChange={setBlockDayModalOpen} blockDate={calendarDate} blockDayReason="" setBlockDayReason={() => {}} onConfirm={handleConfirmBlockDay} />
-        <BlockHourModal isOpen={blockHourModalOpen} onOpenChange={setBlockHourModalOpen} blockDate={calendarDate} setBlockDate={() => {}} blockHourStart="" setBlockHourStart={() => {}} blockHourEnd="" setBlockHourEnd={() => {}} blockTimeReason="" setBlockTimeReason={() => {}} timeSlots={[]} blockTime={blockTime} blockTimeRange={() => {}} getAllDayBlocks={() => []} unblockTime={unblockTime} />
-        <CancelReservationModal isOpen={cancelReservationModalOpen} onOpenChange={setCancelReservationModalOpen} reservation={null} cancelReason="" setCancelReason={() => {}} onConfirm={() => {}} isCancelling={false} getTourDisplayName={getTourDisplayName} />
-        <WhatsappMessageModal isOpen={whatsappMessageModalOpen} onOpenChange={setWhatsappMessageModalOpen} reservation={null} editableMessage="" setEditableMessage={() => {}} onSend={() => {}} getClientLanguage={getClientLanguage} getTourDisplayName={getTourDisplayName} />
-        <DailyReservationsCard selectedDate={selectedDate} reservations={selectedDateReservations} getTourDisplayName={getTourDisplayName} getStatusBadge={getStatusBadge} />
+        <QuickViewModal 
+          isOpen={false} 
+          onOpenChange={() => {}} 
+          quickViewDate={calendarDate} 
+          getReservationsByDate={() => []} 
+          getStatusBadge={getStatusBadge} 
+          getTourDisplayName={getTourDisplayName} 
+        />
+        <BlockDayModal 
+          isOpen={blockDayModalOpen} 
+          onOpenChange={setBlockDayModalOpen} 
+          blockDate={calendarDate} 
+          blockDayReason="" 
+          setBlockDayReason={() => {}} 
+          onConfirm={handleConfirmBlockDay} 
+        />
+        <BlockHourModal 
+          isOpen={blockHourModalOpen} 
+          onOpenChange={setBlockHourModalOpen} 
+          blockDate={calendarDate} 
+          setBlockDate={() => {}} 
+          blockHourStart="" 
+          setBlockHourStart={() => {}} 
+          blockHourEnd="" 
+          setBlockHourEnd={() => {}} 
+          blockTimeReason="" 
+          setBlockTimeReason={() => {}} 
+          timeSlots={[]} 
+          blockTime={blockTime} 
+          blockTimeRange={() => {}} 
+          getAllDayBlocks={() => []} 
+          unblockTime={unblockTime} 
+        />
+        <CancelReservationModal 
+          isOpen={cancelReservationModalOpen} 
+          onOpenChange={setCancelReservationModalOpen} 
+          reservation={null} 
+          cancelReason="" 
+          setCancelReason={() => {}} 
+          onConfirm={() => {}} 
+          isCancelling={false} 
+          getTourDisplayName={getTourDisplayName} 
+        />
+        <WhatsappMessageModal 
+          isOpen={whatsappMessageModalOpen} 
+          onOpenChange={setWhatsappMessageModalOpen} 
+          reservation={null} 
+          editableMessage="" 
+          setEditableMessage={() => {}} 
+          onSend={() => {}} 
+          getClientLanguage={getClientLanguage} 
+          getTourDisplayName={getTourDisplayName} 
+        />
+        <DailyReservationsCard 
+          selectedDate={selectedDate} 
+          reservations={selectedDateReservations} 
+          getTourDisplayName={getTourDisplayName} 
+          getStatusBadge={getStatusBadge} 
+        />
       </div>
     </>
   );
