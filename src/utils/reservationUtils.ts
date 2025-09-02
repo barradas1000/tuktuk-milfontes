@@ -1,75 +1,5 @@
-import {
-  AdminReservation,
-  ReservationStatistics,
-} from "@/types/adminReservations";
-import { format } from "date-fns";
-import { pt } from "date-fns/locale";
-
-export const getReservationsByDate = (
-  reservations: AdminReservation[],
-  date: string
-): AdminReservation[] => {
-  const result = reservations?.filter((r) => r.reservation_date === date) || [];
-  console.log(`Reservations for ${date}:`, result.length);
-  return result;
-};
-
-export const generateDynamicTimeSlots = (
-  startHour = 9,
-  endHour = 22,
-  intervalMinutes = 15
-): string[] => {
-  const slots: string[] = [];
-
-  // Horário de funcionamento: 09:30 às 22:30
-  let currentHour = startHour;
-  let currentMinute = 30; // Começar às 09:30
-  const endMinute = 30; // Terminar às 22:30
-
-  while (
-    currentHour < endHour ||
-    (currentHour === endHour && currentMinute <= endMinute)
-  ) {
-    const h = currentHour.toString().padStart(2, "0");
-    const m = currentMinute.toString().padStart(2, "0");
-    slots.push(`${h}:${m}`);
-
-    // Incrementar 15 minutos
-    currentMinute += intervalMinutes;
-    if (currentMinute >= 60) {
-      currentMinute = 0;
-      currentHour++;
-    }
-  }
-  return slots;
-};
-
-export const getAvailabilityForDate = (
-  reservations: AdminReservation[],
-  date: string
-): AvailabilitySlot[] => {
-  console.log("Getting availability for date:", date);
-  const timeSlots = generateDynamicTimeSlots();
-  const dateReservations = getReservationsByDate(reservations, date);
-
-  return timeSlots.map((time) => {
-    const slotReservations = dateReservations.filter(
-      (r) => r.reservation_time === time && r.status !== "cancelled"
-    );
-    const reserved = slotReservations.reduce(
-      (sum, r) => sum + r.number_of_people,
-      0
-    );
-
-    return {
-      date,
-      time,
-      status: reserved < 4 ? "available" : "unavailable",
-      capacity: 4,
-      reserved,
-    };
-  });
-};
+// src/utils/reservationUtils.ts
+import { AdminReservation } from "@/types/adminReservations";
 
 export type SlotStatus =
   | "available"
@@ -83,8 +13,136 @@ export interface AvailabilitySlot {
   status: SlotStatus;
   capacity: number;
   reserved: number;
+  available: boolean; // ✅ obrigatório
   reason?: string;
 }
+
+export const calculateStatistics = (reservations: AdminReservation[]) => {
+  const today = new Date().toISOString().split("T")[0];
+  const confirmedToday = reservations.filter(
+    (r) =>
+      r.status === "confirmed" && r.reservation_date === today
+  ).length;
+  const pendingToday = reservations.filter(
+    (r) => r.status === "pending" && r.reservation_date === today
+  ).length;
+  const cancelledToday = reservations.filter(
+    (r) =>
+      r.status === "cancelled" && r.reservation_date === today
+  ).length;
+
+  // Calcular total de pessoas confirmadas para hoje
+  const totalPeopleToday = reservations
+    .filter(
+      (r) =>
+        r.status === "confirmed" && r.reservation_date === today
+    )
+    .reduce((sum, r) => sum + (r.number_of_people || 0), 0);
+
+  // Calcular faturamento estimado (exemplo simples)
+  const estimatedRevenue = reservations
+    .filter(
+      (r) =>
+        r.status === "confirmed" && r.reservation_date === today
+    )
+    .reduce((sum, r) => sum + (r.total_price || 0), 0);
+
+  return {
+    confirmedToday,
+    pendingToday,
+    cancelledToday,
+    totalPeopleToday,
+    estimatedRevenue,
+  };
+};
+
+export const generateDynamicTimeSlots = (
+  startHour = 9,
+  endHour = 22,
+  intervalMinutes = 15
+): string[] => {
+  const slots: string[] = [];
+  let currentHour = startHour;
+  let currentMinute = 30; // iniciar 09:30
+  const endMinute = 30; // terminar 22:30
+
+  while (
+    currentHour < endHour ||
+    (currentHour === endHour && currentMinute <= endMinute)
+  ) {
+    const h = currentHour.toString().padStart(2, "0");
+    const m = currentMinute.toString().padStart(2, "0");
+    slots.push(`${h}:${m}`);
+
+    currentMinute += intervalMinutes;
+    if (currentMinute >= 60) {
+      currentMinute = 0;
+      currentHour++;
+    }
+  }
+  return slots;
+};
+
+export const getReservationsByDate = (
+  reservations: AdminReservation[],
+  date: string
+): AdminReservation[] =>
+  reservations.filter((r) => r.reservation_date === date);
+
+export const getAvailabilityForDate = (
+  reservations: AdminReservation[],
+  date: string
+): AvailabilitySlot[] => {
+  const timeSlots = generateDynamicTimeSlots();
+  const dateReservations = getReservationsByDate(reservations, date);
+
+  return timeSlots.map((time) => {
+    const slotReservations = dateReservations.filter(
+      (r) => r.reservation_time === time && r.status !== "cancelled"
+    );
+    const reserved = slotReservations.reduce(
+      (sum, r) => sum + r.number_of_people,
+      0
+    );
+
+    // Bloqueio por reserva confirmada
+    const hasConfirmedReservation = dateReservations.some(
+      (r) => r.reservation_time === time && r.status === "confirmed"
+    );
+    if (hasConfirmedReservation) {
+      return {
+        date,
+        time,
+        status: "blocked_by_reservation",
+        capacity: 4,
+        reserved,
+        available: false,
+        reason: "Reserva confirmada",
+      };
+    }
+
+    // Disponível ou indisponível por lotação
+    if (reserved < 4) {
+      return {
+        date,
+        time,
+        status: "available",
+        capacity: 4,
+        reserved,
+        available: true,
+      };
+    } else {
+      return {
+        date,
+        time,
+        status: "unavailable",
+        capacity: 4,
+        reserved,
+        available: false,
+      };
+    }
+  });
+};
 
 export const getAvailabilityWithBlocks = (
   reservations: AdminReservation[],
@@ -108,7 +166,7 @@ export const getAvailabilityWithBlocks = (
       0
     );
 
-    // Verifica bloqueio por reserva confirmada
+    // Bloqueio por reserva confirmada
     const hasConfirmedReservation = dateReservations.some(
       (r) => r.reservation_time === time && r.status === "confirmed"
     );
@@ -119,11 +177,12 @@ export const getAvailabilityWithBlocks = (
         status: "blocked_by_reservation",
         capacity: 4,
         reserved,
+        available: false,
         reason: "Reserva confirmada",
       };
     }
 
-    // Verifica bloqueio manual do admin para horário específico
+    // Bloqueio manual do admin
     const adminBlock = blockedPeriods.find(
       (b) => b.date === date && b.startTime === time
     );
@@ -134,10 +193,12 @@ export const getAvailabilityWithBlocks = (
         status: "blocked_by_admin",
         capacity: 4,
         reserved,
+        available: false,
         reason: adminBlock.reason,
       };
     }
-    // Verifica se o dia inteiro está bloqueado
+
+    // Bloqueio do dia inteiro
     const dayBlock = blockedPeriods.find(
       (b) => b.date === date && !b.startTime && !b.endTime
     );
@@ -148,9 +209,11 @@ export const getAvailabilityWithBlocks = (
         status: "blocked_by_admin",
         capacity: 4,
         reserved,
+        available: false,
         reason: dayBlock.reason || "Dia bloqueado pelo administrador",
       };
     }
+
     // Disponível ou indisponível por lotação
     if (reserved < 4) {
       return {
@@ -159,6 +222,7 @@ export const getAvailabilityWithBlocks = (
         status: "available",
         capacity: 4,
         reserved,
+        available: true,
       };
     } else {
       return {
@@ -167,46 +231,8 @@ export const getAvailabilityWithBlocks = (
         status: "unavailable",
         capacity: 4,
         reserved,
+        available: false,
       };
     }
   });
-};
-
-export const calculateStatistics = (
-  reservations: AdminReservation[]
-): ReservationStatistics | null => {
-  console.log("Calculating statistics...");
-  if (!reservations) {
-    console.log("No reservations data for statistics");
-    return null;
-  }
-
-  const today = new Date().toISOString().split("T")[0];
-  const thisMonth = new Date().toISOString().slice(0, 7);
-
-  const stats = {
-    totalReservations: reservations.length,
-    pendingReservations: reservations.filter((r) => r.status === "pending")
-      .length,
-    confirmedReservations: reservations.filter((r) => r.status === "confirmed")
-      .length,
-    todayReservations: reservations.filter((r) => r.reservation_date === today)
-      .length,
-    monthlyReservations: reservations.filter((r) =>
-      r.reservation_date.startsWith(thisMonth)
-    ).length,
-    totalRevenue: reservations
-      .filter((r) => r.status === "confirmed" || r.status === "completed")
-      .reduce(
-        (sum, r) =>
-          sum +
-          (typeof r.manual_payment === "number"
-            ? r.manual_payment
-            : r.total_price),
-        0
-      ),
-  };
-
-  console.log("Statistics calculated:", stats);
-  return stats;
 };
