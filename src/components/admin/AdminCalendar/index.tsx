@@ -120,8 +120,8 @@ const AdminCalendar: React.FC<AdminCalendarProps> = ({
         conductors={conductors}
         loading={conductorsLoading}
         error={conductorsError}
-        updateConductorStatus={() => {}}
-        getCurrentWhatsapp={() => ""}
+        updateConductorStatus={async () => true}
+        getCurrentWhatsapp={() => "351968784043"}
         renderAfterActiveBlock={renderAfterActiveBlock}
       />
 
@@ -134,7 +134,7 @@ const AdminCalendar: React.FC<AdminCalendarProps> = ({
         occupiedMinutes={occupiedMinutes}
         setOccupiedMinutes={setOccupiedMinutes}
         activeConductorIds={activeConductorIds}
-        updateTuktukStatus={() => {}}
+        updateTuktukStatus={async () => {}}
       />
 
       {/* Card de horários disponíveis */}
