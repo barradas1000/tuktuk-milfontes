@@ -163,9 +163,9 @@ const AdminCalendar: React.FC<AdminCalendarProps> = ({
         getFilteredBlocks={() => []}
         blockFilterType="all"
         setBlockFilterType={() => {}}
-        blockFilterDate={calendarDate}
+        blockFilterDate={format(calendarDate, "yyyy-MM-dd")}
         setBlockFilterDate={() => {}}
-        unblockDay={() => {}}
+        unblockDay={async () => {}}
         unblockTime={unblockTime}
         blockedPeriods={blockedPeriods}
       />
