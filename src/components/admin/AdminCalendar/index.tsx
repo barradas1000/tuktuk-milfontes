@@ -153,7 +153,13 @@ const AdminCalendar: React.FC<AdminCalendarProps> = ({
         isDayBlocked={() => false}
         getDayBlockReason={() => ""}
         getDayLabel={() => ""}
-        isValidDate={isValidDate}
+        isValidDate={(date): date is Date => {
+          try {
+            return date instanceof Date && !isNaN(date.getTime());
+          } catch {
+            return false;
+          }
+        }}
         modifiers={{}}
         modifiersClassNames={{}}
       />
@@ -166,7 +172,7 @@ const AdminCalendar: React.FC<AdminCalendarProps> = ({
         blockFilterDate={format(calendarDate, "yyyy-MM-dd")}
         setBlockFilterDate={() => {}}
         unblockDay={async () => {}}
-        unblockTime={unblockTime}
+        unblockTime={async () => {}}
         blockedPeriods={blockedPeriods}
       />
 
