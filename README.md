@@ -86,7 +86,7 @@ O projeto segue uma estrutura modular para facilitar a manutenção e o desenvol
     ```bash
     npm run dev
     ```
-    A aplicação estará disponível em `http://localhost:5173` (ou outra porta, se a 5173 estiver ocupada)....
+    A aplicação estará disponível em `http://localhost:5173` (ou outra porta, se a 5173 estiver ocupada)..........
 
 ---
 
