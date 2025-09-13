@@ -1,21 +1,30 @@
+// src/components/admin/AdminCalendar/useAdminCalendarState.ts
 import { useState } from "react";
-import { BlockedPeriod, AdminReservation } from "./types";
 
+// Interface para slots de disponibilidade
+interface AvailabilitySlot {
+  time: string;
+  available: boolean;
+  reason?: string;
+}
+
+// Interface para condutor
 interface Conductor {
   id: string;
   name: string;
+  is_active: boolean;
+  conductor_id: string;
 }
 
+// Estados básicos do hook de calendário administrativo
 export function useAdminCalendarState() {
-  // --- Estados do Componente ---
+  // Estados do Componente
   const [calendarDate, setCalendarDate] = useState<Date>(new Date());
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const [quickViewDate, setQuickViewDate] = useState<Date | null>(null);
 
-  // Estados relacionados a bloqueios
-  const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
+  // Estados relacionados a disponibilidade
   const [availabilitySlots, setAvailabilitySlots] = useState<AvailabilitySlot[]>([]);
-  const [selectedDateReservations, setSelectedDateReservations] = useState<AdminReservation[]>([]);
 
   // Estados de modais
   const [blockDayModalOpen, setBlockDayModalOpen] = useState(false);
@@ -23,20 +32,16 @@ export function useAdminCalendarState() {
   const [cancelReservationModalOpen, setCancelReservationModalOpen] = useState(false);
   const [whatsappMessageModalOpen, setWhatsappMessageModalOpen] = useState(false);
 
-  // Tuktuk / condutores
+  // Estados do TukTuk
   const [tuktukStatus, setTuktukStatus] = useState<"available" | "busy">("available");
   const [occupiedUntil, setOccupiedUntil] = useState<Date | null>(null);
   const [occupiedMinutes, setOccupiedMinutes] = useState<number>(30);
   const [activeConductorIds, setActiveConductorIds] = useState<string[]>([]);
-  const [conductors, setConductors] = useState<any[]>([]);
+  const [conductors, setConductors] = useState<Conductor[]>([]);
   const [conductorsLoading, setConductorsLoading] = useState(false);
   const [conductorsError, setConductorsError] = useState<string | null>(null);
 
-  const handleDayClick = (date: Date) => {
-    setCalendarDate(date);
-    onDateSelect(date.toISOString());
-  };
-
+  // Função para validação de datas
   const isValidDate = (date: Date): boolean => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -45,39 +50,34 @@ export function useAdminCalendarState() {
     return inputDate >= today;
   };
 
+  // Função para desbloquear horário
   const unblockTime = (date: Date, time: string) => {
-    console.log("unblockTime", date, time);
+    console.log("Desbloquear horário:", date, time);
+    // TODO: Implementar lógica de desbloqueio
   };
 
+  // Função para bloquear horário
   const blockTime = (date: Date, time: string, reason: string) => {
-    console.log("blockTime", date, time, reason);
+    console.log("Bloquear horário:", date, time, reason);
+    // TODO: Implementar lógica de bloqueio
   };
 
+  // Função para clique no dia
+  const handleDayClick = (date: Date) => {
+    setCalendarDate(date);
+    // TODO: Implementar callback para data selecionada
+  };
+
+  // Retornar apenas os valores definidos
   return {
     calendarDate,
-    reservations,
-    blockedPeriods,
-    setBlockedPeriods,
-    blockedPeriodsLoading,
-    setBlockedPeriodsLoading,
-    blockModalOpen,
-    setBlockModalOpen,
-    blockDate,
-    setBlockDate,
-    blockTab,
-    setBlockTab,
-    blockDayReason,
-    setBlockDayReason,
-    blockDaysStart,
-    setBlockDaysStart,
-    blockDaysEnd,
-    setBlockDaysEnd,
-    blockHourStart,
-    setBlockHourStart,
-    blockHourEnd,
-    setBlockHourEnd,
-    blockTimeReason,
-    setBlockTimeReason,
+    setCalendarDate,
+    quickViewOpen,
+    setQuickViewOpen,
+    quickViewDate,
+    setQuickViewDate,
+    availabilitySlots,
+    setAvailabilitySlots,
     blockDayModalOpen,
     setBlockDayModalOpen,
     blockHourModalOpen,
@@ -93,8 +93,16 @@ export function useAdminCalendarState() {
     occupiedMinutes,
     setOccupiedMinutes,
     activeConductorIds,
+    setActiveConductorIds,
     conductors,
+    setConductors,
     conductorsLoading,
+    setConductorsLoading,
     conductorsError,
+    setConductorsError,
+    isValidDate,
+    unblockTime,
+    blockTime,
+    handleDayClick,
   };
-};
+}

@@ -1,7 +1,11 @@
 import React from 'react';
 import { Switch } from "@/components/ui/switch";
 import { useActiveConductors } from "@/hooks/useActiveConductors";
-
+/*
+  Certifique-se de que o caminho do import está correto.
+  Se o arquivo useActiveConductors.ts estiver em src/hooks, use:
+  Caso contrário, mantenha o caminho relativo:
+*/
 interface ActiveConductorsPanelProps {
   conductors: ReturnType<typeof useActiveConductors>['conductors'];
   loading: boolean;

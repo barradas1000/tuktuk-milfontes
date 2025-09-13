@@ -132,7 +132,7 @@ export const checkSupabaseConfiguration = (): boolean => {
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
   if (!url || !anonKey) {
-    console.log("Supabase not configured, using mock data");
+    console.log("Supabase not configured");
     return false;
   }
   return true;
@@ -515,7 +515,7 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
   }
   };
   
-  // Fetch inactive days (currently mock data, TODO: implement based on database)
+  // Fetch inactive days
   export const fetchInactiveDays = async (): Promise<string[]> => {
     // For now, return empty array. In future, fetch from a table if exists.
     return [];

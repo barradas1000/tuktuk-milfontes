@@ -19,40 +19,36 @@ export interface AvailabilitySlot {
 
 export const calculateStatistics = (reservations: AdminReservation[]) => {
   const today = new Date().toISOString().split("T")[0];
-  const confirmedToday = reservations.filter(
-    (r) =>
-      r.status === "confirmed" && r.reservation_date === today
-  ).length;
-  const pendingToday = reservations.filter(
-    (r) => r.status === "pending" && r.reservation_date === today
-  ).length;
-  const cancelledToday = reservations.filter(
-    (r) =>
-      r.status === "cancelled" && r.reservation_date === today
-  ).length;
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth();
+  const currentYear = currentDate.getFullYear();
 
-  // Calcular total de pessoas confirmadas para hoje
-  const totalPeopleToday = reservations
-    .filter(
-      (r) =>
-        r.status === "confirmed" && r.reservation_date === today
-    )
-    .reduce((sum, r) => sum + (r.number_of_people || 0), 0);
+  // Estatísticas totais
+  const totalReservations = reservations.length;
+  const pendingReservations = reservations.filter(r => r.status === "pending").length;
+  const confirmedReservations = reservations.filter(r => r.status === "confirmed").length;
 
-  // Calcular faturamento estimado (exemplo simples)
-  const estimatedRevenue = reservations
-    .filter(
-      (r) =>
-        r.status === "confirmed" && r.reservation_date === today
-    )
+  // Estatísticas de hoje
+  const todayReservations = reservations.filter(r => r.reservation_date === today).length;
+
+  // Estatísticas mensais (mês atual)
+  const monthlyReservations = reservations.filter(r => {
+    const reservationDate = new Date(r.reservation_date);
+    return reservationDate.getMonth() === currentMonth && reservationDate.getFullYear() === currentYear;
+  }).length;
+
+  // Receita total (com base em reservas confirmadas)
+  const totalRevenue = reservations
+    .filter(r => r.status === "confirmed")
     .reduce((sum, r) => sum + (r.total_price || 0), 0);
 
   return {
-    confirmedToday,
-    pendingToday,
-    cancelledToday,
-    totalPeopleToday,
-    estimatedRevenue,
+    totalReservations,
+    pendingReservations,
+    confirmedReservations,
+    todayReservations,
+    monthlyReservations,
+    totalRevenue,
   };
 };
 

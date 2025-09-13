@@ -12,7 +12,7 @@ import {
   updateReservationInSupabase,
   updateManualPaymentInSupabase,
 } from "@/services/supabaseService";
-import { mockReservations } from "@/data/mockReservations";
+
 import {
   calculateStatistics,
   getAvailabilityForDate,
@@ -36,19 +36,9 @@ const supabase = createClient(
 export const useAdminReservations = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [isUsingMockData, setIsUsingMockData] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if Supabase is configured
-  useEffect(() => {
-    const isConfigured = checkSupabaseConfiguration();
-    setIsUsingMockData(!isConfigured);
-    if (!isConfigured) {
-      console.log("Using mock data for admin reservations");
-    }
-  }, []);
-
-  // Fetch reservations
+  // Fetch reservations directly from Supabase
   const {
     data: reservations = [],
     error,
@@ -56,19 +46,11 @@ export const useAdminReservations = () => {
   } = useQuery({
     queryKey: ["admin-reservations"],
     queryFn: async (): Promise<AdminReservation[]> => {
-      if (isUsingMockData) {
-        console.log("Returning mock reservations for admin");
-        return mockReservations;
-      }
       try {
         return await fetchReservationsFromSupabase();
       } catch (error) {
-        console.error(
-          "Failed to fetch from Supabase, falling back to mock data:",
-          error
-        );
-        setIsUsingMockData(true);
-        return mockReservations;
+        console.error("Failed to fetch from Supabase:", error);
+        throw error; // Let React Query handle the error
       }
     },
     refetchInterval: 30000, // Refetch every 30 seconds
@@ -77,10 +59,6 @@ export const useAdminReservations = () => {
   // Update reservation status
   const updateReservationMutation = useMutation({
     mutationFn: async (input: UpdateReservationInput) => {
-      if (isUsingMockData) {
-        console.log("Mock update reservation:", input);
-        return input;
-      }
       const { error } = await supabase
         .from("reservations")
         .update({
@@ -119,16 +97,6 @@ export const useAdminReservations = () => {
       id: string;
       manualPayment: number;
     }) => {
-      if (isUsingMockData) {
-        console.log("Mock update manual payment:", { id, manualPayment });
-        // Update the mock data directly
-        const reservationIndex = mockReservations.findIndex((r) => r.id === id);
-        if (reservationIndex !== -1) {
-          mockReservations[reservationIndex].manual_payment = manualPayment;
-        }
-        return { id, manualPayment };
-      }
-
       return await updateManualPaymentInSupabase(id, manualPayment);
     },
     onSuccess: (data, variables) => {
@@ -189,8 +157,7 @@ export const useAdminReservations = () => {
     isUpdating: updateReservationMutation.isPending, // Alias for compatibility
     getReservationsByDate,
     getAvailabilityForDate: getAvailabilityForDateWrapper,
-    isUsingMockData,
-    isSupabaseConfigured: !isUsingMockData, // For compatibility
+    isSupabaseConfigured: true, // Always using Supabase now
     isLoading,
     // Novas funções da grid avançada
     generateDayAvailability,

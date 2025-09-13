@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Calendar as CalendarIcon, Lock } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import { DayPicker, DayProps } from "react-day-picker";
 import { pt } from "date-fns/locale";
 import { format } from "date-fns";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
@@ -9,14 +9,16 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 interface MainCalendarCardProps {
   calendarDate: Date;
   handleDayClick: (date: Date | undefined) => void;
-  modifiers: any;
-  modifiersClassNames: any;
+  modifiers: Record<string, (date: Date) => boolean>;
+  modifiersClassNames: Record<string, string>;
   getDayStatus: (date: Date) => string;
   isDayBlocked: (date: Date) => boolean;
   getDayBlockReason: (date: Date) => string;
   getDayLabel: (status: string) => string;
-  isValidDate: (date: any) => date is Date;
+  isValidDate: (date: unknown) => date is Date;
 }
+
+
 
 const MainCalendarCard: React.FC<MainCalendarCardProps> = ({
   calendarDate,
@@ -51,15 +53,16 @@ const MainCalendarCard: React.FC<MainCalendarCardProps> = ({
               modifiers={modifiers}
               modifiersClassNames={modifiersClassNames}
               components={{
-                Day: (props) => {
-                  // O react-day-picker pode passar undefined aqui
-                  if (!props?.date) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                Day: ({ date, displayMonth, ...props }: any) => {
+                  // Verificar se date existe
+                  if (!date) {
                     return <td className="text-gray-300"> </td>; // célula vazia
                   }
 
-                  const date = new Date(props.date);
-                  if (isNaN(date.getTime())) {
-                    console.warn("Data inválida no componente Day:", props.date);
+                  const currentDate = new Date(date);
+                  if (isNaN(currentDate.getTime())) {
+                    console.warn("Data inválida no componente Day:", date);
                     return <td className="text-red-500">X</td>;
                   }
 

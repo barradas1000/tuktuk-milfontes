@@ -2,11 +2,27 @@
 import React, { useState } from "react";
 import TuktukAvailabilityPanel from "./TuktukAvailabilityPanel";
 
+// Interface para representar os dados de disponibilidade
+interface Occupant {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+}
+
+interface AvailabilityData {
+  availableTimeSlots: string[];
+  occupants: Occupant[];
+  totalCapacity: number;
+  [key: string]: unknown; // Para extensibilidade futura
+}
+
 type Props = {
   selectedDate: Date | null;
+  getAvailabilityForDate?: (date: string) => Promise<AvailabilityData>;
 };
 
-export default function AvailabilityTab({ selectedDate }: Props) {
+export default function AvailabilityTab({ selectedDate, getAvailabilityForDate }: Props) {
   // Estado para gerenciar a disponibilidade do TukTuk
   const [tuktukStatus, setTuktukStatus] = useState<"available" | "busy">("available");
   const [occupiedUntil, setOccupiedUntil] = useState<Date | null>(null);

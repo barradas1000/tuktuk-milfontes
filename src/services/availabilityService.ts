@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import { mockReservations } from "@/data/mockReservations";
 import { checkSupabaseConfiguration } from "./supabaseService";
 import { generateDynamicTimeSlots } from "@/utils/reservationUtils";
 
@@ -254,9 +253,7 @@ export const checkAvailability = async (
       }
       existingReservations = data || [];
     } else {
-      existingReservations = mockReservations.filter(
-        (r) => r.reservation_date === date && r.status !== "cancelled"
-      );
+      existingReservations = [];
     }
     const duration = tourType ? TOUR_DURATIONS[tourType] : 45;
     const startNew = time;
@@ -342,10 +339,9 @@ export const generateAlternativeTimes = async (
         .neq("status", "cancelled");
       existingReservations = data || [];
     } else {
-      existingReservations = mockReservations.filter(
-        (r) => r.reservation_date === date && r.status !== "cancelled"
-      );
+      existingReservations = [];
     }
+
     const duration = tourType ? TOUR_DURATIONS[tourType] : 45;
     // Ordenar reservas existentes
     const sorted = existingReservations
@@ -404,12 +400,7 @@ export const getAvailabilityForDate = async (
 
         existingReservations = data || [];
       } else {
-        existingReservations = mockReservations.filter(
-          (r) =>
-            r.reservation_date === date &&
-            r.reservation_time === timeSlot &&
-            r.status !== "cancelled"
-        );
+        existingReservations = [];
       }
 
       // 0 = disponível, 1 = ocupado
@@ -593,11 +584,9 @@ export const generateDayAvailability = async (
 
       reservations = data || [];
     } else {
-      reservations = mockReservations.filter(
-        (r) => r.reservation_date === date && r.status !== "cancelled"
-      );
+      reservations = [];
       console.log(
-        `📋 [GRID] Usando mock data: ${reservations.length} reservas`
+        `📋 [GRID] Sem reservas encontradas para ${date}`
       );
     }
 
@@ -738,9 +727,7 @@ export const canScheduleTour = async (
         .neq("status", "cancelled");
       existingReservations = data || [];
     } else {
-      existingReservations = mockReservations.filter(
-        (r) => r.reservation_date === date && r.status !== "cancelled"
-      );
+      existingReservations = [];
     }
 
     // Verificar conflitos com tours existentes
