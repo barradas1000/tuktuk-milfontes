@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { generateDynamicTimeSlots } from "@/utils/reservationUtils";
-import i18n from "@/i18n";
+import i18n from "@/i18n/index";
 
 export const timeSlots = generateDynamicTimeSlots();
 
@@ -23,11 +23,11 @@ export const FALLBACK_CONDUCTORS = [
   {
     id: "condutor2",
     name: "Condutor 2",
-    whatsapp: "351968784043",
+    whatsapp: "",
   },
 ];
 
-export const isValidDate = (date: any): date is Date => date instanceof Date && !isNaN(date.getTime());
+export const isValidDate = (date: unknown): date is Date => date instanceof Date && !isNaN(date.getTime());
 
 export const getTourDisplayName = (tourType: string): string => {
   const tourTypes = [
@@ -147,7 +147,7 @@ export const getWhatsappLink = (phone: string, message: string) => {
   return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 };
 
-export function useSyncActiveConductors(fetchActiveConductors: () => Promise<any>, setActiveConductors: (conductors: any) => void) {
+export function useSyncActiveConductors(fetchActiveConductors: () => Promise<unknown>, setActiveConductors: (conductors: unknown) => void) {
   useEffect(() => {
     function handleStatusChanged() {
       fetchActiveConductors().then(setActiveConductors);

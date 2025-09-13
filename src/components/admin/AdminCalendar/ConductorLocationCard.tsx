@@ -1,144 +1,59 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+// /components/admin/AdminCalendar/CancelReservationModal.tsx
+import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { AdminReservation } from "@/types/adminReservations";
+import { getTourDisplayName } from "./helpers";
 
-interface ConductorLocationCardProps {
-  conductorId: string;
-  conductorName: string;
+interface CancelReservationModalProps {
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+  reservation: AdminReservation | null;
+  cancelReason: string;
+  setCancelReason: (reason: string) => void;
+  onConfirm: () => void;
+  isCancelling: boolean;
 }
 
-interface ConductorLocationPayload {
-  conductor_id: string;
-  current_latitude?: number | null;
-  current_longitude?: number | null;
-  accuracy?: number | null;
-  is_active?: boolean;
-  last_ping?: string | null;
-  status?: string | null;
-  is_available?: boolean;
-}
-
-interface DeviceCoords {
-  latitude: number | null;
-  longitude: number | null;
-  accuracy: number | null;
-}
-
-const ConductorLocationCard: React.FC<ConductorLocationCardProps> = ({
-  conductorId,
-  conductorName,
-}) => {
-  const [location, setLocation] = useState<{
-    latitude: number;
-    longitude: number;
-    accuracy: number | null;
-    lastPing: string | null;
-    status: string | null;
-    isAvailable: boolean | null;
-  } | null>(null);
-  const [connected, setConnected] = useState(false);
-
-  useEffect(() => {
-    async function fetchLocation() {
-      const { data, error } = await supabase
-        .from("active_conductors")
-        .select("current_latitude, current_longitude, accuracy, is_active, last_ping, status, is_available")
-        .eq("conductor_id", conductorId)
-        .single();
-      if (!error && data && data.is_active && typeof data.current_latitude === 'number' && typeof data.current_longitude === 'number') {
-        setLocation({
-          latitude: data.current_latitude,
-          longitude: data.current_longitude,
-          accuracy: data.accuracy,
-          lastPing: data.last_ping,
-          status: data.status,
-          isAvailable: data.is_available,
-        });
-        setConnected(true);
-      } else {
-        setConnected(false);
-        setLocation(null);
-      }
-    }
-    fetchLocation();
-    const channel = supabase
-      .channel(`conductor_location_${conductorId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "UPDATE",
-          schema: "public",
-          table: "active_conductors",
-        } as const,
-        (payload: { new?: ConductorLocationPayload }) => {
-          if (payload.new && payload.new.is_active && typeof payload.new.current_latitude === 'number' && typeof payload.new.current_longitude === 'number') {
-            setLocation({
-              latitude: payload.new.current_latitude,
-              longitude: payload.new.current_longitude,
-              accuracy: payload.new.accuracy,
-              lastPing: payload.new.last_ping,
-              status: payload.new.status,
-              isAvailable: payload.new.is_available,
-            });
-            setConnected(true);
-          } else {
-            setConnected(false);
-            setLocation(null);
-          }
-        }
-      )
-      .subscribe();
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [conductorId]);
-
+const CancelReservationModal = ({
+  isOpen,
+  onOpenChange,
+  reservation,
+  cancelReason,
+  setCancelReason,
+  onConfirm,
+  isCancelling,
+}: CancelReservationModalProps) => {
+  if (!reservation) return null;
 
   return (
-    <Card className="mb-4 bg-blue-50 border-blue-200">
-      <CardHeader>
-        <CardTitle>Localização Atual do Condutor</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="font-semibold text-blue-900 mb-2">{conductorName}</div>
-        {connected && location ? (
-          <div>
-            <div>
-              Latitude: <b>{location.latitude}</b>
-            </div>
-            <div>
-              Longitude: <b>{location.longitude}</b>
-            </div>
-            <div>
-              Precisão: <b>{location.accuracy ?? "N/A"} m</b>
-            </div>
-            <div className="text-green-700 mt-2">
-              Conectado ao Supabase e recebendo coordenadas.
-            </div>
-            {location.lastPing && (
-              <div className="text-sm text-gray-600">
-                Última atualização: {new Date(location.lastPing).toLocaleTimeString()}
-              </div>
-            )}
-            {location.status && (
-              <div className="text-sm text-gray-600">
-                Status: {location.status}
-              </div>
-            )}
-            {location.isAvailable !== null && (
-              <div className="text-sm text-gray-600">
-                Disponível: {location.isAvailable ? "Sim" : "Não"}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="text-red-700">
-            Condutor não está ativo ou sem localização.
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Cancelar Reserva</DialogTitle>
+        </DialogHeader>
+        <p>
+          Tens a certeza que queres cancelar a reserva de{" "}
+          <strong>{reservation.customer_name}</strong> para{" "}
+          <em>{getTourDisplayName(reservation.tour_type)}</em>?
+        </p>
+        <Textarea
+          placeholder="Motivo do cancelamento"
+          value={cancelReason}
+          onChange={(e) => setCancelReason(e.target.value)}
+        />
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+            Fechar
+          </Button>
+          <Button variant="destructive" onClick={onConfirm} disabled={isCancelling}>
+            {isCancelling ? "A cancelar..." : "Confirmar Cancelamento"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
-export default ConductorLocationCard;
+export default CancelReservationModal;

@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Clock, Calendar } from "lucide-react";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
-import { AvailabilitySlot } from "@/types/adminReservations";
+import { AvailabilitySlot } from "@/utils/reservationUtils";
 
 interface HourlyAvailabilityCardProps {
   calendarDate: Date;
@@ -36,26 +36,29 @@ const HourlyAvailabilityCard = ({
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
-              {availabilitySlots.map((slot) => (
-                <div
-                  key={slot.time}
-                  className={`p-3 border rounded-lg text-center ${
-                    slot.available 
-                      ? "bg-green-100 border-green-300 text-green-800" 
-                      : "bg-red-100 border-red-300 text-red-800"
-                  }`}
-                >
-                  <div className="font-semibold">{slot.time}</div>
-                  <div className="text-sm">
-                    {slot.available ? "Disponível" : "Indisponível"}
-                  </div>
-                  {!slot.available && (
-                    <div className="text-xs mt-1">
-                      {slot.reserved}/{slot.capacity} lugares
+              {availabilitySlots.map((slot) => {
+                const isAvailable = slot.status === 'available';
+                return (
+                  <div
+                    key={slot.time}
+                    className={`p-3 border rounded-lg text-center ${
+                      isAvailable
+                        ? "bg-green-100 border-green-300 text-green-800"
+                        : "bg-red-100 border-red-300 text-red-800"
+                    }`}
+                  >
+                    <div className="font-semibold">{slot.time}</div>
+                    <div className="text-sm">
+                      {isAvailable ? "Disponível" : "Indisponível"}
                     </div>
-                  )}
-                </div>
-              ))}
+                    {!isAvailable && (
+                      <div className="text-xs mt-1">
+                        {slot.reserved}/{slot.capacity} lugares
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

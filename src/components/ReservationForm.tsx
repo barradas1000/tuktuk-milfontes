@@ -27,10 +27,11 @@ import { checkAvailability } from "@/services/availabilityService";
 import AlternativeTimesModal from "./AlternativeTimesModal";
 import { Badge } from "@/components/ui/badge";
 import { fetchActiveConductors } from "@/services/supabaseService";
+import { useAuth } from "@/hooks/useAuth";
 
 const allConductors = [
-  { id: "condutor1", whatsapp: "351963496320" },
-  { id: "condutor2", whatsapp: "351968784043" },
+  { id: "condutor1", whatsapp: "351963496320", name: "Condutor 1" },
+  { id: "condutor2", whatsapp: "", name: "Condutor 2" }, // número removido conforme solicitado
   // ... outros condutores, se existirem
 ];
 
@@ -48,6 +49,7 @@ function interpolateMessage(
 const ReservationForm = () => {
   console.log("ReservationForm rendering");
   const { t } = useTranslation();
+  const auth = useAuth();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -70,12 +72,22 @@ const ReservationForm = () => {
     alternativeTimes: [] as string[],
   });
 
-  const [availabilityStatus, setAvailabilityStatus] = useState({
+  interface AvailabilityStatus {
+    isChecking: boolean;
+    isAvailable: boolean;
+    existingPeople: number;
+    maxCapacity: number;
+    message: string;
+    alternativeTimes: string[];
+  }
+
+  const [availabilityStatus, setAvailabilityStatus] = useState<AvailabilityStatus>({
     isChecking: false,
     isAvailable: true,
     existingPeople: 0,
     maxCapacity: 1,
     message: "",
+    alternativeTimes: [],
   });
 
   const { toast } = useToast();
@@ -218,7 +230,9 @@ const ReservationForm = () => {
         });
         return;
       }
-      // Enviar evento para Google Sheet
+      // Google Sheets integration - Temporarily disabled due to CORS
+      // TODO: Implement proper Google Apps Script with CORS or use alternative method
+      /*
       try {
         const selectedTour = tourTypes.find(
           (tour) => tour.id === formData.tourType
@@ -249,6 +263,7 @@ const ReservationForm = () => {
       } catch (err) {
         console.error("Erro ao enviar evento Google Sheet:", err);
       }
+      */
     } catch (err) {
       toast({
         title: "Erro ao registar reserva",
@@ -258,22 +273,52 @@ const ReservationForm = () => {
       return;
     }
 
-    // Buscar condutor ativo
-    let phoneNumber = "351968784043"; // fallback
-    try {
-      const activeConductors = await fetchActiveConductors(); // retorna array de IDs
-      if (activeConductors.length > 0) {
-        const conductor = allConductors.find(
-          (c) => c.id === activeConductors[0]
-        );
-        if (conductor) phoneNumber = conductor.whatsapp;
+    // Verificar se há um administrador autenticado com WhatsApp
+    let phoneNumber: string | null = null;
+    let adminName = "";
+
+    // Prioridade 1: Usar WhatsApp do administrador autenticado
+    if (auth.profile && auth.profile.whatsapp) {
+      phoneNumber = auth.profile.whatsapp;
+      adminName = auth.profile.full_name;
+    } else {
+      // Prioridade 2: Buscar condutor ativo
+      try {
+        const activeConductors = await fetchActiveConductors(); // retorna array de IDs
+        if (activeConductors.length > 0) {
+          const conductor = allConductors.find(
+            (c) => c.id === activeConductors[0]
+          );
+          if (conductor && conductor.whatsapp) {
+            phoneNumber = conductor.whatsapp;
+            adminName = conductor.name || "";
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao buscar condutores ativos:", e);
       }
-    } catch (e) {
-      // fallback já definido
+    }
+
+    // Se não encontrou nenhum WhatsApp, mostrar erro e não prosseguir
+    if (!phoneNumber) {
+      toast({
+        title: "Erro de contacto",
+        description: "Não foi possível encontrar um número de WhatsApp para contacto. Por favor, tente novamente ou contacte-nos por outros meios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Adicionar informação do administrador responsável na mensagem
+    let finalMessage = message;
+    if (adminName) {
+      finalMessage += `\n\nWhatsApp responsável: ${adminName} (${phoneNumber})`;
+    } else {
+      finalMessage += `\n\nWhatsApp responsável: ${phoneNumber}`;
     }
 
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
+      finalMessage
     )}`;
     window.open(whatsappUrl, "_blank");
 
@@ -306,6 +351,7 @@ const ReservationForm = () => {
         existingPeople: 0,
         maxCapacity: 4,
         message: "",
+        alternativeTimes: [],
       });
       return;
     }
@@ -325,6 +371,7 @@ const ReservationForm = () => {
         existingPeople: availability.existingReservations,
         maxCapacity: availability.maxCapacity,
         message: availability.message,
+        alternativeTimes: availability.alternativeTimes || [],
       });
     } catch (error) {
       setAvailabilityStatus({
@@ -333,6 +380,7 @@ const ReservationForm = () => {
         existingPeople: 0,
         maxCapacity: 4,
         message: "Erro ao verificar disponibilidade",
+        alternativeTimes: [],
       });
     }
   }, [formData.date, formData.time, formData.numberOfPeople]);
@@ -352,6 +400,7 @@ const ReservationForm = () => {
         existingPeople: 0,
         maxCapacity: 1,
         message: "",
+        alternativeTimes: [],
       });
       return;
     }

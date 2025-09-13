@@ -1,19 +1,18 @@
-// /components/AdminCalendar/DailyReservationsCard.tsx
-import React from 'react';
+// /components/admin/AdminCalendar/DailyReservationsCard.tsx
+import React from "react";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Clock, Users, Eye } from "lucide-react";
 import { AdminReservation } from "@/types/adminReservations";
+import { getTourDisplayName, getStatusBadge } from "./helpers";
 
 interface DailyReservationsCardProps {
   selectedDate: string;
   reservations: AdminReservation[];
-  getTourDisplayName: (tourType: string) => string;
-  getStatusBadge: (status: string) => React.ReactNode;
 }
 
-const DailyReservationsCard = ({ selectedDate, reservations, getTourDisplayName, getStatusBadge }: DailyReservationsCardProps) => {
+const DailyReservationsCard = ({ selectedDate, reservations }: DailyReservationsCardProps) => {
   return (
     <Card className="lg:col-span-2">
       <CardHeader>
@@ -38,13 +37,17 @@ const DailyReservationsCard = ({ selectedDate, reservations, getTourDisplayName,
                 <div
                   key={reservation.id}
                   className={`p-4 border rounded-lg shadow-sm ${
-                    reservation.status === "cancelled" ? "bg-gray-100 opacity-60" : "bg-white"
+                    reservation.status === "cancelled"
+                      ? "bg-gray-100 opacity-60"
+                      : "bg-white"
                   }`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <h4 className="font-semibold">{reservation.customer_name}</h4>
-                      <p className="text-sm text-gray-600">{getTourDisplayName(reservation.tour_type)}</p>
+                      <p className="text-sm text-gray-600">
+                        {getTourDisplayName(reservation.tour_type)}
+                      </p>
                     </div>
                     {getStatusBadge(reservation.status)}
                   </div>

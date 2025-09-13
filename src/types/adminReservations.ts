@@ -12,7 +12,9 @@ export interface AdminReservation {
   total_price: number;
   manual_payment?: number;
   created_at: string;
+  updated_at: string;
   language?: string;
+  cancellation_reason?: string;
 }
 
 export interface AvailabilitySlot {
@@ -40,4 +42,10 @@ export interface BlockedPeriod {
   reason?: string;
   createdBy: string;
   createdAt?: string; // Data/hora de criação do bloqueio
+}
+
+export interface UpdateReservationParams {
+  id: string;
+  status: AdminReservation["status"];
+  cancellation_reason?: string;
 }

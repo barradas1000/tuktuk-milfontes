@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { BlockedPeriod, AdminReservation, Conductor } from "./types";
+import { BlockedPeriod, AdminReservation } from "./types";
+
+interface Conductor {
+  id: string;
+  name: string;
+}
 
 export function useAdminCalendarState() {
   // --- Estados do Componente ---
@@ -112,7 +117,7 @@ export function useAdminCalendarState() {
     blockHourEnd,
     setBlockHourEnd,
     blockTimeReason,
-    setBlockTimeReason
+    setBlockTimeReason,
     blockDayModalOpen,
     setBlockDayModalOpen,
     blockHourModalOpen,

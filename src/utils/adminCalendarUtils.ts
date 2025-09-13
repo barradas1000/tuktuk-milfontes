@@ -290,7 +290,7 @@ export const FALLBACK_CONDUCTORS = [
   {
     id: "condutor2",
     name: "Condutor 2",
-    whatsapp: "351968784043",
+    whatsapp: "",
   },
 ];
 

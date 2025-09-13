@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "./use-toast";
 import {
   AdminReservation,
   ReservationStatistics,
@@ -25,11 +25,19 @@ import {
   type DayAvailability,
   type TimeSlot,
 } from "@/services/availabilityService";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+
 
 export const useAdminReservations = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isUsingMockData, setIsUsingMockData] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check if Supabase is configured
   useEffect(() => {
@@ -43,7 +51,6 @@ export const useAdminReservations = () => {
   // Fetch reservations
   const {
     data: reservations = [],
-    isLoading,
     error,
     refetch,
   } = useQuery({
@@ -69,12 +76,21 @@ export const useAdminReservations = () => {
 
   // Update reservation status
   const updateReservationMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async (input: UpdateReservationInput) => {
       if (isUsingMockData) {
-        console.log("Mock update reservation:", { id, status });
-        return { id, status };
+        console.log("Mock update reservation:", input);
+        return input;
       }
-      return await updateReservationInSupabase(id, status);
+      const { error } = await supabase
+        .from("reservations")
+        .update({
+          status: input.status,
+          cancellation_reason: input.cancellation_reason,
+        })
+        .eq("id", input.id);
+
+      if (error) throw error;
+      return input;
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["admin-reservations"] });
@@ -138,29 +154,31 @@ export const useAdminReservations = () => {
   const statistics: ReservationStatistics = calculateStatistics(reservations);
 
   // Get reservations by date
-  const getReservationsByDate = (date: string): AdminReservation[] => {
-    return reservations.filter(
-      (reservation) => reservation.reservation_date === date
-    );
+  const getReservationsByDate = async (
+    date: string
+  ): Promise<AdminReservation[]> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/admin/reservations?date=${date}`);
+      return await response.json();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Get availability for date - fixed the parameter order
-  const getAvailabilityForDateWrapper = (date: string): AvailabilitySlot[] => {
-    const slots = getAvailabilityForDate(reservations, date);
-    // Mapear para o tipo esperado em types/adminReservations
-    return slots.map((s) => ({
-      date: s.date,
-      time: s.time,
-      available: s.status === "available",
-      capacity: s.capacity,
-      reserved: s.reserved,
-    }));
+  const getAvailabilityForDateWrapper = async (date: string) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/admin/availability?date=${date}`);
+      return await response.json();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {
     reservations,
-    isLoading,
-    reservationsLoading: isLoading, // Alias for compatibility
     error,
     refetch,
     statistics,
@@ -173,9 +191,16 @@ export const useAdminReservations = () => {
     getAvailabilityForDate: getAvailabilityForDateWrapper,
     isUsingMockData,
     isSupabaseConfigured: !isUsingMockData, // For compatibility
+    isLoading,
     // Novas funções da grid avançada
     generateDayAvailability,
     generateWeeklyAvailability,
     canScheduleTour,
   };
+};
+
+export type UpdateReservationInput = {
+  id: string;
+  status?: string;
+  cancellation_reason?: string;
 };

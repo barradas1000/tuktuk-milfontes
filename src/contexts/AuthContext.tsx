@@ -1,32 +1,9 @@
-import { useState, useEffect, createContext, useContext } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { User, Session } from "@supabase/supabase-js";
 import { allowedAdmins } from "@/constants/allowedAdmins";
-interface Profile {
-  id: string;
-  email: string;
-  full_name: string;
-  role: string;
-  created_at: string;
-  updated_at: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  session: Session | null;
-  profile: Profile | null;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (
-    email: string,
-    password: string,
-    fullName: string
-  ) => Promise<{ error: { message: string } | Error | null }>;
-  signOut: () => Promise<void>;
-  isAdmin: boolean;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { AuthContext } from "./AuthContextInstance";
+import type { Profile, AuthContextType } from "./AuthContext.types";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -125,7 +102,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return { error: { message: "Ocorreu um erro na base de dados. Tente novamente." } };
     }
 
-
     console.log("Attempting sign up for:", trimmedEmail);
     // Redirecionamento fixo para produção
     const redirectUrl = "https://tuktuk-milfontes.vercel.app/login";
@@ -164,13 +140,4 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 };

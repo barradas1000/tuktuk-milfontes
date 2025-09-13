@@ -41,10 +41,6 @@ const MainCalendarCard: React.FC<MainCalendarCardProps> = ({
         <>
           {/* Removido bloco dos botões de bloqueio/desbloqueio */}
           <div className="rounded-2xl shadow-xl bg-white p-2">
-            {console.log("DayPicker props:", {
-              selected: calendarDate,
-              defaultMonth: calendarDate,
-            })}
             <DayPicker
               mode="single"
               selected={calendarDate}

@@ -10,6 +10,25 @@ interface Conductor {
   // Dados estáticos apenas. Não incluir latitude, longitude ou is_active.
   // end interface Conductor
 }
+type UpdateReservationInput = {
+  id: string;
+  status: "pending" | "confirmed" | "cancelled" | "completed";
+  cancellationReason?: string;
+};
+
+export async function updateReservation(data: UpdateReservationInput) {
+  const { error } = await supabase
+    .from("reservations")
+    .update({
+      status: data.status,
+      cancellation_reason: data.cancellationReason ?? null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", data.id);
+
+  if (error) throw error;
+}
+
 
 export interface ActiveConductor {
   conductor_id: string;

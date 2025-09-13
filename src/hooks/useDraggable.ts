@@ -1,86 +1,112 @@
-import { useRef, useState } from "react";
-import type React from "react";
+import React, { useState, useCallback } from 'react';
 
-export type DragPosition = { top: number; left?: number; right?: number };
+export interface DragPosition {
+  top?: number;
+  left?: number;
+  right?: number;
+  bottom?: number;
+}
 
-export function useDraggable(initial: DragPosition = { top: 16, right: 16 }) {
-  const [position, setPosition] = useState<DragPosition>(initial);
-  const dragging = useRef(false);
-  const offset = useRef({ x: 0, y: 0 });
+interface UseDraggableOptions {
+  top?: number;
+  left?: number;
+  right?: number;
+  bottom?: number;
+}
 
-  const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    dragging.current = true;
-    const el = e.currentTarget;
-    const rect = el.getBoundingClientRect();
-    offset.current = {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-  };
+export const useDraggable = (initialPosition: UseDraggableOptions = {}) => {
+  const [position, setPosition] = useState<DragPosition>({
+    top: initialPosition.top,
+    left: initialPosition.left,
+    right: initialPosition.right,
+    bottom: initialPosition.bottom,
+  });
 
-  const onMouseMove = (e: MouseEvent) => {
-    if (!dragging.current) return;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const card = document.getElementById("draggable-distance-card");
-    if (!card) return;
-    const cardRect = card.getBoundingClientRect();
-    let left = e.clientX - offset.current.x;
-    let top = e.clientY - offset.current.y;
-    left = Math.max(0, Math.min(left, width - cardRect.width));
-    top = Math.max(0, Math.min(top, height - cardRect.height));
-    setPosition({ left, top });
-  };
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
 
-  const onMouseUp = () => {
-    dragging.current = false;
-    document.removeEventListener("mousemove", onMouseMove);
-    document.removeEventListener("mouseup", onMouseUp);
-  };
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart({ x: e.clientX, y: e.clientY });
+    e.preventDefault();
+  }, []);
 
-  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
-    dragging.current = true;
-    const el = e.currentTarget;
-    const rect = el.getBoundingClientRect();
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    if (!isDragging || !dragStart) return;
+
+    const deltaX = e.clientX - dragStart.x;
+    const deltaY = e.clientY - dragStart.y;
+
+    setPosition(prev => ({
+      ...prev,
+      top: prev.top !== undefined ? (prev.top + deltaY) : undefined,
+      left: prev.left !== undefined ? (prev.left + deltaX) : undefined,
+      right: prev.right !== undefined ? (prev.right - deltaX) : undefined,
+      bottom: prev.bottom !== undefined ? (prev.bottom - deltaY) : undefined,
+    }));
+
+    setDragStart({ x: e.clientX, y: e.clientY });
+  }, [isDragging, dragStart]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+    setDragStart(null);
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    setIsDragging(true);
     const touch = e.touches[0];
-    offset.current = {
-      x: touch.clientX - rect.left,
-      y: touch.clientY - rect.top,
-    };
-    document.addEventListener("touchmove", onTouchMove);
-    document.addEventListener("touchend", onTouchEnd);
-  };
+    setDragStart({ x: touch.clientX, y: touch.clientY });
+  }, []);
 
-  const onTouchMove = (e: TouchEvent) => {
-    if (!dragging.current) return;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    const card = document.getElementById("draggable-distance-card");
-    if (!card) return;
-    const cardRect = card.getBoundingClientRect();
-    let left = e.touches[0].clientX - offset.current.x;
-    let top = e.touches[0].clientY - offset.current.y;
-    left = Math.max(0, Math.min(left, width - cardRect.width));
-    top = Math.max(0, Math.min(top, height - cardRect.height));
-    setPosition({ left, top });
-  };
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (!isDragging || !dragStart) return;
 
-  const onTouchEnd = () => {
-    dragging.current = false;
-    document.removeEventListener("touchmove", onTouchMove);
-    document.removeEventListener("touchend", onTouchEnd);
-  };
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - dragStart.x;
+    const deltaY = touch.clientY - dragStart.y;
 
-  const reset = () => setPosition(initial);
+    setPosition(prev => ({
+      ...prev,
+      top: prev.top !== undefined ? (prev.top + deltaY) : undefined,
+      left: prev.left !== undefined ? (prev.left + deltaX) : undefined,
+      right: prev.right !== undefined ? (prev.right - deltaX) : undefined,
+      bottom: prev.bottom !== undefined ? (prev.bottom - deltaY) : undefined,
+    }));
+
+    setDragStart({ x: touch.clientX, y: touch.clientY });
+  }, [isDragging, dragStart]);
+
+  const handleTouchEnd = useCallback(() => {
+    setIsDragging(false);
+    setDragStart(null);
+  }, []);
+
+  // Adicionar event listeners globais quando dragging
+  React.useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
+      };
+    }
+  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
+
+  const eventHandlers = {
+    onMouseDown: handleMouseDown,
+    onTouchStart: handleTouchStart,
+  };
 
   return {
     position,
-    eventHandlers: {
-      onMouseDown,
-      onTouchStart,
-    },
-    reset,
-  } as const;
-}
+    eventHandlers,
+    isDragging,
+  };
+};

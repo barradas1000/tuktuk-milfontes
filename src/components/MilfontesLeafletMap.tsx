@@ -133,7 +133,7 @@ const pointsOfInterest = [
   {
     name: "Estátua do Arcanjo",
     category: "História e Cultura",
-    coords: [37.7192726, -8.7900765, 300],
+    coords: [37.7192726, -8.7900765],
     description: "poi.arcanjo.description",
     image:
       "https://tuktuk-milfontes.vercel.app/lovable-uploads/Est%C3%A1tua%20do%20Arcanjo.jpeg",

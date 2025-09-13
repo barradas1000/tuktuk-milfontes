@@ -1,28 +1,55 @@
+// /components/admin/AdminCalendar/WhatsappMessageModal.tsx
 import React from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { AdminReservation } from "@/types/adminReservations";
+import { getTourDisplayName, getClientLanguage } from "./helpers";
 
 interface WhatsappMessageModalProps {
   isOpen: boolean;
-  message: string;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
+  reservation: AdminReservation | null;
+  editableMessage: string;
+  setEditableMessage: (msg: string) => void;
   onSend: () => void;
 }
 
-const WhatsappMessageModal: React.FC<WhatsappMessageModalProps> = ({
+const WhatsappMessageModal = ({
   isOpen,
-  message,
-  onClose,
+  onOpenChange,
+  reservation,
+  editableMessage,
+  setEditableMessage,
   onSend,
-}) => {
-  if (!isOpen) return null;
+}: WhatsappMessageModalProps) => {
+  if (!reservation) return null;
+
+  const language = getClientLanguage(reservation);
+
   return (
-    <div className="modal">
-      <div className="modal-content">
-        <h3>Enviar mensagem pelo WhatsApp</h3>
-        <textarea value={message} readOnly />
-        <button onClick={onSend}>Enviar</button>
-        <button onClick={onClose}>Fechar</button>
-      </div>
-    </div>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Mensagem WhatsApp</DialogTitle>
+        </DialogHeader>
+        <p>
+          Enviar mensagem para{" "}
+          <strong>{reservation.customer_name}</strong> ({language}) sobre{" "}
+          <em>{getTourDisplayName(reservation.tour_type)}</em>.
+        </p>
+        <Textarea
+          value={editableMessage}
+          onChange={(e) => setEditableMessage(e.target.value)}
+        />
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => onOpenChange(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={onSend}>Enviar</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

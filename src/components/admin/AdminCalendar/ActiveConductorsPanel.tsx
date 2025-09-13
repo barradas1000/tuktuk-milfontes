@@ -7,7 +7,6 @@ interface ActiveConductorsPanelProps {
   loading: boolean;
   error: string | null;
   updateConductorStatus: (conductorId: string, newStatus: boolean) => Promise<boolean>;
-  getCurrentWhatsapp: () => string;
   renderAfterActiveBlock?: (params: {
     activeConductors: string[];
     activeConductorsWithNames: { id: string; name: string }[];
@@ -19,10 +18,9 @@ const ActiveConductorsPanel: React.FC<ActiveConductorsPanelProps> = ({
   loading,
   error,
   updateConductorStatus,
-  getCurrentWhatsapp,
   renderAfterActiveBlock,
 }) => {
-  const activeConductors = conductors.filter(c => c.is_active);
+  const activeConductors = conductors ? conductors.filter(c => c.is_active) : [];
   const activeConductorIds = activeConductors.map(c => c.conductor_id);
   const activeConductorsWithNames = activeConductors.map(c => ({ id: c.conductor_id, name: c.name || '' }));
 
@@ -37,7 +35,7 @@ const ActiveConductorsPanel: React.FC<ActiveConductorsPanelProps> = ({
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : (
-          conductors.map((c) => (
+          (conductors ?? []).map((c) => (
             <div
               key={c.id}
               className="flex items-center gap-3 bg-white rounded-lg px-4 py-2 shadow-sm border border-gray-200"
@@ -66,10 +64,36 @@ const ActiveConductorsPanel: React.FC<ActiveConductorsPanelProps> = ({
         )}
       </div>
 
-      <div className="mt-4 text-base text-purple-900 font-semibold">
-        WhatsApp responsável:{" "}
-        <span className="text-purple-700">{getCurrentWhatsapp()}</span>
-      </div>
+      {activeConductors.length > 0 && (
+        <div className="mt-6 w-full">
+          <h3 className="text-lg font-semibold text-purple-900 mb-3">
+            WhatsApp dos Condutores Ativos
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {activeConductors.map((conductor) => (
+              <div
+                key={conductor.id}
+                className="bg-white rounded-lg p-4 shadow-md border border-purple-200"
+              >
+                <h4 className="font-bold text-purple-800 text-lg">
+                  {conductor.name || "Condutor sem nome"}
+                </h4>
+                <p className="text-gray-600 mt-2">
+                  Status:{" "}
+                  <span className="text-purple-700 font-medium">
+                    {conductor.is_available ? "Disponível" : "Ocupado"}
+                  </span>
+                </p>
+                <div className="mt-2">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Ativo
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {renderAfterActiveBlock &&
         renderAfterActiveBlock({

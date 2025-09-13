@@ -18,7 +18,7 @@ interface BlockHourModalProps {
   timeSlots: string[];
   blockTime: (date: Date, time: string, reason: string) => void;
   blockTimeRange: (date: Date, start: string, end: string, reason: string) => void;
-  getAllDayBlocks: (date: Date) => any[]; // Adjust type as per your BlockedPeriod type
+  getAllDayBlocks: (date: Date) => { id: string; date: string; startTime?: string; reason?: string }[]; // Adjust type as per your BlockedPeriod type
   unblockTime: (date: Date, time: string) => void;
 }
 
@@ -39,6 +39,19 @@ const BlockHourModal = ({
   getAllDayBlocks,
   unblockTime,
 }: BlockHourModalProps) => {
+  // Validação adicional de props
+  if (!timeSlots) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Erro de Configuração</DialogTitle>
+          </DialogHeader>
+          <p className="text-red-500">Configuração de horários não encontrada.</p>
+        </DialogContent>
+      </Dialog>
+    );
+  }
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[80vh] overflow-hidden">
@@ -73,7 +86,7 @@ const BlockHourModal = ({
                 onChange={(e) => setBlockHourStart(e.target.value)}
                 className="border rounded p-2 flex-1"
               >
-                {timeSlots.map((slot) => (
+                {timeSlots && timeSlots.map((slot) => (
                   <option key={slot} value={slot}>
                     {slot}
                   </option>
@@ -122,7 +135,7 @@ const BlockHourModal = ({
                 onChange={(e) => setBlockHourStart(e.target.value)}
                 className="border rounded p-2 flex-1"
               >
-                {timeSlots.map((slot) => (
+                {timeSlots && timeSlots.map((slot) => (
                   <option key={slot} value={slot}>
                     {slot}
                   </option>
@@ -134,7 +147,7 @@ const BlockHourModal = ({
                 onChange={(e) => setBlockHourEnd(e.target.value)}
                 className="border rounded p-2 flex-1"
               >
-                {timeSlots.map((slot) => (
+                {timeSlots && timeSlots.map((slot) => (
                   <option key={slot} value={slot}>
                     {slot}
                   </option>
@@ -183,6 +196,7 @@ const BlockHourModal = ({
                 Horários bloqueados:
               </h4>
               {blockDate &&
+                getAllDayBlocks &&
                 getAllDayBlocks(blockDate).filter((b) => b.startTime)
                   .length > 3 && (
                   <span className="text-xs text-gray-500">
@@ -191,6 +205,7 @@ const BlockHourModal = ({
                 )}
             </div>
             {blockDate &&
+            getAllDayBlocks &&
             getAllDayBlocks(blockDate).filter((b) => b.startTime)
               .length === 0 ? (
               <div className="text-gray-500 text-sm text-center py-4">
@@ -199,6 +214,7 @@ const BlockHourModal = ({
             ) : (
               <div className="space-y-2 max-h-48 overflow-y-auto border rounded p-2 bg-gray-25">
                 {blockDate &&
+                  getAllDayBlocks &&
                   [
                     ...new Map(
                       getAllDayBlocks(blockDate)

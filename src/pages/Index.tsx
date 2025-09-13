@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Map,
   Heart,
@@ -48,6 +49,7 @@ import VideoModal from "../components/VideoModal";
 const Index = () => {
   console.log("Index component rendering");
   const { t } = useTranslation();
+  const { toast } = useToast();
 
   const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
@@ -144,11 +146,12 @@ const Index = () => {
 
   const handleWhatsAppContact = () => {
     const message = t("reservation.simpleContactMessage");
-    const phoneNumber = "351968784043";
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
-      message
-    )}`;
-    window.open(whatsappUrl, "_blank");
+    // Número removido conforme solicitado - o contacto deve ser feito apenas através do formulário de reserva
+    toast({
+      title: "Contacto não disponível",
+      description: "Por favor, utilize o formulário de reserva para entrar em contacto connosco.",
+      variant: "destructive",
+    });
   };
 
   return (

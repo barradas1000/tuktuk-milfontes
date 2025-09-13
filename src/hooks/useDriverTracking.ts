@@ -1,197 +1,188 @@
-import { useEffect, useRef, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 
-// Haversine em metros
-function distMeters(lat1: number, lon1: number, lat2: number, lon2: number) {
-  const R = 6371000;
-  const toRad = (d: number) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+interface TrackingOptions {
+  minIntervalMs: number;
+  minDeltaMeters: number;
+  trackingEnabled: boolean;
 }
 
-export type UseDriverTrackingOpts = {
-  minIntervalMs?: number; // default 3000 ms
-  minDeltaMeters?: number; // default 8 m
-  highAccuracy?: boolean; // default true
-  trackingEnabled?: boolean; // default true - controla se o rastreamento está ativo
-};
+interface TrackingState {
+  error: string | null;
+  lastUpdateAt: Date | null;
+  isUpdating: boolean;
+}
 
-export function useDriverTracking(
-  conductorId: string | null,
-  enabled: boolean,
-  opts: UseDriverTrackingOpts = {}
-) {
-  const {
-    minIntervalMs = 3000, // 3 segundos
-    minDeltaMeters = 2, // só envia se mover pelo menos 2 metros
-    highAccuracy = true,
-    trackingEnabled = true, // por padrão, o rastreamento está ativo
-  } = opts;
+export const useDriverTracking = (
+  conductorId: string,
+  isTracking: boolean,
+  options: TrackingOptions
+) => {
+  const [state, setState] = useState<TrackingState>({
+    error: null,
+    lastUpdateAt: null,
+    isUpdating: false,
+  });
 
-  const watchIdRef = useRef<number | null>(null);
-  const lastSentRef = useRef<number>(0);
-  const lastPosRef = useRef<GeolocationPosition | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [lastUpdateAt, setLastUpdateAt] = useState<number | null>(null);
+  const [lastPosition, setLastPosition] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
 
-  // Cleanup global ao montar/desmontar o hook
-  useEffect(() => {
-    return () => {
-      if (watchIdRef.current !== null && navigator?.geolocation?.clearWatch) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
-    };
+  const [watchId, setWatchId] = useState<number | null>(null);
+
+  const calculateDistance = useCallback((lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371e3; // Earth's radius in meters
+    const φ1 = lat1 * Math.PI / 180;
+    const φ2 = lat2 * Math.PI / 180;
+    const Δφ = (lat2 - lat1) * Math.PI / 180;
+    const Δλ = (lng2 - lng1) * Math.PI / 180;
+
+    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
   }, []);
 
-  useEffect(() => {
-    // Se desligar, tracking desativado ou não tiver id, parar qualquer watch ativo
-    if (!enabled || !trackingEnabled || !conductorId) {
-      if (watchIdRef.current !== null && navigator?.geolocation?.clearWatch) {
-        console.log(
-          `[useDriverTracking] Limpando watchPosition (ID: ${watchIdRef.current}). Causa: Tracking desativado ou ID do condutor ausente.`
-        );
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
-      return;
-    }
+  const updateLocation = useCallback(async (
+    latitude: number,
+    longitude: number,
+    accuracy: number
+  ) => {
+    if (!conductorId) return;
 
-    console.log("[useDriverTracking] Tentando iniciar watchPosition...", {
-      enabled,
-      conductorId,
-    });
-    if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
-      setError("Geolocalização não suportada neste dispositivo/navegador.");
-      return;
-    }
+    // Check if position changed enough
+    if (lastPosition) {
+      const distance = calculateDistance(
+        lastPosition.lat,
+        lastPosition.lng,
+        latitude,
+        longitude
+      );
 
-    // Em mobile, geolocalização requer HTTPS (exceto localhost)
-    if (!isSecureContext && location.hostname !== "localhost") {
-      setError("Geolocalização requer HTTPS em dispositivos móveis.");
-      return;
-    }
-
-    const onSuccess = async (pos: GeolocationPosition) => {
-      const now = Date.now();
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-
-      // Validação das coordenadas
-      const isValid =
-        typeof lat === "number" &&
-        typeof lng === "number" &&
-        !isNaN(lat) &&
-        !isNaN(lng) &&
-        lat >= -90 &&
-        lat <= 90 &&
-        lng >= -180 &&
-        lng <= 180;
-
-      if (!isValid) {
-        setError("Coordenadas inválidas recebidas do dispositivo.");
-        console.warn("[useDriverTracking] Coordenadas inválidas:", {
-          lat,
-          lng,
-        });
-        alert(
-          "Erro: Coordenadas inválidas recebidas do dispositivo. Verifique permissões e GPS."
-        );
+      if (distance < options.minDeltaMeters) {
+        console.log('[useDriverTracking] Position change too small, skipping update');
         return;
       }
+    }
 
-      // Throttling: só envia se mudou o suficiente ou passou tempo mínimo
-      if (lastPosRef.current) {
-        const prev = lastPosRef.current.coords;
-        const delta = distMeters(prev.latitude, prev.longitude, lat, lng);
-        if (
-          delta < minDeltaMeters &&
-          now - lastSentRef.current < minIntervalMs
-        ) {
-          // Ignora update
-          return;
-        }
+    setState(prev => ({ ...prev, isUpdating: true }));
+
+    try {
+      const timestamp = new Date().toISOString();
+      const { error } = await supabase
+        .from('active_conductors')
+        .update({
+          current_latitude: latitude,
+          current_longitude: longitude,
+          accuracy: accuracy,
+          updated_at: timestamp,
+        })
+        .eq('conductor_id', conductorId)
+        .eq('is_active', true);
+
+      if (error) {
+        console.error('[useDriverTracking] Error updating location:', error);
+        setState(prev => ({
+          ...prev,
+          error: error.message,
+          isUpdating: false,
+        }));
+      } else {
+        setState(prev => ({
+          ...prev,
+          error: null,
+          lastUpdateAt: new Date(),
+          isUpdating: false,
+        }));
+        setLastPosition({ lat: latitude, lng: longitude });
+        console.log('[useDriverTracking] Location updated successfully');
       }
+    } catch (err) {
+      console.error('[useDriverTracking] Unexpected error:', err);
+      setState(prev => ({
+        ...prev,
+        error: 'Erro inesperado ao atualizar localização',
+        isUpdating: false,
+      }));
+    }
+  }, [conductorId, lastPosition, calculateDistance, options.minDeltaMeters]);
 
-      lastPosRef.current = pos;
-      lastSentRef.current = now;
+  const startTracking = useCallback(() => {
+    if (watchId !== null || !navigator.geolocation) {
+      return;
+    }
 
-      // [INÍCIO] Envio de coordenadas desativado - Para reativar, descomente todo este bloco
-      // console.log(
-      //   `[useDriverTracking] Enviando localização para active_conductors:`,
-      //   {
-      //     latitude: lat,
-      //     longitude: lng,
-      //     conductorId,
-      //   }
-      // );
+    console.log('[useDriverTracking] Starting location tracking');
 
-      // const { error: updErr } = await supabase.from("active_conductors").upsert(
-      //   {
-      //     conductor_id: conductorId,
-      //     current_latitude: lat,
-      //     current_longitude: lng,
-      //     is_active: true,
-      //     is_available: true, // Ajuste conforme lógica de disponibilidade
-      //     status: "available",
-      //     updated_at: new Date(now).toISOString(),
-      //     last_seen: new Date(now).toISOString(),
-      //   },
-      //   { onConflict: "conductor_id" }
-      // );
-
-      // if (updErr) {
-      //   console.error("[useDriverTracking] Erro ao upsert Supabase:", updErr);
-      //   setError(updErr.message);
-      //   alert("Erro ao enviar localização para Supabase: " + updErr.message);
-      // } else {
-      //   setError(null);
-      //   setLastUpdateAt(now);
-      // }
-      // [FIM] Envio de coordenadas desativado
-
-      // Simular sucesso para manter a funcionalidade da interface
-      console.log(
-        `[useDriverTracking] [SIMULADO] Localização obtida (não enviada para Supabase):`,
-        {
-          latitude: lat,
-          longitude: lng,
-          conductorId,
+    const id = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude, accuracy } = position.coords;
+        console.log('[useDriverTracking] Received position:', latitude, longitude);
+        updateLocation(latitude, longitude, accuracy);
+      },
+      (error) => {
+        console.error('[useDriverTracking] Geolocation error:', error);
+        let errorMessage = '';
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Permissão de localização negada';
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Localização indisponível';
+            break;
+          case error.TIMEOUT:
+            errorMessage = 'Timeout ao obter localização';
+            break;
+          default:
+            errorMessage = 'Erro desconhecido de geolocalização';
+            break;
         }
-      );
-      setError(null);
-      setLastUpdateAt(now);
-    };
-
-    const onError = (e: GeolocationPositionError) => {
-      setError(e.message || "Erro de geolocalização");
-      alert("Erro de geolocalização: " + (e.message || "Erro desconhecido"));
-    };
-
-    const options: PositionOptions = {
-      enableHighAccuracy: highAccuracy,
-      maximumAge: 2000, // Equilíbrio: permite cache de até 2s
-      timeout: 7000, // Equilíbrio: espera até 7s por fix
-    };
-
-    watchIdRef.current = navigator.geolocation.watchPosition(
-      onSuccess,
-      onError,
-      options
+        setState(prev => ({ ...prev, error: errorMessage }));
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: options.minIntervalMs * 2,
+        maximumAge: options.minIntervalMs,
+      }
     );
 
-    // Cleanup quando dependências mudarem
-    return () => {
-      if (watchIdRef.current !== null && navigator?.geolocation?.clearWatch) {
-        navigator.geolocation.clearWatch(watchIdRef.current);
-        watchIdRef.current = null;
-      }
-    };
-  }, [enabled, conductorId, minIntervalMs, minDeltaMeters, highAccuracy, trackingEnabled]);
+    setWatchId(id);
+  }, [watchId, updateLocation, options.minIntervalMs]);
 
-  return { error, lastUpdateAt };
-}
+  const stopTracking = useCallback(() => {
+    if (watchId !== null) {
+      console.log('[useDriverTracking] Stopping location tracking');
+      navigator.geolocation.clearWatch(watchId);
+      setWatchId(null);
+    }
+  }, [watchId]);
+
+  useEffect(() => {
+    setState(prev => ({ ...prev, error: null }));
+
+    if (isTracking && options.trackingEnabled && conductorId) {
+      startTracking();
+    } else {
+      stopTracking();
+    }
+
+    return () => {
+      stopTracking();
+    };
+  }, [
+    isTracking,
+    options.trackingEnabled,
+    conductorId,
+    startTracking,
+    stopTracking
+  ]);
+
+  useEffect(() => {
+    console.log('[useDriverTracking] State changed:', state);
+  }, [state]);
+
+  return state;
+};
