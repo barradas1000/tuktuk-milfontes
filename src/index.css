@@ -144,3 +144,68 @@ object {
 .leaflet-container ~ div[data-radix-dialog-content] {
   z-index: 10001 !important;
 }
+
+/* Scrollbar personalizado para melhor aparência em PCs */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+  background-clip: content-box;
+}
+
+/* Classes utilitárias para scroll lateral */
+.overflow-x-scroll-custom {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
+/* Garantir que tabelas e grids possam ter scroll lateral */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.grid-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Pulse scale animation para botões */
+@keyframes pulseScale {
+  0% { transform: scale(1); background: #2196f3; }
+  50% { transform: scale(1.18); background: #00bfff; }
+  100% { transform: scale(1); background: #2196f3; }
+}
+
+.animate-pulse-scale {
+  animation: pulseScale 1.2s ease 0s infinite normal none running;
+}

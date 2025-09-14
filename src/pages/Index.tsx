@@ -155,7 +155,7 @@ const Index = () => {
   };
 
   return (
-    <div className="h-screen-safe bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="h-screen-safe bg-gradient-to-br from-slate-50 to-blue-50 overflow-x-scroll-custom">
       {/* Language Selector */}
       <LanguageSelector />
 

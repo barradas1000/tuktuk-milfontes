@@ -5,4 +5,5 @@ export interface Conductor {
   session_start: string | null;
   created_at: string | null;
   name: string;
+  whatsapp?: string;
 }

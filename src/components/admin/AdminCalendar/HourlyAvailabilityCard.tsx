@@ -35,7 +35,7 @@ const HourlyAvailabilityCard = ({
               <p>Nenhum slot de disponibilidade para este dia</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 overflow-x-scroll-custom scrollbar-hide">
               {availabilitySlots.map((slot) => {
                 const isAvailable = slot.status === 'available';
                 return (

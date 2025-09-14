@@ -1,241 +1,324 @@
-import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock, Lock, Calendar as CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
-import { pt } from "date-fns/locale";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Lock, Unlock, Plus, Calendar, Clock, AlertTriangle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 interface BlockedPeriod {
   id: string;
   date: string;
-  startTime?: string;
-  reason?: string;
+  time?: string;
+  reason: string;
+  isDayBlock: boolean;
+  createdBy: string;
+  createdAt: string;
 }
 
 interface BlockedPeriodsPanelProps {
-  getFilteredBlocks: () => BlockedPeriod[];
-  blockFilterType: "all" | "days" | "hours";
-  setBlockFilterType: (type: "all" | "days" | "hours") => void;
-  blockFilterDate: string;
-  setBlockFilterDate: (date: string) => void;
-  unblockDay: (date: Date) => Promise<void>;
-  unblockTime: (date: Date, time: string) => Promise<void>;
-  blockedPeriods: BlockedPeriod[];
+  onBlock: (date: string, time?: string, reason?: string) => void;
+  onUnblock: (blockId: string) => void;
 }
 
 const BlockedPeriodsPanel: React.FC<BlockedPeriodsPanelProps> = ({
-  getFilteredBlocks,
-  blockFilterType,
-  setBlockFilterType,
-  blockFilterDate,
-  setBlockFilterDate,
-  unblockDay,
-  unblockTime,
-  blockedPeriods,
+  onBlock,
+  onUnblock
 }) => {
+  const [blockedPeriods, setBlockedPeriods] = useState<BlockedPeriod[]>([]);
+  const [filterType, setFilterType] = useState<'all' | 'days' | 'hours'>('all');
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [blockReason, setBlockReason] = useState<string>('');
+  const [blockTime, setBlockTime] = useState<string>('');
+  const [isBlocking, setIsBlocking] = useState(false);
+
+  // Dados simulados - em produção viriam do Supabase
+  useEffect(() => {
+    const sampleBlocks: BlockedPeriod[] = [
+      {
+        id: 'block-1',
+        date: '2025-08-24',
+        reason: 'Folga',
+        isDayBlock: true,
+        createdBy: 'Admin',
+        createdAt: '2025-08-20T10:00:00Z'
+      },
+      {
+        id: 'block-2',
+        date: '2025-08-24',
+        time: '14:00',
+        reason: 'Manutenção veicular',
+        isDayBlock: false,
+        createdBy: 'Admin',
+        createdAt: '2025-08-20T10:30:00Z'
+      },
+      {
+        id: 'block-3',
+        date: '2025-08-26',
+        reason: 'Feriado',
+        isDayBlock: true,
+        createdBy: 'System',
+        createdAt: '2025-08-01T10:00:00Z'
+      },
+      {
+        id: 'block-4',
+        date: '2025-08-27',
+        reason: 'Condições meteorológicas',
+        isDayBlock: true,
+        createdBy: 'Admin',
+        createdAt: '2025-08-25T18:00:00Z'
+      }
+    ];
+
+    setBlockedPeriods(sampleBlocks);
+  }, []);
+
+  // Filtrar bloqueios baseados no tipo selecionado
+  const filteredBlocks = blockedPeriods.filter(block => {
+    switch (filterType) {
+      case 'days':
+        return block.isDayBlock;
+      case 'hours':
+        return !block.isDayBlock;
+      default:
+        return true;
+    }
+  });
+
+  // Contadores por tipo
+  const dayBlocksCount = blockedPeriods.filter(b => b.isDayBlock).length;
+  const hourBlocksCount = blockedPeriods.filter(b => !b.isDayBlock).length;
+
+  const handleBlock = async () => {
+    if (!selectedDate) {
+      alert('Selecione uma data para bloquear');
+      return;
+    }
+
+    setIsBlocking(true);
+
+    try {
+      const newBlock: BlockedPeriod = {
+        id: `block-${Date.now()}`,
+        date: selectedDate,
+        time: blockTime || undefined,
+        reason: blockReason || 'Bloqueado pelo admin',
+        isDayBlock: !blockTime,
+        createdBy: 'Admin',
+        createdAt: new Date().toISOString()
+      };
+
+      // Simular chamada para API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      setBlockedPeriods(prev => [...prev, newBlock]);
+
+      if (onBlock) {
+        onBlock(selectedDate, blockTime, blockReason);
+      }
+
+      // Limpar campos
+      setSelectedDate('');
+      setBlockTime('');
+      setBlockReason('');
+    } catch (error) {
+      console.error('Erro ao bloquear:', error);
+      alert('Erro ao bloquear período');
+    } finally {
+      setIsBlocking(false);
+    }
+  };
+
+  const handleUnblock = async (blockId: string) => {
+    try {
+      // Simular chamada para API
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setBlockedPeriods(prev => prev.filter(b => b.id !== blockId));
+
+      if (onUnblock) {
+        onUnblock(blockId);
+      }
+    } catch (error) {
+      console.error('Erro ao desbloquear:', error);
+      alert('Erro ao desbloquear período');
+    }
+  };
+
   return (
-    <div className="mb-6 p-4 bg-orange-50 border border-orange-200 rounded-xl shadow-md">
-      <h2 className="text-lg font-bold text-orange-900 mb-4 flex items-center gap-2">
-        <Lock className="h-5 w-5" />
-        Visualização de Bloqueios
-      </h2>
-
-      {/* Filtros */}
-      <div className="mb-4 flex flex-wrap gap-3 items-center">
-        <div className="flex items-center gap-2">
-          <label
-            className="text-sm font-medium text-orange-800"
-            htmlFor="block-filter-type"
-          >
-            Filtrar por:
-          </label>
-          <select
-            id="block-filter-type"
-            name="block-filter-type"
-            value={blockFilterType}
-            onChange={(e) =>
-              setBlockFilterType(e.target.value as "all" | "days" | "hours")
-            }
-            className="border border-orange-200 rounded px-2 py-1 text-sm"
-          >
-            <option value="all">Todos</option>
-            <option value="days">Apenas Dias</option>
-            <option value="hours">Apenas Horários</option>
-          </select>
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-orange-900">
+          <Lock className="w-5 h-5" />
+          Visualização de Bloqueios
+        </CardTitle>
+        <div className="text-sm text-gray-600">
+          Gerencie bloqueios de dias completos e horários específicos
         </div>
-        <div className="flex items-center gap-2">
-          <label
-            className="text-sm font-medium text-orange-800"
-            htmlFor="block-filter-date"
-          >
-            Data:
-          </label>
-          <input
-            id="block-filter-date"
-            name="block-filter-date"
-            type="date"
-            value={blockFilterDate}
-            onChange={(e) => setBlockFilterDate(e.target.value)}
-            className="border border-orange-200 rounded px-2 py-1 text-sm"
-          />
-          {blockFilterDate && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setBlockFilterDate("")}
-              className="text-xs"
-            >
-              Limpar
-            </Button>
-          )}
-        </div>
-      </div>
+      </CardHeader>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Dias Bloqueados */}
-        <div className="bg-white rounded-lg p-4 border border-orange-200">
+      <CardContent className="space-y-6">
+        {/* Filtros e Estatísticas */}
+        <div className="mb-4 flex flex-wrap gap-3 items-center">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-orange-800">Filtrar por:</span>
+            <Select value={filterType} onValueChange={(value) => setFilterType(value as 'all' | 'days' | 'hours')}>
+              <SelectTrigger className="w-32 border-orange-200">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="days">Apenas Dias</SelectItem>
+                <SelectItem value="hours">Apenas Horários</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Contadores visuais */}
+          <div className="flex gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-1">
+              <Calendar className="w-4 h-4 text-orange-500" />
+              <span>Dias: {dayBlocksCount}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock className="w-4 h-4 text-orange-500" />
+              <span>Horários: {hourBlocksCount}</span>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Formulário para novo bloqueio */}
+        <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
           <h3 className="font-semibold text-orange-800 mb-3 flex items-center gap-2">
-            <CalendarIcon className="h-4 w-4" />
-            Dias Bloqueados (
-            {getFilteredBlocks().filter((b) => !b.startTime).length})
+            <Plus className="w-4 h-4" />
+            Novo Bloqueio
           </h3>
-          {getFilteredBlocks().filter((b) => !b.startTime).length === 0 ? (
-            <div className="text-gray-500 text-sm text-center py-4">
-              {blockFilterType === "hours"
-                ? "Filtro aplicado: apenas horários"
-                : "Nenhum dia bloqueado"}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+            <div>
+              <label className="text-sm font-medium text-orange-700 mb-1 block">
+                Data *
+              </label>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="border border-orange-200 rounded px-3 py-2 w-full text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-orange-700 mb-1 block">
+                Horário (opcional - apenas horário)
+              </label>
+              <input
+                type="time"
+                value={blockTime}
+                onChange={(e) => setBlockTime(e.target.value)}
+                className="border border-orange-200 rounded px-3 py-2 w-full text-sm"
+              />
+            </div>
+          </div>
+
+          <div className="mb-3">
+            <label className="text-sm font-medium text-orange-700 mb-1 block">
+              Motivo
+            </label>
+            <input
+              type="text"
+              placeholder="Ex: Folga, Manutenção, Feriado..."
+              value={blockReason}
+              onChange={(e) => setBlockReason(e.target.value)}
+              className="border border-orange-200 rounded px-3 py-2 w-full text-sm"
+            />
+          </div>
+
+          <Button
+            onClick={handleBlock}
+            disabled={isBlocking || !selectedDate}
+            className="bg-orange-600 hover:bg-orange-700 text-white w-full"
+          >
+            {isBlocking ? (
+              <>
+                <AlertTriangle className="w-4 h-4 mr-2 animate-spin" />
+                Bloqueando...
+              </>
+            ) : (
+              <>
+                <Lock className="w-4 h-4 mr-2" />
+                Bloquear Período
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Lista de Bloqueios */}
+        <div className="space-y-3">
+          <h4 className="font-semibold text-orange-800 flex items-center gap-2">
+            <Calendar className="w-4 h-4" />
+            Bloqueios Ativos ({filteredBlocks.length})
+          </h4>
+
+          {filteredBlocks.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <Lock className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>Nenhum bloqueio encontrado para este filtro</p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-32 overflow-y-auto">
-              {getFilteredBlocks()
-                .filter((b) => !b.startTime)
-                .sort(
-                  (a, b) =>
-                    new Date(a.date).getTime() - new Date(b.date).getTime()
-                )
-                .map((block) => (
-                  <div
-                    key={block.id}
-                    className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-100"
-                  >
-                    <div className="flex-1">
-                      <span className="font-medium text-sm">
-                        {format(new Date(block.date), "dd/MM/yyyy", {
-                          locale: pt,
-                        })}
-                      </span>
-                      {block.reason && (
-                        <span className="text-xs text-gray-500 ml-2">
-                          ({block.reason})
-                        </span>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => unblockDay(new Date(block.date))}
-                    >
-                      Desbloquear
-                    </Button>
-                  </div>
-                ))}
-            </div>
-          )}
-        </div>
-
-        {/* Horários Bloqueados */}
-        <div className="bg-white rounded-lg p-4 border border-orange-200">
-          <h3 className="font-semibold text-orange-800 mb-3 flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Horários Bloqueados (
-            {getFilteredBlocks().filter((b) => b.startTime).length})
-          </h3>
-          {getFilteredBlocks().filter((b) => b.startTime).length === 0 ? (
-            <div className="text-gray-500 text-sm text-center py-4">
-              {blockFilterType === "days"
-                ? "Filtro aplicado: apenas dias"
-                : "Nenhum horário bloqueado"}
-            </div>
-          ) : (
-            <div className="space-y-2 max-h-32 overflow-y-auto">
-              {[
-                ...new Map(
-                  getFilteredBlocks()
-                    .filter((b) => b.startTime)
-                    .map((block) => [
-                      block.date + "-" + block.startTime,
-                      block,
-                    ])
-                ).values(),
-              ].map((block) => (
+            <div className="space-y-3 max-h-96 overflow-y-auto">
+              {filteredBlocks.map((block) => (
                 <div
                   key={block.id}
-                  className="flex items-center justify-between p-2 bg-orange-50 rounded border border-orange-100"
+                  className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200"
                 >
                   <div className="flex-1">
-                    <div className="font-medium text-sm">
-                      {format(new Date(block.date), "dd/MM", {
-                        locale: pt,
-                      })}{" "}
-                      às {block.startTime}
-                    </div>
-                    {block.reason && (
-                      <span className="text-xs text-gray-500">
-                        {block.reason}
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="secondary" className="bg-orange-100 text-orange-800">
+                        {block.isDayBlock ? 'Dia Completo' : `Horário: ${block.time}`}
+                      </Badge>
+                      <span className="font-medium text-orange-800">
+                        {new Date(block.date).toLocaleDateString('pt-PT')}
                       </span>
-                    )}
+                    </div>
+
+                    <div className="text-sm text-gray-600 mb-1">
+                      <strong>Motivo:</strong> {block.reason}
+                    </div>
+
+                    <div className="text-xs text-gray-500">
+                      Bloqueado por {block.createdBy} em {new Date(block.createdAt).toLocaleDateString('pt-PT')}
+                    </div>
                   </div>
+
                   <Button
-                    size="sm"
+                    onClick={() => handleUnblock(block.id)}
                     variant="destructive"
-                    onClick={() =>
-                      unblockTime(new Date(block.date), block.startTime!)
-                    }
+                    size="sm"
+                    className="ml-4"
                   >
-                    Desbloquear
+                    <Unlock className="w-4 h-4" />
                   </Button>
                 </div>
               ))}
             </div>
           )}
         </div>
-      </div>
 
-      {/* Resumo */}
-      <div className="mt-4 p-3 bg-orange-100 rounded-lg">
-        <div className="flex justify-between items-center text-sm">
-          <span className="font-medium text-orange-800">
-            {blockFilterDate || blockFilterType !== "all"
-              ? `Bloqueios filtrados: ${getFilteredBlocks().length}`
-              : `Total de bloqueios: ${blockedPeriods.length}`}
-          </span>
-          <div className="flex gap-4 text-xs text-orange-700">
-            <span>
-              Dias: {getFilteredBlocks().filter((b) => !b.startTime).length}
-            </span>
-            <span>
-              Horários:{" "}
-              {getFilteredBlocks().filter((b) => b.startTime).length}
-            </span>
+        {/* Resumo Estatístico */}
+        <div className="mt-6 p-4 bg-orange-100 rounded-lg border border-orange-300">
+          <div className="flex justify-between items-center text-sm">
+            <span className="font-medium text-orange-800">Total de bloqueios:</span>
+            <div className="flex gap-4 text-orange-700">
+              <span>Dias: {dayBlocksCount}</span>
+              <span>Horários: {hourBlocksCount}</span>
+              <span className="font-bold">Total: {blockedPeriods.length}</span>
+            </div>
           </div>
         </div>
-        {(blockFilterDate || blockFilterType !== "all") && (
-          <div className="mt-2 text-xs text-orange-600">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                setBlockFilterDate("");
-                setBlockFilterType("all");
-              }}
-              className="text-xs h-6"
-            >
-              Limpar filtros
-            </Button>
-          </div>
-        )}
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

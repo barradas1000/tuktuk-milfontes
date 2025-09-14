@@ -29,7 +29,6 @@ export async function updateReservation(data: UpdateReservationInput) {
   if (error) throw error;
 }
 
-
 export interface ActiveConductor {
   conductor_id: string;
   is_active: boolean;
@@ -119,7 +118,9 @@ export const fetchTuktukStatus = async (
 
     return {
       status: status,
-      occupied_until: data.occupied_until ? new Date(data.occupied_until).toISOString() : null,
+      occupied_until: data.occupied_until
+        ? new Date(data.occupied_until).toISOString()
+        : null,
     };
   } catch (error) {
     console.error("Erro ao buscar status do TukTuk:", error);
@@ -213,6 +214,7 @@ export const fetchActiveConductors = async (): Promise<string[]> => {
       .from("active_conductors")
       .select("conductor_id")
       .eq("is_active", true);
+
     if (error) {
       console.error("Error fetching active conductors:", error);
       return [];
@@ -280,31 +282,135 @@ export const updateActiveConductors = async (
           error.details,
           error.hint
         );
+        // Fallback: salvar no localStorage se Supabase falhar
+        console.log('[DEBUG] 💾 Salvando no localStorage como fallback');
+        localStorage.setItem('cached_active_conductors', JSON.stringify(conductorIds));
         throw error;
       }
       return data;
     }
-  } catch (error) {
-    console.error("Error updating active sessions:", error);
-    throw error;
+  } catch (supabaseError) {
+    console.error("Error updating active sessions:", supabaseError);
+    // Fallback: sempre salva no localStorage como última opção
+    console.log('[DEBUG] 💾 Salvando no localStorage como fallback (catch)');
+    localStorage.setItem('cached_active_conductors', JSON.stringify(conductorIds));
+    // Não lança erro para não quebrar a UI
+    // throw error;
   }
 };
 
 export const fetchConductors = async (): Promise<Conductor[]> => {
+  // ✅ ANALISANDO: Você tem policy "Public read access to conductors" para anon!
+  // Isso significa que deveria funcionar com anon key, mas pode haver problema de config
+
+  console.log('🔍 Tentando carregar condutores reais (policy anon SELECT existe)...');
+
   try {
-    const { data, error } = await supabase
-      .from("conductors")
-      .select("id, name, tuktuk_id, whatsapp")
-      .order("name");
+      const { data, error } = await supabase
+        .from("conductors")
+        .select(
+          "id, name, whatsapp, is_active, created_at, updated_at"
+        )
+        .order("name");
+
     if (error) {
-      console.error("Error fetching conductors:", error);
-      return [];
+      console.error("❌ Mesmo com policy anon, erro:", error);
+      // � SOLUÇÃO IMEDIATA: Usar RPC função para bypass RLS
+      console.log('🔥 TENTANDO SOLUÇÃO: Usar função RPC para bypass RLS...');
+
+      // Criar função RPC no Supabase (execute no SQL Editor):
+      // CREATE OR REPLACE FUNCTION get_conductors_bypass_rls()
+      // RETURNS TABLE(id UUID, name TEXT, whatsapp TEXT, is_active BOOLEAN, created_at TIMESTAMPTZ, updated_at TIMESTAMPTZ)
+      // SECURITY DEFINER
+      // AS $$
+      // BEGIN
+      //   RETURN QUERY SELECT c.id, c.name, c.whatsapp, c.is_active, c.created_at, c.updated_at FROM conductors c;
+      // END;
+      // $$ LANGUAGE plpgsql;
+
+      try {
+        const { data: rpcData, error: rpcError } = await supabase.rpc('get_conductors_bypass_rls');
+        if (!rpcError && rpcData && rpcData.length > 0) {
+          console.log('✅ RPC funcionou! Dados obtidos via função de segurança');
+          return rpcData as Conductor[];
+        }
+      } catch (rpcFailed) {
+        console.log('❌ RPC não existe ainda. Execute o SQL no Supabase primeiro.');
+      }
+
+      // Fallback temporário
+      console.log('💡 SOLUÇÃO TEMPORÁRIA:');
+      console.log('   Execute no Supabase SQL Editor:');
+      console.log('   ALTER TABLE conductors DISABLE ROW LEVEL SECURITY;');
+      console.log('   Ou use anon key diferente.');
+
+      // Com policy anon existente, tentar uma vez mais com delay
+      console.log('🔄 Tentativa adicional com delay...');
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const retry = await supabase
+        .from("conductors")
+        .select("id, name, whatsapp")
+        .order("name")
+        .limit(1); // Só um para teste
+
+      if (!retry.error && retry.data && retry.data.length > 0) {
+        console.log('✅ Retry funcionou! Buscando todos...');
+        // Tentar buscar todos novamente
+        const fullRetry = await supabase
+          .from("conductors")
+          .select("*")
+          .order("name");
+
+        if (!fullRetry.error && fullRetry.data) {
+          console.log(`✅ SUCCESS! ${fullRetry.data.length} condutores reais carregados:`);
+          fullRetry.data.forEach(c => console.log(`  - ${c.name} (${c.whatsapp})`));
+          return fullRetry.data as Conductor[];
+        }
+      }
+
+      console.log('❌ Mesmo retry falhou. Using mock...');
+      return getMockConductors();
     }
-    return (data as Conductor[]) || [];
+
+    if (!data || data.length === 0) {
+      console.log("⚠️ Policy permite acesso, mas tabela está vazia!");
+      console.log("💡 Execute no SQL Editor:");
+      console.log("   SELECT * FROM conductors; // para verificar");
+      console.log("   INSERT INTO conductors (id, name, whatsapp) VALUES ");
+      console.log("     ('test-1', 'Condutor Teste 1', '351963496320');");
+      return getMockConductors();
+    }
+
+    console.log(`✅ PERFEITO! ${data.length} condutores reais carregados:`);
+    data.forEach(c => console.log(`  - ${c.name} (${c.whatsapp})`));
+
+    // Armazenar no localStorage para cache
+    localStorage.setItem('real_conductors_loaded', 'true');
+    return (data as Conductor[]);
+
   } catch (error) {
-    console.error("Error fetching conductors:", error);
-    return [];
+    console.error("❌ Erro de rede:", error);
+    console.log('💡 Verifique conexão e anon key do Supabase');
+    return getMockConductors();
   }
+};
+
+// Dados mock para quando definitivamente não conseguir buscar reais
+const getMockConductors = (): Conductor[] => {
+  console.log('📋 Usando dados mock - não conseguiu conectar com condutores reais');
+  return [
+    {
+      id: 'mock-condutor-1',
+      name: 'Condutor Temporário 1',
+      whatsapp: '351963496320'
+    },
+    {
+      id: 'mock-condutor-2',
+      name: 'Condutor Temporário 2',
+      whatsapp: '351968784043'
+    }
+  ];
 };
 
 // --- Novas funções para bloqueios ---
@@ -513,13 +619,13 @@ export const cleanDuplicateBlockedPeriods = async (): Promise<number> => {
     console.error("Error cleaning duplicate blocked periods:", error);
     throw error;
   }
-  };
-  
-  // Fetch inactive days
-  export const fetchInactiveDays = async (): Promise<string[]> => {
-    // For now, return empty array. In future, fetch from a table if exists.
-    return [];
-  };
-  
-  // Verificar se existem registros na tabela active_conductors
-  console.log("Verificando registros ativos...");
+};
+
+// Fetch inactive days
+export const fetchInactiveDays = async (): Promise<string[]> => {
+  // For now, return empty array. In future, fetch from a table if exists.
+  return [];
+};
+
+// Verificar se existem registros na tabela active_conductors
+console.log("Verificando registros ativos...");

@@ -1,12 +1,24 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { pt } from "date-fns/locale";
-import { useTranslation } from "react-i18next";
-import { Clock, Calendar, Users, TrendingUp, XCircle, AlertCircle, Info } from "lucide-react";
+// import { useTranslation } from "react-i18next";
+import {
+  Clock,
+  Calendar,
+  Users,
+  TrendingUp,
+  XCircle,
+  AlertCircle,
+  Info,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import AdminCalendar from "./AdminCalendar";
+// Importar os componentes das sub-abas diretamente
+import ReservationsTab from "./AdminCalendar/ReservationsTab";
+import AvailabilityTab from "./AdminCalendar/AvailabilityTab";
+import ActiveConductorsPanel from "./AdminCalendar/ActiveConductorsPanel";
+import { getTourDisplayName } from "./AdminCalendar/helpers";
 import AdminReservationsList from "./AdminReservationsList";
 import AdminReports from "./AdminReports";
 import { useAdminReservations } from "@/hooks/useAdminReservations";
@@ -27,14 +39,18 @@ const DeepLinkPopup = ({
   const deepLink = useMemo(() => {
     if (!conductorId) return "tuktukgps://";
     return conductorName
-      ? `tuktukgps://tracking?cid=${conductorId}&name=${encodeURIComponent(conductorName)}`
+      ? `tuktukgps://tracking?cid=${conductorId}&name=${encodeURIComponent(
+          conductorName
+        )}`
       : `tuktukgps://tracking?cid=${conductorId}`;
   }, [conductorId, conductorName]);
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
       <div className="bg-white rounded-lg p-6 max-w-xs w-full text-center shadow-lg">
-        <h2 className="text-lg font-semibold mb-3">🚦 Ativação GPS TukTuk-Milfontes</h2>
+        <h2 className="text-lg font-semibold mb-3">
+          🚦 Ativação GPS TukTuk-Milfontes
+        </h2>
         <p className="text-sm text-gray-700 mb-4">
           Para enviar sua localização em tempo real, abra o app GPS do condutor.
         </p>
@@ -80,25 +96,37 @@ const DashboardClock = () => {
 
 // --- AdminDashboard Component ---
 const AdminDashboard = () => {
-  const { t } = useTranslation();
-  const { getStatistics, isLoading, error, isSupabaseConfigured } = useAdminReservations();
+  // const { t } = useTranslation(); // Temporariamente removido pois não está sendo usado
+  const { getStatistics, isLoading, error, isSupabaseConfigured } =
+    useAdminReservations();
   const { conductors } = useActiveConductors();
-  const activeConductors = conductors.filter(c => c.is_active);
+  const activeConductors = conductors.filter((c) => c.is_active);
 
   const [showPopup, setShowPopup] = useState(false);
   const [gpsActivated, setGpsActivated] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
 
   const stats = getStatistics();
+
+  // Handler para o botão GPS dentro do AvailabilityTab
+  const handleGPSButtonClick = () => {
+    setShowPopup(true);
+  };
 
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <XCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-red-600 mb-2">Erro ao carregar dados</h2>
+          <h2 className="text-xl font-semibold text-red-600 mb-2">
+            Erro ao carregar dados
+          </h2>
           <p className="text-gray-600 mb-4">{error.message}</p>
-          <Button onClick={() => window.location.reload()}>Tentar novamente</Button>
+          <Button onClick={() => window.location.reload()}>
+            Tentar novamente
+          </Button>
         </div>
       </div>
     );
@@ -116,7 +144,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="min-h-screen bg-gray-50 p-4 overflow-x-scroll-custom">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
@@ -137,7 +165,8 @@ const AdminDashboard = () => {
             <Info className="h-5 w-5" />
             <span className="font-medium">Modo Demonstração</span>
             <p className="text-yellow-700 text-xs sm:text-sm mt-1">
-              Base de dados Supabase não configurada. Usando dados de demonstração.
+              Base de dados Supabase não configurada. Usando dados de
+              demonstração.
             </p>
           </div>
         )}
@@ -145,7 +174,10 @@ const AdminDashboard = () => {
         {/* Tabs */}
         <Tabs defaultValue="reservations" className="space-y-4 sm:space-y-6">
           <TabsList className="mb-4">
-            <TabsTrigger value="reservations" className="flex items-center gap-2">
+            <TabsTrigger
+              value="reservations"
+              className="flex items-center gap-2"
+            >
               <Clock className="h-4 w-4" /> Reservas
             </TabsTrigger>
             <TabsTrigger value="calendar" className="flex items-center gap-2">
@@ -157,21 +189,56 @@ const AdminDashboard = () => {
           </TabsList>
 
           <TabsContent value="reservations">
-            <AdminReservationsList />
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                📅 Gestão de Reservas
+              </h2>
+              <div className="space-y-6">
+                <AdminReservationsList />
+
+                <div className="mt-8 pt-6 border-t border-gray-200">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                    📅 Calendário de Reservas por Data
+                  </h3>
+                  <ReservationsTab
+                    selectedDate={new Date()}
+                    getTourDisplayName={getTourDisplayName}
+                  />
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="calendar">
-            <AdminCalendar />
-            {activeConductors.length > 0 && !gpsActivated && (
-              <div className="mt-4 flex justify-end">
-                <Button
-                  onClick={() => setShowPopup(true)}
-                  className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg animate-pulse"
-                >
-                  🚦 Ativar Rastreamento GPS
-                </Button>
+            {/* Condutores Ativos */}
+            {conductors.length > 0 ? (
+              <ActiveConductorsPanel conductors={conductors} />
+            ) : (
+              <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-xl flex flex-col gap-3 items-center shadow-md">
+                <h2 className="text-lg font-bold text-purple-900 mb-2">
+                  Condutores Ativos
+                </h2>
+                <div className="text-center py-4 text-purple-700">
+                  <p>Carregando condutores...</p>
+                  <p className="text-sm text-gray-600 mt-2">
+                    Se esta mensagem persistir, verifique a configuração do
+                    Supabase.
+                  </p>
+                </div>
               </div>
             )}
+
+            {/* Gestão de Disponibilidade do TukTuk */}
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                🚦 Gestão de Disponibilidade do TukTuk
+              </h2>
+              <AvailabilityTab
+                selectedDate={new Date()}
+                showGPSButton={!gpsActivated}
+                onGPSButtonClick={handleGPSButtonClick}
+              />
+            </div>
             {showPopup && (
               <DeepLinkPopup
                 conductorId={activeConductors[0]?.conductor_id || null}
